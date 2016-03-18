@@ -1,3 +1,5 @@
+using Microbrewit.Api.ElasticSearch.Component;
+using Microbrewit.Api.ElasticSearch.Interface;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -11,7 +13,7 @@ using Microbrewit.Api.Service.Interface;
 using Microbrewit.Api.Service.Component;
 using Microbrewit.Repository.Repository;
 
-namespace microbrewit_api
+namespace Microbrewit.Api
 {
     public class Startup
     {
@@ -50,6 +52,7 @@ namespace microbrewit_api
             services.AddTransient<IBeerService, BeerService>();
             services.AddTransient<IBreweryRepository, BreweryDapperRepository>();
             services.AddTransient<IBreweryService, BreweryService>();
+            services.AddTransient<IOtherElasticsearch, OtherElasticsearch>();
 
             // Add framework services.
             services.AddMvc();
