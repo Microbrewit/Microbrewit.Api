@@ -3,32 +3,32 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microbrewit.Api.ElasticSearch.Interface;
 using Microbrewit.Api.Model.DTOs;
+using Microbrewit.Api.Settings;
+using Microsoft.Extensions.OptionsModel;
 using Nest;
 
 namespace Microbrewit.Api.ElasticSearch.Component
 {
     public class OriginElasticsearch : IOriginElasticsearch
     {
+        private readonly ElasticSearchSettings _elasticSearchSettings;
         private Uri _node;
         private ConnectionSettings _settings;
         private ElasticClient _client;
         private int _bigNumber = 10000;
-        private readonly string _url;
-        private string _index;
 
-        public OriginElasticsearch()
+        public OriginElasticsearch(IOptions<ElasticSearchSettings> elasticsearchSettings)
         {
-            this._url = "http://localhost:9200";          
-            this._node = new Uri(_url);
+            _elasticSearchSettings = elasticsearchSettings.Value;  
+            this._node = new Uri(_elasticSearchSettings.Url);
             this._settings = new ConnectionSettings(_node);
             this._client = new ElasticClient(_settings);
-            this._index = "mb";
         }
 
         public async Task UpdateAsync(OriginDto originDto)
         {
             await _client.MapAsync<OriginDto>(d => d.Properties(p => p.String(s => s.Name(n => n.Name).Analyzer("autocomplete"))));
-            var index =  await _client.IndexAsync<OriginDto>(originDto);
+            var index =  await _client.IndexAsync<OriginDto>(originDto, idx => idx.Index(_elasticSearchSettings.Index));
         }
 
         public async Task<IEnumerable<OriginDto>> GetAllAsync(int from, int size ,string custom)
@@ -46,14 +46,14 @@ namespace Microbrewit.Api.ElasticSearch.Component
 
         public async Task<OriginDto> GetSingleAsync(int id)
         {
-            IGetRequest getRequest = new GetRequest(_index, "origin", id.ToString());
+            IGetRequest getRequest = new GetRequest(_elasticSearchSettings.Index, "origin", id.ToString());
             var result = await  _client.GetAsync<OriginDto>(getRequest);
             return result.Source;
         }
 
         public OriginDto GetSingle(int id)
         {
-            IGetRequest getRequest = new GetRequest(_index, "origin", id.ToString());
+            IGetRequest getRequest = new GetRequest(_elasticSearchSettings.Index, "origin", id.ToString());
             var result = _client.Get<OriginDto>(getRequest);
             return result.Source;
         }
@@ -71,7 +71,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
         public async Task UpdateAllAsync(IEnumerable<OriginDto> originDtos)
         {
             await _client.MapAsync<OriginDto>(d => d.Properties(p => p.String(s => s.Name(n => n.Name).Analyzer("autocomplete"))));
-            var index = await _client.IndexManyAsync<OriginDto>(originDtos);
+            var index = await _client.IndexManyAsync<OriginDto>(originDtos,_elasticSearchSettings.Index);
         }
 
         public async Task DeleteAsync(int id)

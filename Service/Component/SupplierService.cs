@@ -1,66 +1,82 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microbrewit.Api.ElasticSearch.Interface;
 using Microbrewit.Api.Model.Database;
 using Microbrewit.Api.Model.DTOs;
 using Microbrewit.Api.Repository.Interface;
 using Microbrewit.Api.Service.Interface;
+using System.Linq;
+
 namespace Microbrewit.Api.Service.Component
 {
     public class SupplierService : ISupplierService
     {
-        private ISupplierRepository _supplierRepository;
+        private readonly ISupplierRepository _supplierRepository;
+        private readonly ISupplierElasticsearch _supplierElasticsearch;
         
-        public SupplierService(ISupplierRepository SupplierRepository)
+        public SupplierService(ISupplierRepository supplierRepository, ISupplierElasticsearch supplierElasticsearch)
         {
-            _supplierRepository = SupplierRepository;
+            _supplierRepository = supplierRepository;
+            _supplierElasticsearch = supplierElasticsearch;
         }
-        public async Task<SupplierDto> AddAsync(SupplierDto SupplierDto)
+        public async Task<SupplierDto> AddAsync(SupplierDto supplierDto)
         {
-            var supplier = AutoMapper.Mapper.Map<SupplierDto,Supplier>(SupplierDto);
+             var supplier = AutoMapper.Mapper.Map<SupplierDto, Supplier>(supplierDto);
             await _supplierRepository.AddAsync(supplier);
-            return AutoMapper.Mapper.Map<Supplier,SupplierDto>(supplier);
+            var result = await _supplierRepository.GetSingleAsync(supplier.SupplierId);
+            var mappedResult = AutoMapper.Mapper.Map<Supplier, SupplierDto>(result);
+            await _supplierElasticsearch.UpdateAsync(mappedResult);
+            return mappedResult;
         }
 
         public async Task<SupplierDto> DeleteAsync(int id)
         {
             var supplier = await _supplierRepository.GetSingleAsync(id);
-            await _supplierRepository.RemoveAsync(supplier);
-            return AutoMapper.Mapper.Map<Supplier,SupplierDto>(supplier);
+            var supplierDto = await _supplierElasticsearch.GetSingleAsync(id);
+            if (supplier != null) await _supplierRepository.RemoveAsync(supplier);
+            if (supplierDto != null) await _supplierElasticsearch.DeleteAsync(id);
+            return supplierDto ?? AutoMapper.Mapper.Map<Supplier, SupplierDto>(supplier);
         }
 
 
         public async Task<IEnumerable<SupplierDto>> GetAllAsync(string custom)
         {
+             var supplierDtos = await _supplierElasticsearch.GetAllAsync(custom);
+            if (supplierDtos.Any()) return supplierDtos;
             var suppliers = await _supplierRepository.GetAllAsync();
-            return AutoMapper.Mapper.Map<IEnumerable<Supplier>,IEnumerable<SupplierDto>>(suppliers);
+            supplierDtos = AutoMapper.Mapper.Map<IEnumerable<Supplier>, IEnumerable<SupplierDto>>(suppliers);
+            return supplierDtos;
         }
 
         public async Task<SupplierDto> GetSingleAsync(int id)
         {
+            var supplierDto = await _supplierElasticsearch.GetSingleAsync(id);
+            if (supplierDto != null) return supplierDto;
             var supplier = await _supplierRepository.GetSingleAsync(id);
-            return AutoMapper.Mapper.Map<Supplier,SupplierDto>(supplier);
+            supplierDto = AutoMapper.Mapper.Map<Supplier, SupplierDto>(supplier);
+            return supplierDto;
         }
 
-        public Task ReIndexElasticSearch()
+        public async Task ReIndexElasticSearch()
         {
-            throw new NotImplementedException();
+            var suppliers = await _supplierRepository.GetAllAsync();
+            var supplierDtos = AutoMapper.Mapper.Map<IEnumerable<Supplier>,IEnumerable<SupplierDto>>(suppliers);
+            await _supplierElasticsearch.UpdateAllAsync(supplierDtos);
         }
 
-        public Task<IEnumerable<OriginDto>> SearchAsync(string query, int from, int size)
+        public async Task<IEnumerable<SupplierDto>> SearchAsync(string query, int from, int size)
         {
-            throw new NotImplementedException();
+             return await _supplierElasticsearch.SearchAsync(query, from, size);
         }
 
-        public async Task UpdateAsync(SupplierDto SupplierDto)
+        public async Task UpdateAsync(SupplierDto supplierDto)
         {
-            var supplier = AutoMapper.Mapper.Map<SupplierDto,Supplier>(SupplierDto);
+              var supplier = AutoMapper.Mapper.Map<SupplierDto, Supplier>(supplierDto);
             await _supplierRepository.UpdateAsync(supplier);
-        }
-
-        Task<IEnumerable<SupplierDto>> ISupplierService.SearchAsync(string query, int from, int size)
-        {
-            throw new NotImplementedException();
+            var result = await _supplierRepository.GetSingleAsync(supplier.SupplierId);
+            var mapperResult = AutoMapper.Mapper.Map<Supplier, SupplierDto>(result);
+            await _supplierElasticsearch.UpdateAsync(mapperResult);
         }
     }
 }

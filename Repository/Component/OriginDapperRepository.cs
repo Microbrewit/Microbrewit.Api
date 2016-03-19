@@ -27,7 +27,7 @@ namespace Microbrewit.Api.Repository.Component
             }
         }
 
-        public async Task<Origin> GetSingleAsync(int id, params string[] navigtionProperties)
+        public async Task<Origin> GetSingleAsync(int id)
         {
             using (var context = new NpgsqlConnection(_databaseSettings.DbConnection))
             {

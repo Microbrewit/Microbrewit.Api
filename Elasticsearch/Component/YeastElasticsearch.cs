@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microbrewit.Api.ElasticSearch.Interface;
 using Microbrewit.Api.Model.DTOs;
+using Microbrewit.Api.Settings;
+using Microsoft.Extensions.OptionsModel;
 using Nest;
 
 namespace Microbrewit.Api.ElasticSearch.Component
@@ -10,19 +12,18 @@ namespace Microbrewit.Api.ElasticSearch.Component
     public class YeastElasticsearch : IYeastElasticsearch
     {
 
+        private readonly ElasticSearchSettings _elasticSearchSettings;
         private Uri _node;
         private ConnectionSettings _settings;
         private ElasticClient _client;
         private int _bigNumber = 10000;
-        private string _index;
 
-        public YeastElasticsearch()
+        public YeastElasticsearch(IOptions<ElasticSearchSettings> elasticSearchSettings)
         {
-            string url = "http://localhost:9200";
-            this._node = new Uri(url);
+            _elasticSearchSettings = elasticSearchSettings.Value;
+            this._node = new Uri( _elasticSearchSettings.Url);
             this._settings = new ConnectionSettings(_node);
             this._client = new ElasticClient(_settings);
-            _index = "mb";
         }
 
         public async Task UpdateAsync(YeastDto yeastDto)
@@ -31,7 +32,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
                 .String(s => s.Name(n => n.Name).Analyzer("autocomplete"))
                 .String(s => s.Name(n => n.ProductCode).Analyzer("autocomplete"))
                 ));
-            await _client.IndexAsync(yeastDto);
+            await _client.IndexAsync(yeastDto, idx => idx.Index(_elasticSearchSettings.Index));
         }
 
         public async Task<IEnumerable<YeastDto>> GetAllAsync(string custom)
@@ -46,7 +47,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
 
         public async Task<YeastDto> GetSingleAsync(int id)
         {
-            IGetRequest getRequest = new GetRequest(_index, "yeast", id.ToString());
+            IGetRequest getRequest = new GetRequest( _elasticSearchSettings.Index, "yeast", id.ToString());
             var result = await _client.GetAsync<YeastDto>(getRequest);
             return (YeastDto)result.Source;
         }
@@ -67,29 +68,12 @@ namespace Microbrewit.Api.ElasticSearch.Component
                .String(s => s.Name(n => n.Name).Analyzer("autocomplete"))
                .String(s => s.Name(n => n.ProductCode).Analyzer("autocomplete"))
                ));
-            await _client.IndexManyAsync(yeasts);
+            await _client.IndexManyAsync(yeasts,_elasticSearchSettings.Index);
         }
 
         public async Task DeleteAsync(int id)
         {
             await _client.DeleteAsync<YeastDto>(id);
-        }
-
-        public YeastDto GetSingle(int id)
-        {
-            IGetRequest getRequest = new GetRequest(_index, "yeast", id.ToString());
-            var result = _client.Get<YeastDto>(getRequest);
-            return (YeastDto)result.Source;
-        }
-
-        public IEnumerable<YeastDto> Search(string query, int @from, int size)
-        {
-            var fields = new List<string> { "name", "productCode" };
-            var searchResults = _client.Search<YeastDto>(s => s
-                                                .From(from)
-                                                .Size(size)
-                                                .Query(q => q.Match(m => m.Field(f => f.Name).Query(query))));
-            return searchResults.Documents;
         }
     }
 

@@ -2,10 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Nest;
 
 namespace Microbrewit.Api.Model.DTOs
 {
-    //[ElasticType(Name = "hop")]
+    [ElasticsearchType(Name= "hop")]
     public class HopDto
     {
         [JsonProperty(PropertyName = "hopId")]

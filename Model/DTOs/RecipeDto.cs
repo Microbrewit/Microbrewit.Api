@@ -2,10 +2,11 @@
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 using Microbrewit.Api.Model.JsonTypeConverters;
+using Nest;
 
 namespace Microbrewit.Api.Model.DTOs
 {
-    //[ElasticType(Name = "recipe")]
+    [ElasticsearchType(Name = "recipe")]
     public class RecipeDto
     {
         [JsonProperty(PropertyName = "recipeId")]

@@ -12,6 +12,7 @@ using Microbrewit.Api.Repository.Interface;
 using Microbrewit.Api.Service.Interface;
 using Microbrewit.Api.Service.Component;
 using Microbrewit.Repository.Repository;
+using Microbrewit.Api.Calculations;
 
 namespace Microbrewit.Api
 {
@@ -33,27 +34,39 @@ namespace Microbrewit.Api
         {
             services.Configure<ElasticSearchSettings>(Configuration.GetSection("ElasticSearch"));
             services.Configure<DatabaseSettings>(Configuration.GetSection("DatabaseSettings"));
-            
+            //Repository dependency injection
             services.AddTransient<IOriginRespository,OriginDapperRepository>();
-            services.AddTransient<IOriginService,OriginService>();
             services.AddTransient<IHopRepository,HopDapperRepository>();
-            services.AddTransient<IHopService,HopService>();
             services.AddTransient<IYeastRepository, YeastDapperRepository>();
-            services.AddTransient<IYeastService, YeastService>();
             services.AddTransient<IFermentableRepository, FermentableDapperRepository>();
-            services.AddTransient<IFermentableService, FermentableService>();
             services.AddTransient<IOtherRepository, OtherDapperRepository>();
-            services.AddTransient<IOtherService, OtherService>();
             services.AddTransient<ISupplierRepository, SupplierDapperRepository>();
-            services.AddTransient<ISupplierService, SupplierService>();
             services.AddTransient<IBeerStyleRepository, BeerStyleDapperRepository>();
-            services.AddTransient<IBeerStyleService, BeerStyleService>();
             services.AddTransient<IBeerRepository, BeerDapperRepository>();
-            services.AddTransient<IBeerService, BeerService>();
             services.AddTransient<IBreweryRepository, BreweryDapperRepository>();
+            services.AddTransient<IOriginService,OriginService>();
+            //Service dependency injection
+            services.AddTransient<IHopService,HopService>();
+            services.AddTransient<IYeastService, YeastService>();
+            services.AddTransient<IFermentableService, FermentableService>();
+            services.AddTransient<IOtherService, OtherService>();
+            services.AddTransient<ISupplierService, SupplierService>();
+            services.AddTransient<IBeerStyleService, BeerStyleService>();
+            services.AddTransient<IBeerService, BeerService>();
             services.AddTransient<IBreweryService, BreweryService>();
+            //ElasticSearch dependency injection
+            services.AddTransient<IBeerElasticsearch, BeerElasticsearch>();
+            services.AddTransient<IBeerStyleElasticsearch, BeerStyleElasticsearch>();
+            services.AddTransient<IBreweryElasticsearch, BreweryElasticsearch>();
+            services.AddTransient<IFermentableElasticsearch, FermentableElasticsearch>();
+            services.AddTransient<IGlassElasticsearch, GlassElasticsearch>();
+            services.AddTransient<IHopElasticsearch, HopElasticsearch>();
+            services.AddTransient<IOriginElasticsearch, OriginElasticsearch>();
             services.AddTransient<IOtherElasticsearch, OtherElasticsearch>();
+            services.AddTransient<ISearchElasticsearch, SearchElasticsearch>();
+            services.AddTransient<IYeastElasticsearch, YeastElasticsearch>();
 
+            services.AddTransient<ICalculation,Calculation>();
             // Add framework services.
             services.AddMvc();
         }

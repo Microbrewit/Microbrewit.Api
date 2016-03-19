@@ -1,16 +1,10 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
-using Microsoft.Extensions.OptionsModel;
 using Microbrewit.Api.Model.DTOs;
-using Microbrewit.Api.Repository.Component;
-using Microbrewit.Api.Repository.Interface;
-using Microbrewit.Api.Service.Component;
 using Microbrewit.Api.Service.Interface;
-using Microbrewit.Api.Settings;
 using Microsoft.Extensions.Logging;
 using System.Net;
-using System.Threading;
 
 namespace Microbrewit.Api.Controllers
 {
@@ -89,8 +83,7 @@ namespace Microbrewit.Api.Controllers
             return Ok();
         }
 
-        [HttpGet]
-        [Route("")]
+        [HttpGet("search")]
         public async Task<HopCompleteDto> GeHopsBySearch(string query, int from = 0, int size = 20)
         {
             var hops = await _hopService.SearchHop(query, from, size);

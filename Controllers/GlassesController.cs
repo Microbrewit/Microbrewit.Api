@@ -106,7 +106,7 @@ namespace Microbrewit.Api.Controllers
         }
 
 
-        [HttpGet]
+        [HttpGet("search")]
         public async Task<GlassCompleteDto> GetGlassBySearch(string query, int from = 0, int size = 20)
         {
             var glassesDto = await _glassService.SearchAsync(query, from, size);

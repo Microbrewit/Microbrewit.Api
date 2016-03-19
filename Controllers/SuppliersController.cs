@@ -119,7 +119,7 @@ namespace Microbrewit.Api.Controllers
             return Ok();
         }
 
-        [HttpGet]
+        [HttpGet("search")]
         public async Task<SupplierCompleteDto> GetSuppliersBySearch(string query, int from = 0, int size = 20)
         {
             var supplierDto = await _supplierService.SearchAsync(query,from,size);

@@ -1,8 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿using Nest;
+using Newtonsoft.Json;
 
 namespace Microbrewit.Api.Model.DTOs
 {
-    // [ElasticType(Name = "ibu")]
+    [ElasticsearchType(Name = "ibu")]
     public class IBUDto
     {
         [JsonProperty(PropertyName = "ibuId")]

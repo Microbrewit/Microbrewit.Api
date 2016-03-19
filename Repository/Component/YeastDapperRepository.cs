@@ -7,6 +7,7 @@ using Dapper;
 using Microbrewit.Api.Model.Database;
 using Microbrewit.Api.Repository.Interface;
 using Microbrewit.Api.Settings;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.OptionsModel;
 using Npgsql;
 
@@ -15,10 +16,12 @@ namespace Microbrewit.Repository.Repository
 
     public class YeastDapperRepository : IYeastRepository
     {
-        private DatabaseSettings _databaseSettings;
-        public YeastDapperRepository(IOptions<DatabaseSettings> databaseSettings)
+        private readonly DatabaseSettings _databaseSettings;
+        private readonly ILogger<YeastDapperRepository> _logger;
+        public YeastDapperRepository(IOptions<DatabaseSettings> databaseSettings, ILogger<YeastDapperRepository> logger)
         {
-            _databaseSettings = databaseSettings.Value;   
+            _databaseSettings = databaseSettings.Value;
+            _logger = logger;   
         }
         public async Task<IEnumerable<Yeast>> GetAllAsync()
         {
@@ -76,6 +79,7 @@ namespace Microbrewit.Repository.Repository
                     }
                     catch (Exception e)
                     {
+                        _logger.LogError(e.ToString());
                         transaction.Rollback();
                     }
                 }
@@ -101,6 +105,7 @@ namespace Microbrewit.Repository.Repository
                     }
                     catch (Exception exception)
                     {
+                        _logger.LogError(exception.ToString());
                         transaction.Rollback();
                         throw;
                     }
@@ -122,6 +127,7 @@ namespace Microbrewit.Repository.Repository
                     }
                     catch (Exception e)
                     {
+                        _logger.LogError(e.ToString());
                         transaction.Rollback();
                         throw;
                     }

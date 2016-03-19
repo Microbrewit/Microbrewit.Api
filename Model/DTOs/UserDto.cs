@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
+using Nest;
 using Newtonsoft.Json;
 
 namespace Microbrewit.Api.Model.DTOs
 {
-    //[ElasticType(Name = "user")]
+    [ElasticsearchType(Name = "user")]
     public class UserDto
     {
         [JsonProperty(PropertyName = "userId")]

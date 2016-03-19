@@ -108,7 +108,7 @@ namespace Microbrewit.Api.Controllers
             return Ok();
         }
 
-        [HttpGet]
+        [HttpGet("search")]
         public async Task<OtherCompleteDto> GetOthersBySearch(string query, int from = 0, int size = 20)
         {
             var othersDto = await _otherService.SearchAsync(query, from, size);

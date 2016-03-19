@@ -3,21 +3,24 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microbrewit.Api.ElasticSearch.Interface;
 using Microbrewit.Api.Model.DTOs;
+using Microbrewit.Api.Settings;
+using Microsoft.Extensions.OptionsModel;
 using Nest;
 
 namespace Microbrewit.Api.ElasticSearch.Component
 {
     public class FermentableElasticsearch : IFermentableElasticsearch
     {
+        private readonly ElasticSearchSettings _elasticSearchSettings;
         private Uri _node;
         private ConnectionSettings _settings;
         private ElasticClient _client;
         private int _bigNumber = 10000;
 
-        public FermentableElasticsearch()
+        public FermentableElasticsearch(IOptions<ElasticSearchSettings> elasticsearchSettings)
         {
-            string url = "http://localhost:9200";
-            this._node = new Uri(url);
+            _elasticSearchSettings = elasticsearchSettings.Value;
+            this._node = new Uri(_elasticSearchSettings.Url);
             this._settings = new ConnectionSettings(_node);
             this._client = new ElasticClient(_settings);
         }
@@ -27,7 +30,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
             await _client.MapAsync<FermentableDto>(d => d.Properties(p => p
                 .String(s => s.Name(n => n.Name).Analyzer("autocomplete"))
                 ));
-            await _client.IndexAsync(fermentableDto);
+            await _client.IndexAsync(fermentableDto,idx => idx.Index(_elasticSearchSettings.Index));
         }
 
         public async Task<IEnumerable<FermentableDto>> GetAllAsync(int from,int size,string custom)
@@ -62,7 +65,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
             await _client.MapAsync<FermentableDto>(d => d.Properties(p => p
                .String(s => s.Name(n => n.Name).Analyzer("autocomplete"))
                ));
-            await _client.IndexManyAsync(fermentableDtos);
+            await _client.IndexManyAsync(fermentableDtos,_elasticSearchSettings.Index);
         }
 
         public async Task DeleteAsync(int id)

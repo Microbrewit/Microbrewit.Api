@@ -4,26 +4,27 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microbrewit.Api.ElasticSearch.Interface;
 using Microbrewit.Api.Model.DTOs;
+using Microbrewit.Api.Settings;
+using Microsoft.Extensions.OptionsModel;
 using Nest;
 
 namespace Microbrewit.Api.ElasticSearch.Component
 {
     public class BreweryElasticsearch : IBreweryElasticsearch
     {
+        private readonly ElasticSearchSettings _elasticSearchSettings;
         private Uri _node;
         private ConnectionSettings _settings;
         private ElasticClient _client;
         private const int BigNumber = 10000;
         private string _index;
 
-        public BreweryElasticsearch()
+        public BreweryElasticsearch(IOptions<ElasticSearchSettings> elasticsearchSettings)
         {
-            string url = "http://localhost:9200";
-            this._node = new Uri(url);
+            _elasticSearchSettings = elasticsearchSettings.Value;
+            this._node = new Uri(_elasticSearchSettings.Url);
             this._settings = new ConnectionSettings(_node);
             this._client = new ElasticClient(_settings);
-            _index = "mb";
-
         }
 
         public async Task UpdateAsync(BreweryDto breweryDto)
@@ -31,7 +32,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
             await _client.MapAsync<BreweryDto>(d => d.Properties(p => p
                 .String(s => s.Name(n => n.Name).Analyzer("autocomplete"))
                 ));
-            await _client.IndexAsync(breweryDto);
+            await _client.IndexAsync(breweryDto, idx => idx.Index(_elasticSearchSettings.Index));
         }
 
         public async Task<IEnumerable<BreweryDto>> GetAllAsync(int from, int size)
@@ -66,9 +67,8 @@ namespace Microbrewit.Api.ElasticSearch.Component
         {
             await _client.MapAsync<BreweryDto>(d => d.Properties(p => p
                .String(s => s.Name(n => n.Name).Analyzer("autocomplete"))
-               //.NestedObject<BreweryMemberDto>(no => no.Name("members"))
                ));
-            await _client.IndexManyAsync(brewerys);
+            await _client.IndexManyAsync(brewerys,_elasticSearchSettings.Index);
         }
 
         public async Task DeleteAsync(int id)

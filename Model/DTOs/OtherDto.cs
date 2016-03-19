@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Nest;
 using Newtonsoft.Json;
 
 namespace Microbrewit.Api.Model.DTOs
 {
-    // [ElasticType(Name = "other")]
+    [ElasticsearchType(Name = "other")]
     public class OtherDto
     {
         [JsonProperty(PropertyName = "otherId")]

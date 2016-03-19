@@ -3,32 +3,32 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microbrewit.Api.ElasticSearch.Interface;
 using Microbrewit.Api.Model.DTOs;
+using Microbrewit.Api.Settings;
+using Microsoft.Extensions.OptionsModel;
 using Nest;
 
 namespace Microbrewit.Api.ElasticSearch.Component
 {
     public class BeerStyleElasticsearch : IBeerStyleElasticsearch
     {
+        private readonly ElasticSearchSettings _elasticSearchSettings;
         private Uri _node;
         private ConnectionSettings _settings;
         private ElasticClient _client;
         private const int BigNumber = 10000;
-        private readonly string _url ;
-        private string _index;
 
-        public BeerStyleElasticsearch()
+        public BeerStyleElasticsearch(IOptions<ElasticSearchSettings> elasticsearchSettings)
         {
-            _url = "http://localhost:9200";
-            this._node = new Uri(_url);
+            _elasticSearchSettings = elasticsearchSettings.Value;
+            this._node = new Uri(_elasticSearchSettings.Url);
             this._settings = new ConnectionSettings(_node);
             this._client = new ElasticClient(_settings);
-            _index = "mb";
         }
 
         public async Task UpdateAsync(BeerStyleDto beerStyleDto)
         {
             await _client.MapAsync<BeerStyleDto>(d => d.Properties(p => p.String(s => s.Name(n => n.Name).Analyzer("autocomplete"))));
-            var index = await _client.IndexAsync<BeerStyleDto>(beerStyleDto);
+            var index = await _client.IndexAsync<BeerStyleDto>(beerStyleDto, idx => idx.Index(_elasticSearchSettings.Index));
         }
 
         public async Task<IEnumerable<BeerStyleDto>> GetAllAsync(int from, int size)
@@ -45,7 +45,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
 
         public async Task<BeerStyleDto> GetSingleAsync(int id)
         {
-            IGetRequest getRequest = new GetRequest(_index, "beerStyle", id.ToString());
+            IGetRequest getRequest = new GetRequest(_elasticSearchSettings.Index, "beerStyle", id.ToString());
             var result = await _client.GetAsync<BeerStyleDto>(getRequest);
             return result.Source;
         }
@@ -63,7 +63,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
         public async Task UpdateAllAsync(IEnumerable<BeerStyleDto> beerStyleDtos)
         {
             await _client.MapAsync<BeerStyleDto>(d => d.Properties(p => p.String(s => s.Name(n => n.Name).Analyzer("autocomplete"))));
-            var index = await _client.IndexManyAsync<BeerStyleDto>(beerStyleDtos);
+            var index = await _client.IndexManyAsync<BeerStyleDto>(beerStyleDtos,_elasticSearchSettings.Index);
         }
 
         public async Task DeleteAsync(int id)
@@ -73,7 +73,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
 
         public BeerStyleDto GetSingle(int id)
         {
-            IGetRequest getRequest = new GetRequest(_index, "beerStyle", id.ToString());
+            IGetRequest getRequest = new GetRequest(_elasticSearchSettings.Index, "beerStyle", id.ToString());
             var result = _client.Get<BeerStyleDto>(getRequest);
             return result.Source;
         }

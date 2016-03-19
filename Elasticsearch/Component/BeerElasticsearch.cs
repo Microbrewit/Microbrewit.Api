@@ -29,7 +29,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
         {
             // Adds an analayzer to the name property in FermentableDto object.
             await _client.MapAsync<BeerDto>(d => d.Properties(p => p.String(s => s.Name(n => n.Name).Analyzer("autocomplete"))));
-            return await _client.IndexAsync<BeerDto>(beerDto);
+            return await _client.IndexAsync<BeerDto>(beerDto, idx => idx.Index(_elasticSearchSettings.Index));
         }
 
         public async Task<IEnumerable<BeerDto>> GetAllAsync(int from, int size)
@@ -48,7 +48,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
 
         public async Task<BeerDto> GetSingleAsync(int id)
         {
-            IGetRequest getRequest = new GetRequest("mb", "beer", id.ToString());
+            IGetRequest getRequest = new GetRequest(_elasticSearchSettings.Index, "beer", id.ToString());
             var result = await _client.GetAsync<BeerDto>(getRequest);
             return result.Source;
         }
@@ -67,13 +67,13 @@ namespace Microbrewit.Api.ElasticSearch.Component
         public async Task<IBulkResponse> UpdateAllAsync(IEnumerable<BeerDto> beers)
         {
             await _client.MapAsync<BeerDto>(d => d.Properties(p => p.String(s => s.Name(n => n.Name).Analyzer("autocomplete"))));
-            return await _client.IndexManyAsync(beers);
+            return await _client.IndexManyAsync(beers,_elasticSearchSettings.Index);
         }
 
         public async Task<IBulkResponse> ReIndexBulk(IEnumerable<BeerDto> beers, string index)
         {
             await _client.MapAsync<BeerDto>(d => d.Properties(p => p.String(s => s.Name(n => n.Name).Analyzer("autocomplete"))));
-            return await _client.IndexManyAsync(beers);
+            return await _client.IndexManyAsync(beers,index);
         }
 
         public Task<IDeleteResponse> DeleteAsync(int id)
@@ -105,23 +105,9 @@ namespace Microbrewit.Api.ElasticSearch.Component
             return result.Documents;
         }
 
-        public IEnumerable<BeerDto> GetUserBeers(string username)
+        public async Task<IEnumerable<BeerDto>> GetAllBreweryBeersAsync(int breweryId)
         {
-            var result = _client.Search<BeerDto>(s => s
-                .Size(BigNumber)
-                .Query(q => q
-                .Filtered(f => f
-                    .Query(q2 => q2
-                    .Term("brewers.username", username))
-                    .Filter(filter => filter
-                        .Term(t => t.DataType, "beer")
-                        ))));
-            return result.Documents;
-        }
-
-        public IEnumerable<BeerDto> GetAllBreweryBeers(int breweryId)
-        {
-            var result = _client.Search<BeerDto>(s => s
+            var result = await _client.SearchAsync<BeerDto>(s => s
                 .Size(BigNumber)
                 .Query(q => q
                 .Filtered(f => f
@@ -133,11 +119,5 @@ namespace Microbrewit.Api.ElasticSearch.Component
             return result.Documents;
         }
 
-        public BeerDto GetSingle(int id)
-        {
-            IGetRequest getRequest = new GetRequest("mb", "beer", id.ToString());
-            var result = _client.Get<BeerDto>(getRequest);
-            return result.Source;
-        }
     }
 }

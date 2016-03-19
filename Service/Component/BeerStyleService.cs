@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microbrewit.Api.ElasticSearch.Interface;
 using Microbrewit.Api.Model.Database;
 using Microbrewit.Api.Model.DTOs;
 using Microbrewit.Api.Repository.Interface;
@@ -12,53 +13,83 @@ namespace Microbrewit.Api.Service.Component
     public class BeerStyleService : IBeerStyleService
     {
         private readonly IBeerStyleRepository _beerStyleRepository;
-
-        public BeerStyleService(IBeerStyleRepository beerStyleRepository)
+        private readonly IBeerStyleElasticsearch _beerStyleElasticsearch;
+        private readonly IHopElasticsearch _hopElasticsearch;
+        private readonly IHopRepository _hopRepository;
+        public BeerStyleService(IBeerStyleElasticsearch beerStyleElasticsearch, 
+        IBeerStyleRepository beerStyleRepository,IHopElasticsearch hopElasticsearch, IHopRepository hopRepository)
         {
+            _beerStyleElasticsearch = beerStyleElasticsearch;
             _beerStyleRepository = beerStyleRepository;
+            _hopElasticsearch = hopElasticsearch;
+            _hopRepository = hopRepository;
         }
         public async Task<IEnumerable<BeerStyleDto>> GetAllAsync(int @from, int size)
         {
-            var beerStyles = await _beerStyleRepository.GetAllAsync(from, size);
+            var beerStyleDtos = await _beerStyleElasticsearch.GetAllAsync(from,size);
+            if (beerStyleDtos.Any()) return beerStyleDtos;
+            var beerStyles = await _beerStyleRepository.GetAllAsync(from,size);
             return AutoMapper.Mapper.Map<IEnumerable<BeerStyle>, IEnumerable<BeerStyleDto>>(beerStyles);
         }
 
         public async Task<BeerStyleDto> GetSingleAsync(int id)
         {
+             var beerStyleDto = await _beerStyleElasticsearch.GetSingleAsync(id);
+            if (beerStyleDto != null) return beerStyleDto;
             var beerStyle = await _beerStyleRepository.GetSingleAsync(id);
             return AutoMapper.Mapper.Map<BeerStyle, BeerStyleDto>(beerStyle);
         }
 
         public async Task<BeerStyleDto> AddAsync(BeerStyleDto beerStyleDto)
         {
-            var beerStyle = AutoMapper.Mapper.Map<BeerStyleDto, BeerStyle>(beerStyleDto);
+             var beerStyle = AutoMapper.Mapper.Map<BeerStyleDto, BeerStyle>(beerStyleDto);
             await _beerStyleRepository.AddAsync(beerStyle);
             var result = await _beerStyleRepository.GetSingleAsync(beerStyle.BeerStyleId);
-            return AutoMapper.Mapper.Map<BeerStyle, BeerStyleDto>(result);
+            var mappedResult = AutoMapper.Mapper.Map<BeerStyle, BeerStyleDto>(result);
+            await _beerStyleElasticsearch.UpdateAsync(mappedResult);
+            await IndexHopAsync(beerStyle);
+            return mappedResult;
         }
 
         public async Task<BeerStyleDto> DeleteAsync(int id)
         {
             var beerStyle = await _beerStyleRepository.GetSingleAsync(id);
-            if (beerStyle != null) await _beerStyleRepository.RemoveAsync(beerStyle);
-            return AutoMapper.Mapper.Map<BeerStyle,BeerStyleDto>(beerStyle);
+            var beerStyleDto = await _beerStyleElasticsearch.GetSingleAsync(id);
+            if(beerStyle != null) await _beerStyleRepository.RemoveAsync(beerStyle);
+            if (beerStyleDto != null) await _beerStyleElasticsearch.DeleteAsync(id);
+            await IndexHopAsync(beerStyle);
+            return beerStyleDto ?? AutoMapper.Mapper.Map<BeerStyle, BeerStyleDto>(beerStyle);
         }
 
         public async Task UpdateAsync(BeerStyleDto beerStyleDto)
         {
-            var beerStyle = AutoMapper.Mapper.Map<BeerStyleDto, BeerStyle>(beerStyleDto);
+             var beerStyle = AutoMapper.Mapper.Map<BeerStyleDto, BeerStyle>(beerStyleDto);
             await _beerStyleRepository.UpdateAsync(beerStyle);
-            await _beerStyleRepository.GetSingleAsync(beerStyleDto.Id);
+            var result = await _beerStyleRepository.GetSingleAsync(beerStyleDto.Id);
+            var mappedResult = AutoMapper.Mapper.Map<BeerStyle, BeerStyleDto>(result);
+            await _beerStyleElasticsearch.UpdateAsync(mappedResult);
+            await IndexHopAsync(beerStyle);
         }
 
         public async Task<IEnumerable<BeerStyleDto>> SearchAsync(string query, int @from, int size)
         {
-            throw new NotImplementedException();
+            return await _beerStyleElasticsearch.SearchAsync(query,from,size);
         }
 
         public async Task ReIndexElasticSearch()
         {
-            throw new NotImplementedException();
+            var beerStyles = await _beerStyleRepository.GetAllAsync(0,int.MaxValue);
+            var beerStyleDtos = AutoMapper.Mapper.Map<IList<BeerStyle>, IList<BeerStyleDto>>(beerStyles);
+            await _beerStyleElasticsearch.UpdateAllAsync(beerStyleDtos);
+        }
+        
+          private async Task IndexHopAsync(BeerStyle beerStyle)
+        {
+            foreach (var hopBeerStyle in beerStyle.HopBeerStyles)
+            {
+                var hop = await _hopRepository.GetSingleAsync(hopBeerStyle.HopId);
+                await _hopElasticsearch.UpdateAsync(AutoMapper.Mapper.Map<Hop, HopDto>(hop));
+            }
         }
     }
 }

@@ -3,23 +3,24 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microbrewit.Api.ElasticSearch.Interface;
 using Microbrewit.Api.Model.DTOs;
+using Microbrewit.Api.Settings;
+using Microsoft.Extensions.OptionsModel;
 using Nest;
 
 namespace Microbrewit.Api.ElasticSearch.Component
 {
     public class HopElasticsearch : IHopElasticsearch
     {
+        private readonly ElasticSearchSettings _elasticSearchSettings;
         private Uri _node;
         private ConnectionSettings _settings;
         private ElasticClient _client;
-        private string _index;
         private int _bigNumber = 10000;
 
-        public HopElasticsearch()
+        public HopElasticsearch(IOptions<ElasticSearchSettings> elasticsearchSettings)
         {
-            this._index = "mb";
-            string url = "http://localhost:9200";
-            this._node = new Uri(url);
+            _elasticSearchSettings = elasticsearchSettings.Value;
+            this._node = new Uri(_elasticSearchSettings.Url);
             this._settings = new ConnectionSettings(_node);
             this._client = new ElasticClient(_settings);
         }
@@ -36,7 +37,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
         {
             // Adds an analayzer to the name property in FermentableDto object.
             await _client.MapAsync<HopDto>(d => d.Properties(p => p.String(s => s.Name(n => n.Name).Analyzer("autocomplete"))));
-            await _client.IndexAsync<HopDto>(hop);
+            await _client.IndexAsync<HopDto>(hop, idx => idx.Index(_elasticSearchSettings.Index));
         }
 
         public async Task<IEnumerable<HopDto>> GetAllAsync(int from, int size)
@@ -56,7 +57,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
 
         public async Task<HopDto> GetSingleAsync(int id)
         {
-            IGetRequest getRequest = new GetRequest(_index, "hop", id.ToString());
+            IGetRequest getRequest = new GetRequest(_elasticSearchSettings.Index, "hop", id.ToString());
             var result = await _client.GetAsync<HopDto>(getRequest);
             return result.Source;
         }
@@ -83,7 +84,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
 
         public HopDto GetSingle(int id)
         {
-            IGetRequest getRequest = new GetRequest(_index, "hop", id.ToString());
+            IGetRequest getRequest = new GetRequest(_elasticSearchSettings.Index, "hop", id.ToString());
             var result = _client.Get<HopDto>(getRequest);
             return result.Source;
         }

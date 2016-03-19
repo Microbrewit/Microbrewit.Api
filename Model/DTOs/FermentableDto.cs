@@ -1,10 +1,11 @@
 ﻿using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
+using Nest;
 
 namespace Microbrewit.Api.Model.DTOs
 {
-    //[ElasticType(Name = "fermentable")]
+    [ElasticsearchType(Name = "fermentable")]
     public class FermentableDto
     {
         [JsonProperty(PropertyName = "fermentableId")]

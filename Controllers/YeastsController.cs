@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Reflection;
 using System.Threading.Tasks;
 using Microbrewit.Api.Model.DTOs;
 using Microbrewit.Api.Service.Interface;
@@ -112,8 +111,7 @@ namespace Microbrewit.Api.Controllers
         /// <param name="from">Start point of the search.</param>
         /// <param name="size">Number of results returned.</param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("")]
+        [HttpGet("search")]
         public async Task<YeastCompleteDto> GetYeastsBySearch(string query, int from = 0, int size = 20)
         {
             var yeastsDto = await _yeastService.SearchAsync(query, from, size);

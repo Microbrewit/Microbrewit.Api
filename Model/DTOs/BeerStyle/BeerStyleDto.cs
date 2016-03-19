@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Nest;
 using Newtonsoft.Json;
 
 namespace Microbrewit.Api.Model.DTOs
 {
-    // [ElasticType(Name = "beerStyle")]
+    [ElasticsearchType(Name = "beerStyle")]
     public class BeerStyleDto
     {
         [JsonProperty(PropertyName = "beerStyleId")]

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using Microbrewit.Api.Model.Database;
 using Microbrewit.Api.Model.DTOs;
 using Microbrewit.Api.Service.Interface;
 using Microsoft.AspNet.Mvc;
@@ -114,7 +113,7 @@ namespace Microbrewit.Api.Controllers
         /// <param name="from">From what object</param>
         /// <param name="size">Number of objects returned</param>
         /// <returns></returns>
-        [HttpGet]
+        [HttpGet("search")]
         public async Task<OriginCompleteDto> GetOriginBySearch(string query, int from = 0, int size = 20)
         {
            var result = await _originService.SearchAsync(query, from, size);

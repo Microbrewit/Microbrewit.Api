@@ -3,25 +3,27 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microbrewit.Api.ElasticSearch.Interface;
 using Microbrewit.Api.Model.DTOs;
+using Microbrewit.Api.Settings;
+using Microsoft.Extensions.OptionsModel;
 using Nest;
 
 namespace Microbrewit.Api.ElasticSearch.Component
 {
     public class OtherElasticsearch : IOtherElasticsearch
     {
+        private readonly ElasticSearchSettings _elasticSearchSettings;
         private Uri _node;
         private ConnectionSettings _settings;
         private ElasticClient _client;
         private int _bigNumber = 10000;
-        private string _index;
 
-        public OtherElasticsearch()
+
+        public OtherElasticsearch(IOptions<ElasticSearchSettings> elasticsearchSettings)
         {
-            string url = "http://localhost:9200";
-            this._node = new Uri(url);
+            _elasticSearchSettings = elasticsearchSettings.Value;
+            this._node = new Uri(_elasticSearchSettings.Url);
             this._settings = new ConnectionSettings(_node);
             this._client = new ElasticClient(_settings);
-            _index = "mb";
         }
 
         public async Task<IIndexResponse> UpdateAsync(OtherDto otherDto)
@@ -45,7 +47,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
 
         public async Task<OtherDto> GetSingleAsync(int id)
         {
-            IGetRequest getRequest = new GetRequest(_index, "other", id.ToString());
+            IGetRequest getRequest = new GetRequest(_elasticSearchSettings.Index, "other", id.ToString());
             var result = await _client.GetAsync<OtherDto>(getRequest);
             return result.Source;
         }
@@ -64,7 +66,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
         public async Task<IBulkResponse> UpdateAllAsync(IEnumerable<OtherDto> others)
         {
             await _client.MapAsync<OtherDto>(d => d.Properties(p => p.String(s => s.Name(n => n.Name).Analyzer("autocomplete"))));
-            return await _client.IndexManyAsync(others);
+            return await _client.IndexManyAsync(others,_elasticSearchSettings.Index);
         }
 
         public Task<IDeleteResponse> DeleteAsync(int id)
@@ -74,7 +76,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
 
         public OtherDto GetSingle(int id)
         {
-            IGetRequest getRequest = new GetRequest(_index, "other", id.ToString());
+            IGetRequest getRequest = new GetRequest(_elasticSearchSettings.Index, "other", id.ToString());
             var result = _client.Get<OtherDto>(getRequest);
             return result.Source;
         }
@@ -94,7 +96,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
         {
             // Adds an analayzer to the name property in FermentableDto object.
              _client.Map<OtherDto>(d => d.Properties(p => p.String(s => s.Name(n => n.Name).Analyzer("autocomplete"))));
-            _client.Index<OtherDto>(otherDto);
+            _client.Index<OtherDto>(otherDto, idx => idx.Index(_elasticSearchSettings.Index));
         }
     }
 }

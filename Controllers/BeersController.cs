@@ -1,14 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Net;
-using System.Reflection;
 using System.Threading.Tasks;
-using Microbrewit.Api.Model.Database;
 using Microbrewit.Api.Model.DTOs;
 using Microbrewit.Api.Service.Interface;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 
 
 namespace Microbrewit.Api.Controllers
@@ -127,7 +124,7 @@ namespace Microbrewit.Api.Controllers
         /// <param name="from">From what object</param>
         /// <param name="size">StepNumber of objects returned</param>
         /// <returns></returns>
-        [HttpGet]
+        [HttpGet("search")]
         public async Task<BeerCompleteDto> GetBeerBySearch(string query, int from = 0, int size = 20)
         {
             if(size > 1000) size = 1000;

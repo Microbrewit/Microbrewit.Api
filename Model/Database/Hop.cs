@@ -43,7 +43,11 @@ namespace Microbrewit.Api.Model.Database
         public ICollection<MashStepHop> MashSteps { get; set; }
         public ICollection<BoilStepHop> BoilSteps { get; set; }
         public ICollection<Hop> Substituts { get; set; }
-        
         public ICollection<HopBeerStyle> HopBeerStyles {get; set;}
+        
+        public override string ToString()
+        {
+            return $"Hop: \n Id:{HopId}, Name:{Name}";
+        }
     }
 }

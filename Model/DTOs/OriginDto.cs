@@ -1,9 +1,10 @@
 ﻿using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
+using Nest;
 
 namespace Microbrewit.Api.Model.DTOs
 {
-    // [ElasticType(Name = "origin")]
+    [ElasticsearchType(Name = "origin")]
     public class OriginDto
     {
         [JsonProperty(PropertyName = "originId")]

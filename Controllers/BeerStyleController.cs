@@ -104,7 +104,7 @@ namespace Microbrewit.Api.Controllers
         /// <param name="size">Number of objects returned</param>
         /// <returns></returns>
         [HttpGet]
-        [Route("")]
+        [Route("search")]
         public async Task<BeerStyleCompleteDto> GetBeerBySearch(string query, int from = 0, int size = 20)
         {
             var result = await _beerStyleService.SearchAsync(query, from, size);

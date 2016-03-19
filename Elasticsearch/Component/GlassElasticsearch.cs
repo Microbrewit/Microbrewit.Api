@@ -3,21 +3,24 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microbrewit.Api.ElasticSearch.Interface;
 using Microbrewit.Api.Model.DTOs;
+using Microbrewit.Api.Settings;
+using Microsoft.Extensions.OptionsModel;
 using Nest;
 
 namespace Microbrewit.Api.ElasticSearch.Component
 {
     public class GlassElasticsearch : IGlassElasticsearch
     {
+        private readonly ElasticSearchSettings _elasticSearchSettings;
         private Uri _node;
         private ConnectionSettings _settings;
         private ElasticClient _client;
         private int _bigNumber = 10000;
 
-        public GlassElasticsearch()
+        public GlassElasticsearch(IOptions<ElasticSearchSettings> elasticsearchSettings)
         {
-            string url = "http://localhost:9200";
-            this._node = new Uri(url);
+            _elasticSearchSettings = elasticsearchSettings.Value;
+            this._node = new Uri(_elasticSearchSettings.Url);
             this._settings = new ConnectionSettings(_node);
             this._client = new ElasticClient(_settings);
         }
@@ -26,7 +29,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
         {
             // Adds an analayzer to the name property in FermentableDto object.
             await _client.MapAsync<GlassDto>(d => d.Properties(p => p.String(s => s.Name(n => n.Name).Analyzer("autocomplete"))));
-            return await _client.IndexAsync<GlassDto>(glassDto);
+            return await _client.IndexAsync<GlassDto>(glassDto, idx => idx.Index(_elasticSearchSettings.Index));
         }
 
         public async Task<IEnumerable<GlassDto>> GetAllAsync()
@@ -62,7 +65,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
         public async Task<IBulkResponse> UpdateAllAsync(IEnumerable<GlassDto> glasss)
         {
             await _client.MapAsync<GlassDto>(d => d.Properties(p => p.String(s => s.Name(n => n.Name).Analyzer("autocomplete"))));
-            return await _client.IndexManyAsync(glasss);
+            return await _client.IndexManyAsync(glasss,_elasticSearchSettings.Index);
         }
 
         public Task<IDeleteResponse> DeleteAsync(int id)

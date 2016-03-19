@@ -1,8 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿using Nest;
+using Newtonsoft.Json;
 
 namespace Microbrewit.Api.Model.DTOs
 {
-    // [ElasticType(Name = "abv")]
+    [ElasticsearchType(Name = "abv")]
     public class ABVDto
     {
         [JsonProperty(PropertyName = "abvId")]

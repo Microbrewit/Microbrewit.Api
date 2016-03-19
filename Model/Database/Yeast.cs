@@ -31,6 +31,5 @@ namespace Microbrewit.Api.Model.Database
         public bool Custom { get; set; }
 
         public ICollection<FermentationStepYeast> FermentationSteps { get; set; }
-
     }
 }

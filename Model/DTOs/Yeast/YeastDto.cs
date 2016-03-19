@@ -1,9 +1,10 @@
 ﻿using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
+using Nest;
 
 namespace Microbrewit.Api.Model.DTOs
 {
-    // [ElasticType(Name = "yeast",IdProperty = "Id")]
+    [ElasticsearchType(Name = "yeast",IdProperty = "Id")]
     public class YeastDto
     {
         [JsonProperty(PropertyName = "yeastId")]
@@ -38,7 +39,5 @@ namespace Microbrewit.Api.Model.DTOs
         [Required]
         [JsonProperty(PropertyName = "custom")]
         public bool Custom { get; set; }
-
-
     }
 }

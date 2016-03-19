@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Reflection;
 using System.Threading.Tasks;
-using Microbrewit.Api.Model.Database;
 using Microbrewit.Api.Model.DTOs;
 using Microbrewit.Api.Service.Interface;
 using Microsoft.AspNet.Mvc;
@@ -115,8 +113,7 @@ namespace Microbrewit.Api.Controllers
             return Ok();
         }
 
-        [HttpGet]
-        [Route("")]
+        [HttpGet("search")]
         public async Task<FermentablesCompleteDto> GetFermentablesBySearch(string query, int from = 0, int size = 20)
         {
             var fermentablesDto = await _fermentableService.SearchAsync(query, from, size);

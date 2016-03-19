@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Nest;
 using Newtonsoft.Json;
 
 namespace Microbrewit.Api.Model.DTOs
 {
-    //[ElasticType(Name = "fermentationStep")]
+    [ElasticsearchType(Name = "fermentationStep")]
     public class FermentationStepDto :IStepDto
     {
         [Required]

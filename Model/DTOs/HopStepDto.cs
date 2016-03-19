@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Nest;
 using Newtonsoft.Json;
 
 namespace Microbrewit.Api.Model.DTOs
 {
-    //[ElasticType(Name = "hopStep")]
+    [ElasticsearchType(Name = "hopStep")]
     public class HopStepDto : IIngredientStepDto
     {
         

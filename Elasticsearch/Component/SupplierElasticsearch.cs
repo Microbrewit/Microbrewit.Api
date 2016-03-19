@@ -3,21 +3,24 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microbrewit.Api.ElasticSearch.Interface;
 using Microbrewit.Api.Model.DTOs;
+using Microbrewit.Api.Settings;
+using Microsoft.Extensions.OptionsModel;
 using Nest;
 
 namespace Microbrewit.Api.ElasticSearch.Component
 {
     public class SupplierElasticsearch : ISupplierElasticsearch
     {
+        private readonly ElasticSearchSettings _elasticSearchSettings;
         private Uri _node;
         private ConnectionSettings _settings;
         private ElasticClient _client;
         private int _bigNumber = 10000;
         private string _index;
-        public SupplierElasticsearch()
+        public SupplierElasticsearch(IOptions<ElasticSearchSettings> elasticsearchSettings)
         {
-            string url = "http://localhost:9200";
-            this._node = new Uri(url);
+            _elasticSearchSettings = elasticsearchSettings.Value;
+            this._node = new Uri(_elasticSearchSettings.Url);
             this._settings = new ConnectionSettings(_node);
             this._client = new ElasticClient(_settings);
         }
@@ -26,7 +29,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
         {
             // Adds an analayzer to the name property in FermentableDto object.
             await _client.MapAsync<SupplierDto>(d => d.Properties(p => p.String(s => s.Name(n => n.Name).Analyzer("autocomplete"))));
-            var index = await _client.IndexAsync<SupplierDto>(supplierDto);
+            var index = await _client.IndexAsync<SupplierDto>(supplierDto, idx => idx.Index(_elasticSearchSettings.Index));
         }
 
         public async Task<IEnumerable<SupplierDto>> GetAllAsync(string custom)
@@ -62,7 +65,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
         public async Task UpdateAllAsync(IEnumerable<SupplierDto> supplierDtos)
         {
             await _client.MapAsync<SupplierDto>(d => d.Properties(p => p.String(s => s.Name(n => n.Name).Analyzer("autocomplete"))));
-            var index = await _client.IndexManyAsync<SupplierDto>(supplierDtos);
+            var index = await _client.IndexManyAsync<SupplierDto>(supplierDtos,_elasticSearchSettings.Index);
         }
 
         public async Task DeleteAsync(int id)

@@ -1,8 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿using Nest;
+using Newtonsoft.Json;
 
 namespace Microbrewit.Api.Model.DTOs
 {
-    // [ElasticType(Name = "srm")]
+    [ElasticsearchType(Name = "srm")]
     public class SRMDto
     {
         [JsonProperty(PropertyName = "srmId")]

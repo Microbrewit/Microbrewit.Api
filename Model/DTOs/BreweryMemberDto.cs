@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Nest;
 using Newtonsoft.Json;
 
 namespace Microbrewit.Api.Model.DTOs
 {
-    // [ElasticType(Name = "breweryMember")]
+    [ElasticsearchType(Name = "breweryMember")]
     public class BreweryMemberDto
     {
         [Required]
