@@ -13,6 +13,7 @@ using Microbrewit.Api.Service.Interface;
 using Microbrewit.Api.Service.Component;
 using Microbrewit.Repository.Repository;
 using Microbrewit.Api.Calculations;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Microbrewit.Api
 {
@@ -78,7 +79,23 @@ namespace Microbrewit.Api
             loggerFactory.AddDebug(LogLevel.Verbose);
 
             app.UseIISPlatformHandler();
+             app.UseCors(policy =>
+            {
+                policy.WithOrigins("https://microbrew.it","http://microbrew.it", "http://localhost:3000");
+                policy.AllowAnyHeader();
+                policy.AllowAnyMethod();
+            });
 
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+            app.UseIdentityServerAuthentication(options =>
+            {
+                options.Authority = "http://auth.microbrew.it";
+                options.ScopeName = "microbrewit-api";
+                options.ScopeSecret = "secret";
+
+                options.AutomaticAuthenticate = true;
+                options.AutomaticChallenge = true;
+            });
             app.UseStaticFiles();
            
             app.UseMvc();
