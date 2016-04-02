@@ -4,6 +4,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Microbrewit.Api.Model.DTOs;
 using Microbrewit.Api.Service.Interface;
+using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Mvc;
 
 
@@ -25,6 +26,7 @@ namespace Microbrewit.Api.Controllers
         /// </summary>
         /// <returns>Ok 200 on success</returns>
         /// <errorCode code="400"></errorCode>
+        [Authorize]
         [HttpGet]
         public async Task<OtherCompleteDto> GetOthers(string custom = "false")
         {
@@ -101,13 +103,14 @@ namespace Microbrewit.Api.Controllers
                 return HttpNotFound();
             return Ok(other);
         }
+        [Authorize]
         [HttpGet("es")]
         public async Task<IActionResult> UpdateOtherElasticSearch()
         {
             await _otherService.ReIndexElasticSearch();   
             return Ok();
         }
-
+        
         [HttpGet("search")]
         public async Task<OtherCompleteDto> GetOthersBySearch(string query, int from = 0, int size = 20)
         {
