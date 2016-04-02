@@ -2,9 +2,9 @@
 set -e
 
 sed -i \
-    -e 's,${POSTGRESQL_DB},'"${POSTGRESQL_DB}"',g' \
-    -e 's,${POSTGRESQL_USER},'"${POSTGRESQL_USER}"',g' \
-    -e 's,${POSTGRESQL_PASSWORD},'"${POSTGRESQL_PASSWORD}"',g' \
+    -e 's,${POSTGRES_DB},'"${POSTGRES_DB}"',g' \
+    -e 's,${POSTGRES_USER},'"${POSTGRES_USER}"',g' \
+    -e 's,${POSTGRES_PASSWORD},'"${POSTGRES_PASSWORD}"',g' \
     -e 's,${ELASTICSEARCH_INDEX},'"${ELASTICSEARCH_INDEX}"',g' \
     ./docker/appsettings.json
 
