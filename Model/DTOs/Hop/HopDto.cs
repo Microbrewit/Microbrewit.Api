@@ -33,6 +33,7 @@ namespace Microbrewit.Api.Model.DTOs
         public string Purpose { get; set; }
         [JsonProperty(PropertyName = "substitutes")]
         public IList<DTO> Substituts { get; set; }
+        [JsonProperty(PropertyName = "oils")]
         public OilDto Oils { get; set; }
         [JsonProperty(PropertyName = "beerstyles")]
         public IEnumerable<DTO> BeerStyles { get; set; }
