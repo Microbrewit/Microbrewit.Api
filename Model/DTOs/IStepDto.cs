@@ -11,5 +11,7 @@ namespace Microbrewit.Api.Model.DTOs
         [JsonConverter(typeof(IngredientJsonTypeConverter))]
         [JsonProperty(PropertyName = "ingredients")]
         IList<IIngredientStepDto> Ingredients { get; set; }
+        [JsonProperty(PropertyName = "stepNumber")]
+        int StepNumber { get; set; }
     }
 }
