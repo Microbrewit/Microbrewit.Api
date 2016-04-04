@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Threading.Tasks;
+using Microbrewit.Api.Mapper;
 using Microbrewit.Api.Model.DTOs;
 using Microbrewit.Api.Service.Interface;
 using Microsoft.AspNet.Http;
@@ -15,11 +17,13 @@ namespace Microbrewit.Api.Controllers
     {
         private readonly ILogger<BeersController> _logger;
         private readonly IBeerService _beerService;
+        private readonly IBeerXmlResolver _beerXmlResolver;
 
-        public BeersController(IBeerService beerService,ILogger<BeersController> logger)
+        public BeersController(IBeerService beerService,ILogger<BeersController> logger, IBeerXmlResolver beerXmlResolver)
         {
             _beerService = beerService;
             _logger = logger;
+            _beerXmlResolver = beerXmlResolver;
         }
 
         /// <summary>
@@ -144,6 +148,46 @@ namespace Microbrewit.Api.Controllers
             if (size > 1000) size = 1000;
             var beerDto = await _beerService.GetLastAsync(from, size);
             return new BeerCompleteDto{ Beers = beerDto};
+        }
+        
+        [HttpPost("beerxml")]
+        public async Task<IActionResult> PostBeerXml([FromBody] Model.BeerXml.RecipesComplete recipes)
+        {
+             if (!ModelState.IsValid)
+                return HttpBadRequest(ModelState);
+            if(Request.Body.CanSeek)
+            {
+            // Reset the position to zero to read from the beginning.
+            Request.Body.Position = 0;
+            }
+            var input = new StreamReader(Request.Body).ReadToEnd();
+            _logger.LogInformation(input);
+            _logger.LogDebug("Logging shit");
+            if(recipes == null)
+                _logger.LogInformation("Recipe is null");
+            else
+            {
+                _logger.LogInformation("Recipe not null");
+            }
+            if (recipes == null) return HttpBadRequest("Missing data");
+            var beersDto = new List<BeerDto>();
+            foreach (var recipe in recipes.Recipes)
+            {
+                var beerDto = new BeerDto
+                {
+                    Name = recipe.Name,
+                    ABV = new Model.DTOs.ABVDto(),
+                    SRM = new Model.DTOs.SRMDto(),
+                    IBU = new Model.DTOs.IBUDto(),
+                    Recipe = _beerXmlResolver.ResolveCore(recipe)
+                };
+                beersDto.Add(beerDto);
+            }
+            // CalculateRecipes(beersDto);
+
+        
+            return Ok(new BeerCompleteDto{Beers = beersDto});
+            //return Ok(beersDto);
         }
     }
 }

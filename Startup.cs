@@ -14,6 +14,7 @@ using Microbrewit.Api.Service.Component;
 using Microbrewit.Repository.Repository;
 using Microbrewit.Api.Calculations;
 using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNet.Mvc.Formatters;
 
 namespace Microbrewit.Api
 {
@@ -69,8 +70,14 @@ namespace Microbrewit.Api
             services.AddTransient<IYeastElasticsearch, YeastElasticsearch>();
 
             services.AddTransient<ICalculation,Calculation>();
+            services.AddTransient<IBeerXmlResolver,BeerXmlResolver>();
             // Add framework services.
-            services.AddMvc();
+            services.AddMvc(config =>
+                {
+                  // Add XML Content Negotiation
+                  config.RespectBrowserAcceptHeader = true;
+                  config.InputFormatters.Add(new XmlSerializerInputFormatter());
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -100,7 +107,7 @@ namespace Microbrewit.Api
             app.UseStaticFiles();
            
             app.UseMvc();
-            AutoMapperConfiguration.Configure();
+            AutoMapperConfiguration.Configure();                      
         }
 
         // Entry point for the application.
