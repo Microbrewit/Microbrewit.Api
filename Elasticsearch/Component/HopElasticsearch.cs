@@ -50,7 +50,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
                         .Query(q => q
                             .Filtered(fd => fd
                                 .Filter(f => f
-                                    .Term(h => h.DataType, "hop")
+                                    .Term(h => h.Type, "hop")
                                     ))));
             return res.Documents;
         }
@@ -70,7 +70,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
                                                 .Size(size)
                                                 .Query(q1 => q1
                                                 .Filtered(fi => fi                                              
-                                                    .Filter(f => f.Term(t => t.DataType, "hop"))
+                                                    .Filter(f => f.Term(t => t.Type, "hop"))
                                                 .Query(q => q.Match(m => m.Field(f => f.Name)
                                                                           .Query(query))))));
 
@@ -96,7 +96,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
                                                .Size(size)
                                                .Query(q1 => q1
                                                .Filtered(fi => fi
-                                                .Filter(f => f.Term(t => t.DataType, "hop"))
+                                                .Filter(f => f.Term(t => t.Type, "hop"))
                                                 .Query(q2 => q2.Match(m => m.Field(f => f.Name)
                                                                          .Query(query))))));
 

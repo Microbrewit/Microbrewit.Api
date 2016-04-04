@@ -7,7 +7,7 @@ using Nest;
 namespace Microbrewit.Api.Model.DTOs
 {
     [ElasticsearchType(Name= "hop")]
-    public class HopDto
+    public class HopDto : IIngredientDto
     {
         [JsonProperty(PropertyName = "hopId")]
         public int Id { get; set; }
@@ -37,9 +37,10 @@ namespace Microbrewit.Api.Model.DTOs
         [JsonProperty(PropertyName = "beerstyles")]
         public IEnumerable<DTO> BeerStyles { get; set; }
         [JsonProperty(PropertyName = "dataType")]
-        public string DataType { get { return "hop"; } }
+        public string Type { get { return "hop"; } }
         [Required]
         [JsonProperty(PropertyName = "custom")]
         public bool Custom { get; set; }
+        public string SubType {get; set;}
     }
 }

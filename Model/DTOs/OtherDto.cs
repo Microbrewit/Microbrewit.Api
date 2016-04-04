@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 namespace Microbrewit.Api.Model.DTOs
 {
     [ElasticsearchType(Name = "other")]
-    public class OtherDto
+    public class OtherDto : IIngredientDto
     {
         [JsonProperty(PropertyName = "otherId")]
         public int Id { get; set; }
@@ -13,9 +13,9 @@ namespace Microbrewit.Api.Model.DTOs
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
         [JsonProperty(PropertyName = "type")]
-        public string Type { get; set; }
+        public string SubType { get; set; }
         [JsonProperty(PropertyName = "dataType")]
-        public string DataType { get { return "other"; } }
+        public string Type { get { return "other"; } }
         [JsonProperty(PropertyName = "custom")]
         public bool Custom { get; set; }
     }

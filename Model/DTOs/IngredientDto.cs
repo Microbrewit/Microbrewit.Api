@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace Microbrewit.Api.Model.DTOs
 {
-    public interface IIngredientStepDto
+    public interface IIngredientDto
     {
         [JsonProperty(PropertyName = "name")]
         string Name { get; set; }

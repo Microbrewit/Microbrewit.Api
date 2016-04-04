@@ -55,6 +55,7 @@ namespace Microbrewit.Api
             services.AddTransient<IBeerStyleService, BeerStyleService>();
             services.AddTransient<IBeerService, BeerService>();
             services.AddTransient<IBreweryService, BreweryService>();
+            services.AddTransient<IIngredientService, IngredientService>();
             //ElasticSearch dependency injection
             services.AddTransient<IBeerElasticsearch, BeerElasticsearch>();
             services.AddTransient<IBeerStyleElasticsearch, BeerStyleElasticsearch>();

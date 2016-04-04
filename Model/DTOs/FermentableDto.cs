@@ -2,11 +2,12 @@
 using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
 using Nest;
+using System;
 
 namespace Microbrewit.Api.Model.DTOs
 {
     [ElasticsearchType(Name = "fermentable")]
-    public class FermentableDto
+    public class FermentableDto : IIngredientDto
     {
         [JsonProperty(PropertyName = "fermentableId")]
         public int Id { get; set; }
@@ -31,7 +32,7 @@ namespace Microbrewit.Api.Model.DTOs
         public int? SuperFermentableId { get; set; }
         [JsonProperty(PropertyName = "subFermentables")]
         public IList<DTO> SubFermentables { get; set; }
-
-      }
+        public string SubType {get; set;}
+    }
 
 }

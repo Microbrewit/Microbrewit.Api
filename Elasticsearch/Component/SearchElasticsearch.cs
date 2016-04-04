@@ -26,10 +26,10 @@ namespace Microbrewit.Api.ElasticSearch.Component
 
         public async Task<string> SearchAllAsync(string query, int @from, int size)
         {
-            // var queryString = "{\"from\" : " + from + ", \"size\" : " + size + ", \"query\":{\"match\": {\"name\": {\"query\": \" " + query + " \",\"operator\": \"and\"}}}}";
-            //             _client.SearchAsync<string>();
-            // var res = await _client.SearchAsync<string>( _elasticSearchSettings.Index,queryString);
-            // return res.Response;
+            //var queryString = "{\"from\" : " + from + ", \"size\" : " + size + ", \"query\":{\"match\": {\"name\": {\"query\": \" " + query + " \",\"operator\": \"and\"}}}}";
+            //            _client.SearchAsync<string>();
+            //var res = await _client.SearchAsync<string>(s => s.Query(q => q.QueryString(qs => qs.Query(queryString))));
+            //return res;
             return "";
         }
 

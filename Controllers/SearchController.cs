@@ -23,26 +23,11 @@ namespace Microbrewit.Api.Controllers
         /// <param name="from">Start of result returns.</param>
         /// <param name="size">Size of return result.</param>
         /// <returns>All things.</returns>
-        [Route("")]
+        [HttpGet]
         public async Task<IActionResult> GetAll(string query, int from = 0, int size = 20)
         {
             if (size > 1000) size = 1000;
             var result = await _searchElasticsearch.SearchAllAsync(query, from, size);
-            return Ok(JObject.Parse(result));
-        }
-
-        /// <summary>
-        /// Search in all ingedients in Microberew.it store
-        /// </summary>
-        /// <param name="query">The thing you want found.</param>
-        /// <param name="from">Start of result returns.</param>
-        /// <param name="size">Size of return result.</param>
-        /// <returns>List of ingredients with score.</returns>
-        [Route("ingredients")]
-        public async Task<IActionResult> GetAllIngredients(string query, int from = 0, int size = 20)
-        {
-            if (size > 1000) size = 1000; 
-            var result = await _searchElasticsearch.SearchIngredientsAsync(query, from, size);
             return Ok(JObject.Parse(result));
         }
     }
