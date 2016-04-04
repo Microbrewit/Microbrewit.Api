@@ -35,8 +35,8 @@ namespace Microbrewit.Api.Controllers
         public async Task<IActionResult> GetAllIngredients(string query, int from = 0, int size = 20)
         {
             if (size > 1000) size = 1000; 
-            var result = await _searchElasticsearch.SearchIngredientsAsync(query, from, size);
-            return Ok(JObject.Parse(result));
+            //var result = await _searchElasticsearch.SearchIngredientsAsync(query, from, size);
+            //return Ok(JObject.Parse(result));
             return Ok();
         }
     }
