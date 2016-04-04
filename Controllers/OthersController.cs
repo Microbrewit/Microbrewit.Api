@@ -103,7 +103,6 @@ namespace Microbrewit.Api.Controllers
                 return HttpNotFound();
             return Ok(other);
         }
-        [Authorize]
         [HttpGet("es")]
         public async Task<IActionResult> UpdateOtherElasticSearch()
         {
