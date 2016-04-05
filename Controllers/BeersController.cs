@@ -3,8 +3,10 @@ using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 using Microbrewit.Api.Mapper;
+using Microbrewit.Api.Model.Database;
 using Microbrewit.Api.Model.DTOs;
 using Microbrewit.Api.Service.Interface;
+using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.Logging;
@@ -93,6 +95,7 @@ namespace Microbrewit.Api.Controllers
         /// <response code="400">Bad Request</response>
         /// <param name="beerDto"></param>
         /// <returns></returns>
+        [Authorize(Roles = "User")]
         [HttpPost("")]
        public async Task<IActionResult> PostBeer(BeerDto beerDto)
         {

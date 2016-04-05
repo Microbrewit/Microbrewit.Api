@@ -210,16 +210,14 @@ namespace Microbrewit.Api.Mapper
                     }
                     if (string.Equals(misc.Use, "Mash", StringComparison.OrdinalIgnoreCase))
                     {
-                        var mashStep = GetMashStepDto(recipeDto, time) ?? (recipeDto.Steps.Where(s => s.Type == "mash") as IEnumerable<MashStepDto>).FirstOrDefault();
-                        
+                        var mashStep = GetMashStepDto(recipeDto, time) ?? recipeDto.Steps.Where(s => s.Type == "mash").Select(m => (MashStepDto)m).FirstOrDefault();
                         if (othersStepDto != null)
                             mashStep.Ingredients.Add(othersStepDto);
                     }
                     if (string.Equals(misc.Use, "Primary", StringComparison.OrdinalIgnoreCase) || string.Equals(misc.Use, "Secondary", StringComparison.OrdinalIgnoreCase))
                     {
-                        var fermentationSteps = (recipeDto.Steps.Where(s => s.Type == "fermentation") as IEnumerable<FermentationStepDto>);
-                        var fermentationStepDto = GetFermentationStepDto(recipeDto, time) ??
-                                                  fermentationSteps.FirstOrDefault();
+                        var fermentationSteps = recipeDto.Steps.Where(s => s.Type == "fermentation");
+                        var fermentationStepDto = GetFermentationStepDto(recipeDto, time) ?? fermentationSteps.FirstOrDefault();
                         if (othersStepDto != null)
                             fermentationStepDto.Ingredients.Add(othersStepDto);
                     }
@@ -240,8 +238,7 @@ namespace Microbrewit.Api.Mapper
                     if (!inSecondary)
                     {
                        
-                        var fermentationStepDto = (fermentationSteps.FirstOrDefault() ?? GetFermentationStepDto(recipeDto, 0)) ??
-                                                  fermentationSteps.FirstOrDefault();
+                        var fermentationStepDto = (fermentationSteps.FirstOrDefault() ?? GetFermentationStepDto(recipeDto, 0)) ?? fermentationSteps.FirstOrDefault();
                         fermentationStepDto.Ingredients.Add(yeastStepDto);
                     }
                     else
@@ -298,10 +295,9 @@ namespace Microbrewit.Api.Mapper
 
         private static FermentationStepDto GetFermentationStepDto(RecipeDto recipeDto, int time)
         {
-            var fermentationSteps = recipeDto.Steps.Where(s => s.Type == "fermentation") as IEnumerable<FermentationStepDto>;
-            var fermentationStep = fermentationSteps?.SingleOrDefault(f => f.Length == time / 24);
-            return fermentationStep != null ? fermentationSteps.FirstOrDefault() : null;
-            //return fermentationStep;
+            var fermentationSteps = recipeDto.Steps.Where(s => s.Type == "fermentation");
+            var fermentationStep = fermentationSteps?.Select(f => (FermentationStepDto)f).FirstOrDefault(f => f.Length == time / 24);
+            return fermentationStep != null ? fermentationStep : fermentationSteps?.Select(f => (FermentationStepDto)f).FirstOrDefault();
         }
 
         private static MashStepDto GetMashStepDto(Model.BeerXml.MashStep mashStep)
@@ -318,15 +314,15 @@ namespace Microbrewit.Api.Mapper
 
         private static MashStepDto GetMashStepDto(RecipeDto recipeDto, int time)
         {
-            var mashStepsDto = recipeDto.Steps.Where(s => s.Type == "mash") as IEnumerable<MashStepDto>;
-            var mashStepDto = mashStepsDto?.FirstOrDefault(m => m.Length == time);
+            var mashStepsDto = recipeDto.Steps.Where(s => s.Type == "mash");
+            var mashStepDto = mashStepsDto?.Select(c =>(MashStepDto)c).FirstOrDefault(m => m.Length == time);
             return mashStepDto;
         }
 
         private static BoilStepDto GetBoilStepDto(RecipeDto recipeDto, int time)
         {
-            var boilSteps =  (recipeDto.Steps.Where(s => s.Type == "boil") as IEnumerable<BoilStepDto>);
-            var boilStep = boilSteps?.SingleOrDefault(b => b.Length == time);
+            var boilSteps =  recipeDto.Steps.Where(s => s.Type == "boil");
+            var boilStep = boilSteps?.Select(b => (BoilStepDto)b).FirstOrDefault(b => b.Length == time);
             if (boilStep != null) return boilStep;
             boilStep = new BoilStepDto
             {
@@ -403,7 +399,7 @@ namespace Microbrewit.Api.Mapper
                     Name = misc.Name,
                     Custom = true,
                 };
-                otherDto = _otherService.AddAsync(otherDto).Result;
+                //otherDto = _otherService.AddAsync(otherDto).Result;
             };
             var otherStepDto = AutoMapper.Mapper.Map<OtherDto, OtherStepDto>(otherDto);
             double amount = string.IsNullOrEmpty(misc.Amount) ? 0 : double.Parse(misc.Amount, CultureInfo.InvariantCulture);
