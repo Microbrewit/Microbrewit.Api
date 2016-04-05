@@ -21,7 +21,7 @@ namespace Microbrewit.Api.Controllers
         private readonly IBeerService _beerService;
         private readonly IBeerXmlResolver _beerXmlResolver;
 
-        public BeersController(IBeerService beerService,ILogger<BeersController> logger, IBeerXmlResolver beerXmlResolver)
+        public BeersController(IBeerService beerService, ILogger<BeersController> logger, IBeerXmlResolver beerXmlResolver)
         {
             _beerService = beerService;
             _logger = logger;
@@ -34,11 +34,11 @@ namespace Microbrewit.Api.Controllers
         /// <response code="200">It's all good!</response>
         /// <returns>Returns collection of all beers</returns>
         [HttpGet]
-        public async Task<BeerCompleteDto> GetBeers(int from = 0, int size = 20) 
-        {         
+        public async Task<BeerCompleteDto> GetBeers(int from = 0, int size = 20)
+        {
             if (size > 1000) size = 1000;
             var beers = await _beerService.GetAllAsync(from, size);
-            var result = new BeerCompleteDto { Beers = beers};
+            var result = new BeerCompleteDto { Beers = beers };
             return result;
         }
 
@@ -51,7 +51,7 @@ namespace Microbrewit.Api.Controllers
         public async Task<BeerCompleteDto> GetUserBeers(string username)
         {
             var beersDto = await _beerService.GetUserBeersAsync(username);
-            var result = new BeerCompleteDto { Beers = beersDto};
+            var result = new BeerCompleteDto { Beers = beersDto };
             return result;
         }
 
@@ -63,11 +63,11 @@ namespace Microbrewit.Api.Controllers
         ///<param name="id">Id of the beer</param>
         /// <returns></returns>
         [HttpGet("{id}")]
-       public async Task<IActionResult> GetBeer(int id)
+        public async Task<IActionResult> GetBeer(int id)
         {
             var beerDto = await _beerService.GetSingleAsync(id);
             if (beerDto == null) return HttpNotFound();
-            var result = new BeerCompleteDto() { Beers = new List<BeerDto>{beerDto}};
+            var result = new BeerCompleteDto() { Beers = new List<BeerDto> { beerDto } };
             return Ok(result);
         }
 
@@ -85,7 +85,7 @@ namespace Microbrewit.Api.Controllers
             if (!ModelState.IsValid) return HttpBadRequest(ModelState);
             if (id != beerDto.Id) return HttpBadRequest();
             await _beerService.UpdateAsync(beerDto);
-            return new HttpStatusCodeResult((int) HttpStatusCode.Created);
+            return new HttpStatusCodeResult((int)HttpStatusCode.Created);
         }
 
         /// <summary>
@@ -97,11 +97,11 @@ namespace Microbrewit.Api.Controllers
         /// <returns></returns>
         [Authorize(Roles = "User")]
         [HttpPost("")]
-       public async Task<IActionResult> PostBeer(BeerDto beerDto)
+        public async Task<IActionResult> PostBeer(BeerDto beerDto)
         {
             if (beerDto == null) return HttpBadRequest("Missing data");
             if (!ModelState.IsValid) return HttpBadRequest(ModelState);
-            
+
             var username = HttpContext.User.Identity.Name;
             if (username == null) return HttpBadRequest("Missing user");
             var beer = await _beerService.AddAsync(beerDto, username);
@@ -123,7 +123,7 @@ namespace Microbrewit.Api.Controllers
             if (beerDto == null) return HttpNotFound();
             return Ok(beerDto);
         }
-      
+
         /// <summary>
         /// Searches in beers.
         /// </summary>
@@ -134,9 +134,9 @@ namespace Microbrewit.Api.Controllers
         [HttpGet("search")]
         public async Task<BeerCompleteDto> GetBeerBySearch(string query, int from = 0, int size = 20)
         {
-            if(size > 1000) size = 1000;
+            if (size > 1000) size = 1000;
             var beerDtos = await _beerService.SearchAsync(query, from, size);
-            return new BeerCompleteDto {Beers = beerDtos};
+            return new BeerCompleteDto { Beers = beerDtos };
         }
 
         /// <summary>
@@ -150,23 +150,23 @@ namespace Microbrewit.Api.Controllers
         {
             if (size > 1000) size = 1000;
             var beerDto = await _beerService.GetLastAsync(from, size);
-            return new BeerCompleteDto{ Beers = beerDto};
+            return new BeerCompleteDto { Beers = beerDto };
         }
-        
+
         [HttpPost("beerxml")]
         public async Task<IActionResult> PostBeerXml([FromBody] Model.BeerXml.RecipesComplete recipes)
         {
-             if (!ModelState.IsValid)
+            if (!ModelState.IsValid)
                 return HttpBadRequest(ModelState);
-            if(Request.Body.CanSeek)
+            if (Request.Body.CanSeek)
             {
-            // Reset the position to zero to read from the beginning.
-            Request.Body.Position = 0;
+                // Reset the position to zero to read from the beginning.
+                Request.Body.Position = 0;
             }
             var input = new StreamReader(Request.Body).ReadToEnd();
             _logger.LogInformation(input);
             _logger.LogDebug("Logging shit");
-            if(recipes == null)
+            if (recipes == null)
                 _logger.LogInformation("Recipe is null");
             else
             {
@@ -188,8 +188,8 @@ namespace Microbrewit.Api.Controllers
             }
             // CalculateRecipes(beersDto);
 
-        
-            return Ok(new BeerCompleteDto{Beers = beersDto});
+
+            return Ok(new BeerCompleteDto { Beers = beersDto });
             //return Ok(beersDto);
         }
     }

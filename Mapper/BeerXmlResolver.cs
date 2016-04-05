@@ -113,7 +113,7 @@ namespace Microbrewit.Api.Mapper
 
 
             //Mash step from <MASH> <MASH_STEPS>
-            if (source.Mash != null)
+            if (source.Mash != null && source.Mash.MashSteps.Any())
             {
                 foreach (var mashStep in source.Mash.MashSteps)
                 {
@@ -138,9 +138,8 @@ namespace Microbrewit.Api.Mapper
             if (source.Fermentables != null)
             {
                 var totalBoilTime = (int) recipeDto.TotalBoilTime;
-                var step = GetMashStepDto(recipeDto, totalBoilTime) ??
-                               recipeDto.Steps.FirstOrDefault(m => m.Type == "mash");
-                var mashStep = step as MashStepDto;
+                var mashStep = GetMashStepDto(recipeDto, totalBoilTime) ??
+                                recipeDto.Steps.OfType<MashStepDto>().FirstOrDefault();
                 foreach (var fermentable in source.Fermentables)
                 {
                     if (mashStep != null && (string.IsNullOrEmpty(fermentable.AddAfterBoil) || fermentable.AddAfterBoil.ToLower() == "false"))
@@ -149,7 +148,7 @@ namespace Microbrewit.Api.Mapper
                         mashStep.Ingredients.Add(fermentableStepDto);
                         break;
                     }
-                    var fermentationSteps = recipeDto.Steps.Where(s => s.Type == "fermentation") as IEnumerable<FermentationStepDto>;
+                    var fermentationSteps = recipeDto.Steps.OfType<FermentationStepDto>();
                     var fermentationStep = fermentationSteps?.FirstOrDefault();
                     if (fermentationStep != null && fermentable.AddAfterBoil.ToLower() == "true")
                     {
@@ -179,7 +178,7 @@ namespace Microbrewit.Api.Mapper
 
                     if (string.Equals(hop.Use, "Mash") && string.Equals(hop.Use, "Aroma"))
                     {
-                        var mashStep = GetMashStepDto(recipeDto, time) ?? (recipeDto.Steps.Where(s => s.Type == "mash") as IEnumerable<MashStepDto>).FirstOrDefault();
+                        var mashStep = GetMashStepDto(recipeDto, time) ?? recipeDto.Steps.OfType<MashStepDto>().FirstOrDefault();
                         if (hopStepDto != null)
                             mashStep.Ingredients.Add(hopStepDto);
                     }
@@ -210,7 +209,7 @@ namespace Microbrewit.Api.Mapper
                     }
                     if (string.Equals(misc.Use, "Mash", StringComparison.OrdinalIgnoreCase))
                     {
-                        var mashStep = GetMashStepDto(recipeDto, time) ?? recipeDto.Steps.Where(s => s.Type == "mash").Select(m => (MashStepDto)m).FirstOrDefault();
+                        var mashStep = GetMashStepDto(recipeDto, time) ?? recipeDto.Steps.OfType<MashStepDto>().FirstOrDefault();
                         if (othersStepDto != null)
                             mashStep.Ingredients.Add(othersStepDto);
                     }
@@ -265,7 +264,7 @@ namespace Microbrewit.Api.Mapper
         private void SetStepNumber(RecipeDto recipeDto)
         {
             var stepNumber = 1;
-            foreach (var item in recipeDto.Steps.Where(s => s.Type == "mash"))
+            foreach (var item in recipeDto.Steps.OfType<MashStepDto>())
             {
                 var mashStep = item;
                 mashStep.StepNumber = stepNumber;
@@ -278,15 +277,15 @@ namespace Microbrewit.Api.Mapper
             //    stepNumber++;
             //}
 
-            foreach (var boilStep in recipeDto.Steps.Where(s => s.Type == "boil"))
+            foreach (var boilStep in recipeDto.Steps.OfType<BoilStepDto>())
             {
                 boilStep.StepNumber = stepNumber;
                 stepNumber++;
             }
 
-            foreach (var item in recipeDto.Steps.Where(s => s.Type == "fermentation"))
+            foreach (var item in recipeDto.Steps.OfType<FermentationStepDto>())
             {
-                var fermentationStep = (FermentationStepDto) item;
+                var fermentationStep = item;
                 fermentationStep.StepNumber = stepNumber;
                 stepNumber++;
             }
@@ -295,9 +294,9 @@ namespace Microbrewit.Api.Mapper
 
         private static FermentationStepDto GetFermentationStepDto(RecipeDto recipeDto, int time)
         {
-            var fermentationSteps = recipeDto.Steps.Where(s => s.Type == "fermentation");
-            var fermentationStep = fermentationSteps?.Select(f => (FermentationStepDto)f).FirstOrDefault(f => f.Length == time / 24);
-            return fermentationStep != null ? fermentationStep : fermentationSteps?.Select(f => (FermentationStepDto)f).FirstOrDefault();
+            var fermentationSteps = recipeDto.Steps.OfType<FermentationStepDto>();
+            var fermentationStep = fermentationSteps?.FirstOrDefault(f => f.Length == time / 24);
+            return fermentationStep != null ? fermentationStep : fermentationSteps?.Select(f => f).FirstOrDefault();
         }
 
         private static MashStepDto GetMashStepDto(Model.BeerXml.MashStep mashStep)
@@ -314,15 +313,15 @@ namespace Microbrewit.Api.Mapper
 
         private static MashStepDto GetMashStepDto(RecipeDto recipeDto, int time)
         {
-            var mashStepsDto = recipeDto.Steps.Where(s => s.Type == "mash");
-            var mashStepDto = mashStepsDto?.Select(c =>(MashStepDto)c).FirstOrDefault(m => m.Length == time);
+            var mashStepsDto = recipeDto.Steps.OfType<MashStepDto>();
+            var mashStepDto = mashStepsDto.Select(c =>c).FirstOrDefault(m => m.Length == time);
             return mashStepDto;
         }
 
         private static BoilStepDto GetBoilStepDto(RecipeDto recipeDto, int time)
         {
-            var boilSteps =  recipeDto.Steps.Where(s => s.Type == "boil");
-            var boilStep = boilSteps?.Select(b => (BoilStepDto)b).FirstOrDefault(b => b.Length == time);
+            var boilSteps = recipeDto.Steps.OfType<BoilStepDto>();
+            var boilStep = boilSteps?.FirstOrDefault(b => b.Length == time);
             if (boilStep != null) return boilStep;
             boilStep = new BoilStepDto
             {
