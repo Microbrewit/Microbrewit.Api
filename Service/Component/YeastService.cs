@@ -47,10 +47,10 @@ namespace Microbrewit.Api.Service.Component
         public async Task<IEnumerable<YeastDto>> GetAllAsync(string custom)
         {
             var yeastsDto = await _yeastElasticsearch.GetAllAsync(custom);
-            //if (yeastsDto.Any()) 
-            return yeastsDto ;
-            //var yeasts = await _yeastRepository.GetAllAsync();
-            //return AutoMapper.Mapper.Map<IEnumerable<Yeast>,IEnumerable<YeastDto>>(yeasts);
+            if (yeastsDto.Any()) 
+                return yeastsDto ;
+            var yeasts = await _yeastRepository.GetAllAsync();
+            return AutoMapper.Mapper.Map<IEnumerable<Yeast>,IEnumerable<YeastDto>>(yeasts);
         }
 
         public async Task<YeastDto> GetSingleAsync(int id)
