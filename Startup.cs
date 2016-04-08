@@ -15,6 +15,7 @@ using Microbrewit.Repository.Repository;
 using Microbrewit.Api.Calculations;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNet.Mvc.Formatters;
+using Microsoft.Extensions.OptionsModel;
 
 namespace Microbrewit.Api
 {
@@ -36,6 +37,7 @@ namespace Microbrewit.Api
         {
             services.Configure<ElasticSearchSettings>(Configuration.GetSection("ElasticSearch"));
             services.Configure<DatabaseSettings>(Configuration.GetSection("DatabaseSettings"));
+            services.Configure<ApiSettings>(Configuration.GetSection("ApiSettings"));
             //Repository dependency injection
             services.AddTransient<IOriginRespository,OriginDapperRepository>();
             services.AddTransient<IHopRepository,HopDapperRepository>();
@@ -85,6 +87,8 @@ namespace Microbrewit.Api
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug(LogLevel.Verbose);
+
+            ApiConfiguration.ApiSettings = app.ApplicationServices.GetService<IOptions<ApiSettings>>().Value;
 
             app.UseIISPlatformHandler();
              app.UseCors(policy =>
