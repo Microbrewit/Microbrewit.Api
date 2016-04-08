@@ -45,15 +45,15 @@ namespace Microbrewit.Api.Calculations
         public SRMDto CalculateSRMDto(RecipeDto recipe)
         {
             var srm = new SRMDto();
-            foreach (var item in recipe.Steps.Where(m => m.Type == "mash"))
+            foreach (var item in recipe.Steps.OfType<MashStepDto>())
             {
-                var mashStepDto = (MashStepDto)item;
+                var mashStepDto = item;
                 var volume = recipe.Volume;
                 if (mashStepDto.Volume > 0)
                     volume = mashStepDto.Volume;
-                foreach (var fermentable in mashStepDto.Ingredients.Where(f => f != null && f.Type == "fermentable"))
+                foreach (var fermentable in mashStepDto.Ingredients.OfType<FermentableStepDto>())
                 {
-                    var temp = (FermentableStepDto) fermentable;
+                    var temp = fermentable;
                     srm.Standard += Math.Round(Formulas.MaltColourUnits(temp.Amount, temp.Lovibond, volume), 0);
                     srm.Morey += Math.Round(Formulas.Morey(temp.Amount, temp.Lovibond, volume), 0);
                     srm.Mosher += Math.Round(Formulas.Morey(temp.Amount, temp.Lovibond, volume), 0);
@@ -96,14 +96,13 @@ namespace Microbrewit.Api.Calculations
 
             var tinseth = 0.0;
             var rager = 0.0;
-            foreach (var item in recipe.Steps.Where(s => s.Type == "boil"))
+            foreach (var item in recipe.Steps.OfType<BoilStepDto>())
             {
                 var boilStep = (BoilStepDto)item;
                 var tinsethUtilisation = Formulas.TinsethUtilisation(og, boilStep.Length);
                 var ragerUtilisation = Formulas.RangerUtilisation(boilStep.Length);
-                foreach (var temp in boilStep.Ingredients.Where(i => i.Type == "hop"))
+                foreach (var hop in boilStep.Ingredients.OfType<HopStepDto>())
                 {
-                    var hop = (HopStepDto) temp;
                     var tinasethMgl = Formulas.TinsethMgl(hop.Amount, hop.AAValue, recipe.Volume);
                     tinseth += Formulas.TinsethIbu(tinasethMgl, tinsethUtilisation);
                     rager += Formulas.RangerIbu(hop.Amount, ragerUtilisation, hop.AAValue, recipe.Volume, og);
@@ -158,8 +157,8 @@ namespace Microbrewit.Api.Calculations
             try
             {
                 var fermentables =
-                    recipe.Steps.Where(s => s.Type == "mash")
-                        .SelectMany(mashStep => ((MashStepDto) mashStep).Ingredients.Where(f => f != null && f.Type == "fermentable"));
+                    recipe.Steps.OfType<MashStepDto>()
+                        .SelectMany(mashStep => mashStep.Ingredients.OfType<FermentableStepDto>());
                 foreach (var fermentable in fermentables)
                 {
                     var temp = (FermentableStepDto) fermentable;
