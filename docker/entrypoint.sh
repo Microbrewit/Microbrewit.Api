@@ -6,6 +6,7 @@ sed -i \
     -e 's,${POSTGRES_USER},'"${POSTGRES_USER}"',g' \
     -e 's,${POSTGRES_PASSWORD},'"${POSTGRES_PASSWORD}"',g' \
     -e 's,${ELASTICSEARCH_INDEX},'"${ELASTICSEARCH_INDEX}"',g' \
+    -e 's,${MICROBREWIT_APIURL},'"${MICROBREWIT_APIURL}"',g' \
     ./docker/appsettings.json
 
 # Remove default config and replace with environment variable based config.
