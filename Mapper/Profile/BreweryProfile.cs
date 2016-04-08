@@ -15,7 +15,7 @@ namespace Microbrewit.Api.Mapper.Profile
                 .ForMember(dest => dest.Id, conf => conf.MapFrom(src => src.BreweryId))
                 .ForMember(dest => dest.Name, conf => conf.MapFrom(src => src.Name))
                 .ForMember(dest => dest.Description, conf => conf.MapFrom(src => src.Description))
-                .ForMember(dest => dest.Type, conf => conf.MapFrom(src => src.Type))
+                .ForMember(dest => dest.SubType, conf => conf.MapFrom(src => src.Type))
                 .ForMember(dest => dest.Members, conf => conf.MapFrom(src => src.Members))
                 .ForMember(dest => dest.Beers, conf => conf.MapFrom(src => src.Beers))
                 .ForMember(dest => dest.Origin, conf => conf.MapFrom(src => src.Origin))
@@ -39,7 +39,7 @@ namespace Microbrewit.Api.Mapper.Profile
                 .ForMember(dest => dest.Name, conf => conf.MapFrom(src => src.Brewery.Name))
                 .ForMember(dest => dest.Id, conf => conf.MapFrom(src => src.Brewery.BreweryId))
                 .ForMember(dest => dest.GeoLocation, conf => conf.ResolveUsing<BreweryMemberGeoLocationResolver>())
-                .ForMember(dest => dest.Type, conf => conf.MapFrom(src => src.Brewery.Type));
+                .ForMember(dest => dest.SubType, conf => conf.MapFrom(src => src.Brewery.Type));
 
             CreateMap<BreweryBeer, BrewerySimpleDto>()
                 .ForMember(dto => dto.Id, conf => conf.MapFrom(rec => rec.BreweryId))
@@ -53,7 +53,7 @@ namespace Microbrewit.Api.Mapper.Profile
                 .ForMember(dest => dest.BreweryId, conf => conf.MapFrom(src => src.Id))
                 .ForMember(dest => dest.Name, conf => conf.MapFrom(src => src.Name))
                 .ForMember(dest => dest.Description, conf => conf.MapFrom(src => src.Description))
-                .ForMember(dest => dest.Type, conf => conf.MapFrom(src => src.Type))
+                .ForMember(dest => dest.Type, conf => conf.MapFrom(src => src.SubType))
                 .ForMember(dest => dest.Members, conf => conf.ResolveUsing<BreweryMemberResolver>())
                 .ForMember(dest => dest.Beers, conf => conf.MapFrom(src => src.Beers))
                 .ForMember(dest => dest.OriginId, conf => conf.MapFrom(src => src.Origin.Id))

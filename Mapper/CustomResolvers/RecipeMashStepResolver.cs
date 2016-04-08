@@ -11,9 +11,8 @@ namespace Microbrewit.Api.Mapper.CustomResolvers
         protected override IList<MashStep> ResolveCore(RecipeDto recipe)
         {
             var mashStepList = new List<MashStep>();
-            foreach (var item in recipe.Steps.Where(m => m.Type == "mash"))
+            foreach (var mashStepDto in recipe.Steps.OfType<MashStepDto>())
             {
-                var mashStepDto = (MashStepDto) item;
                 var mashStep = new MashStep()
                 {
                     Fermentables = new List<MashStepFermentable>(),

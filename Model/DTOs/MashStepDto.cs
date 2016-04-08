@@ -19,16 +19,10 @@ namespace Microbrewit.Api.Model.DTOs
         public int Temperature { get; set; }
         [JsonProperty(PropertyName = "notes")]
         public string Notes { get; set; }
-        public string Type { get; set; }
+        public string Type => "mash";
         [JsonProperty(PropertyName = "ingredients")]
         public IList<IIngredientStepDto> Ingredients { get; set; }
 
-        //[JsonProperty(PropertyName = "hops")]
-        //public IList<HopStepDto> Hops { get; set; }
-        //[JsonProperty(PropertyName = "fermentables")]
-        //public IList<FermentableStepDto> Fermentables { get; set; }
-        //[JsonProperty(PropertyName = "others")]
-        //public IList<OtherStepDto> Others { get; set; }
 
     }
 }

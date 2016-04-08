@@ -14,9 +14,7 @@ namespace Microbrewit.Api.Model.DTOs
         public string Name { get; set; }
         [JsonProperty(PropertyName = "origin")]
         public DTO Origin { get; set; }
-        [JsonProperty(PropertyName = "dataType")]
-        public string DataType { get { return "supplier"; } }
-
-
+        [JsonProperty(PropertyName = "type")]
+        public string Type => "supplier";
     }
 }

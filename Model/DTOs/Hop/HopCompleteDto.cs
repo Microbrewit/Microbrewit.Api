@@ -1,11 +1,11 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
+using Microbrewit.Api.Settings;
 
 namespace Microbrewit.Api.Model.DTOs
 {
     public class HopCompleteDto
     {
-        private static readonly string apiPath = "http://dev.microbew.it/";// ConfigurationManager.AppSettings["api"];
         [JsonProperty(PropertyName = "links")]
         public LinksHop Links { get; set; }
         [JsonProperty(PropertyName = "hops")]
@@ -17,12 +17,12 @@ namespace Microbrewit.Api.Model.DTOs
             {
                 HopOrigins = new Links()
                 {
-                    Href = apiPath + "/origins/:id",
+                    Href = ApiConfiguration.ApiSettings.Url + "/origins/:id",
                     Type = "origin"
                 },
                 HopSubstitutions = new Links()
                 {
-                    Href = apiPath + "/hop/:id",
+                    Href = ApiConfiguration.ApiSettings.Url + "/hop/:id",
                     Type = "hop"
                 }
 

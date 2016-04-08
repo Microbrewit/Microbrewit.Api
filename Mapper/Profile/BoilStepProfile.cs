@@ -10,7 +10,6 @@ namespace Microbrewit.Api.Mapper.Profile
         {
             CreateMap<BoilStep, BoilStepDto>()
                 .ForMember(dto => dto.StepNumber, conf => conf.MapFrom(rec => rec.StepNumber))
-                .ForMember(dto => dto.Type, conf => conf.UseValue("boil"))
                 .ForMember(dto => dto.Ingredients, conf => conf.ResolveUsing<IngredientsBoilStepResolver>());
 
             CreateMap<BoilStepHop, HopStepDto>()

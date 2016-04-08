@@ -22,9 +22,7 @@ namespace Microbrewit.Api.Model.DTOs
         public int Amount { get; set; }
         [JsonProperty(PropertyName = "notes")]
         public string Notes { get; set; }
-        [JsonProperty(PropertyName = "type")]
-        public string Type { get; set; }
-        [JsonProperty(PropertyName = "hops")]
+        public string Type => "sparge";
         public IList<IIngredientStepDto> Ingredients { get; set; }
        
     }

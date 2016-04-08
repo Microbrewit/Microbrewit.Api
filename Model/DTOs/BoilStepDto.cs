@@ -9,7 +9,6 @@ namespace Microbrewit.Api.Model.DTOs
     public class BoilStepDto : IStepDto
     {
         [Required]
-        [JsonProperty(PropertyName = "stepNumber")]
         public int StepNumber { get; set; }
         [Required]
         [JsonProperty(PropertyName = "length")]
@@ -18,7 +17,7 @@ namespace Microbrewit.Api.Model.DTOs
         public int Volume { get; set; }
         [JsonProperty(PropertyName = "notes")]
         public string Notes { get; set; }
-        public string Type { get; set; }
+        public string Type => "boil";
         public IList<IIngredientStepDto> Ingredients { get; set; }
     }
 }

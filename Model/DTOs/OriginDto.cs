@@ -12,7 +12,7 @@ namespace Microbrewit.Api.Model.DTOs
         [JsonProperty(PropertyName = "name")]
         [Required]
         public string Name { get; set; }
-        [JsonProperty(PropertyName = "dataType")]
-        public string DataType { get { return "origin"; } }
+        [JsonProperty(PropertyName = "type")]
+        public string Type => "origin";
     }
 }

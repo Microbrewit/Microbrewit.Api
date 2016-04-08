@@ -37,8 +37,9 @@ namespace Microbrewit.Api.Model.DTOs
         public OilDto Oils { get; set; }
         [JsonProperty(PropertyName = "beerstyles")]
         public IEnumerable<DTO> BeerStyles { get; set; }
-        [JsonProperty(PropertyName = "dataType")]
-        public string Type { get { return "hop"; } }
+        [JsonProperty(PropertyName = "type")]
+        public string Type => "hop";
+
         [Required]
         [JsonProperty(PropertyName = "custom")]
         public bool Custom { get; set; }

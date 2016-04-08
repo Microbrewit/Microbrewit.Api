@@ -36,7 +36,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
             var result = await _client.SearchAsync<UserDto>(s => s
                                                 .Query(q => q
                                                 .Filtered(fi => fi
-                                                    .Filter(f => f.Term(t => t.DataType, "user"))
+                                                    .Filter(f => f.Term(t => t.Type, "user"))
                                                     .Filter(f => f.Term(t => t.EmailConfirmed, "true"))))
                                                 .Size(size)
                                                 .From(from)

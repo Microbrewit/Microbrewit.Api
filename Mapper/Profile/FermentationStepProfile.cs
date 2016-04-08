@@ -10,7 +10,6 @@ namespace Microbrewit.Api.Mapper.Profile
         {
             CreateMap<FermentationStep, FermentationStepDto>()
                 .ForMember(dto => dto.StepNumber, conf => conf.MapFrom(rec => rec.StepNumber))
-                .ForMember(dto => dto.Type, conf => conf.UseValue("fermentation"))
                 .ForMember(dto => dto.Ingredients, conf => conf.ResolveUsing<IngredientsFermentationStepResolver>());
 
             CreateMap<FermentationStepDto, FermentationStep>()

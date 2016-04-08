@@ -42,7 +42,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
                 .From(from)
                 .Query(q => q
                     .Filtered(fi => fi
-                        .Filter(f => f.Term(t => t.DataType, "brewery")))));
+                        .Filter(f => f.Term(t => t.Type, "brewery")))));
             return res.Documents;
         }
 

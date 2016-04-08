@@ -33,8 +33,9 @@ namespace Microbrewit.Api.Model.DTOs
         public string PitchingFermentationNotes { get; set; }
         [JsonProperty(PropertyName = "supplier")]
         public DTO Supplier { get; set; }
-        [JsonProperty(PropertyName = "dataType")]
-        public string Type { get { return "yeast"; } }
+        [JsonProperty(PropertyName = "type")]
+        public string Type => "yeast";
+
         [Required]
         [JsonProperty(PropertyName = "custom")]
         public bool Custom { get; set; }

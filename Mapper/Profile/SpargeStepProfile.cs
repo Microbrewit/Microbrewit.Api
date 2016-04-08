@@ -10,7 +10,6 @@ namespace Microbrewit.Api.Mapper.Profile
         {
             CreateMap<SpargeStep, SpargeStepDto>()
                 .ForMember(dest => dest.StepNumber, conf => conf.MapFrom(src => src.StepNumber))
-                .ForMember(dto => dto.Type, conf => conf.UseValue("sparge"))
                 .ForMember(dest => dest.Amount, conf => conf.MapFrom(src => src.Amount))
                 .ForMember(dest => dest.Notes, conf => conf.MapFrom(src => src.Notes))
                 .ForMember(dest => dest.Type, conf => conf.MapFrom(src => src.Type))

@@ -31,8 +31,8 @@ namespace Microbrewit.Api.Model.DTOs
         public IList<DTO> SubBeerStyles { get; set; }
         [JsonProperty(PropertyName = "hops")]
         public IList<DTO> Hops { get; set; }
-        [JsonProperty(PropertyName = "dataType")]
-        public string DataType { get { return "beerstyle"; } }
+        [JsonProperty(PropertyName = "type")]
+        public string Type { get { return "beerstyle"; } }
        
     }
 }

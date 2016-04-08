@@ -21,10 +21,10 @@ namespace Microbrewit.Api.Model.DTOs
         [JsonProperty(PropertyName = "ppg")]
         public int PPG { get; set; }
         [Required]
+        [JsonProperty(PropertyName = "subType")]
+        public string SubType { get; set; }
         [JsonProperty(PropertyName = "type")]
-        public string Type { get; set; }
-        [JsonProperty(PropertyName = "dataType")]
-        public string DataType { get { return "fermentable"; } }
+        public string Type => "fermentable";
         [Required]
         [JsonProperty(PropertyName = "custom")]
         public bool Custom { get; set; }
@@ -32,7 +32,6 @@ namespace Microbrewit.Api.Model.DTOs
         public int? SuperFermentableId { get; set; }
         [JsonProperty(PropertyName = "subFermentables")]
         public IList<DTO> SubFermentables { get; set; }
-        public string SubType {get; set;}
     }
 
 }

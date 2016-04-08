@@ -15,10 +15,11 @@ namespace Microbrewit.Api.Model.DTOs
         public string Name { get; set; }
         [JsonProperty(PropertyName = "description")]
         public string Description { get; set; }
+        [JsonProperty(PropertyName = "subtype")]
+        public string SubType { get; set; }
         [JsonProperty(PropertyName = "type")]
-        public string Type { get; set; }
-        [JsonProperty(PropertyName = "dataType")]
-        public string DataType { get { return "brewery"; } }
+        public string Type => "brewery";
+
         [JsonProperty(PropertyName = "members")]
         public IEnumerable<BreweryMemberDto> Members { get; set; }
         [JsonProperty(PropertyName = "beers")]

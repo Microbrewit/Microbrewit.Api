@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
+using Microbrewit.Api.Settings;
 using Newtonsoft.Json;
 
 namespace Microbrewit.Api.Model.DTOs
 {
-    //  [ElasticType(Name = "beerComplete")]
     public class BeerCompleteDto
     {
         [JsonProperty(PropertyName = "links")]
@@ -14,7 +14,7 @@ namespace Microbrewit.Api.Model.DTOs
         {
             Links = new Links()
             {
-                Href = "http://api.microbrew.it/beers/:id",
+                Href = ApiConfiguration.ApiSettings.Url + "/beers/:id",
                 Type = "beer"
             };
         }

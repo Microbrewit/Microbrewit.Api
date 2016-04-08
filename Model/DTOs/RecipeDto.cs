@@ -9,8 +9,6 @@ namespace Microbrewit.Api.Model.DTOs
     [ElasticsearchType(Name = "recipe")]
     public class RecipeDto
     {
-        [JsonProperty(PropertyName = "recipeId")]
-        public int Id { get; set; }
         [JsonProperty(PropertyName = "notes")]
         public string  Notes { get; set; }
         [Required]
@@ -28,7 +26,7 @@ namespace Microbrewit.Api.Model.DTOs
         [JsonConverter(typeof(StepsJsonTypeConverter))]
         [JsonProperty(PropertyName = "steps")]
         public IList<IStepDto> Steps { get; set; }
-        [JsonProperty(PropertyName = "dataType")]
-        public string DataType { get { return "recipe"; } }
+        [JsonProperty(PropertyName = "type")]
+        public string Type => "recipe";
     }
 }

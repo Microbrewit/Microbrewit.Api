@@ -40,7 +40,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
                      .Size(_bigNumber)
                      .Query(q => q
                         .Filtered(fi => fi
-                            .Filter(f => f.Term(h => h.DataType, "glass")))));
+                            .Filter(f => f.Term(h => h.Type, "glass")))));
             return res.Documents;
         }
 

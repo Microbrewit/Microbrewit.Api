@@ -10,7 +10,6 @@ namespace Microbrewit.Api.Mapper.Profile
         {
             CreateMap<MashStep, MashStepDto>()
                 .ForMember(dto => dto.StepNumber, conf => conf.MapFrom(rec => rec.StepNumber))
-                .ForMember(dto => dto.Type, conf => conf.UseValue("mash"))
                 .ForMember(dto => dto.Ingredients, conf => conf.ResolveUsing<IngredientsMashStepResolver>());
 
             CreateMap<MashStepHop, HopStepDto>()

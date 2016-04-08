@@ -37,7 +37,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
             var result = await _client.SearchAsync<OriginDto>(s => s
                 .Query(q => q
                 .Filtered(fi => fi
-                    .Filter(f => f.Term(t => t.DataType, "origin"))))
+                    .Filter(f => f.Term(t => t.Type, "origin"))))
                 .Size(size)
                 .From(from)
                 );

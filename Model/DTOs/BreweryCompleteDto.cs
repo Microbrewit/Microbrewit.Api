@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
+using Microbrewit.Api.Settings;
 using Newtonsoft.Json;
 
 namespace Microbrewit.Api.Model.DTOs
 {
     public class BreweryCompleteDto
     {
-        private static readonly string apiPath = "http://dev.microbew.it/";// ConfigurationManager.AppSettings["api"];
         [JsonProperty(PropertyName = "links")]
         public LinksBrewery Links { get; set; }
         [JsonProperty(PropertyName = "breweries")]
@@ -17,12 +17,12 @@ namespace Microbrewit.Api.Model.DTOs
             {
                 Beer = new Links() 
                 {
-                    Href = apiPath + "/users/:username",
+                    Href = ApiConfiguration.ApiSettings.Url + "/users/:username",
                     Type = "user"
                 },
                 User = new Links()
                 {
-                    Href = apiPath + "beers/:id",
+                    Href = ApiConfiguration.ApiSettings.Url + "beers/:id",
                     Type = "beer"
                 }
 

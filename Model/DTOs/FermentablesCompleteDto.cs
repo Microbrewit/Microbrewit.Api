@@ -1,12 +1,11 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
+using Microbrewit.Api.Settings;
 
 namespace Microbrewit.Api.Model.DTOs
 {
     public class FermentablesCompleteDto
     {
-        private static readonly string apiPath = "http://dev.microbew.it/";// ConfigurationManager.AppSettings["api"];
-        //public Meta Meta { get; set; }
         [JsonProperty(PropertyName = "links")]
         public LinksFermentable Links { get; set; }
         [JsonProperty(PropertyName = "fermentables")]
@@ -19,7 +18,7 @@ namespace Microbrewit.Api.Model.DTOs
                 
                 FermentablesMaltster = new Links()
                 {
-                    Href = apiPath + "/supplier/:id",
+                    Href = ApiConfiguration.ApiSettings.Url + "/supplier/:id",
                     Type = "supplier",
                 }
             };

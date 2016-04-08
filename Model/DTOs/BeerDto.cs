@@ -38,8 +38,8 @@ namespace Microbrewit.Api.Model.DTOs
             public IList<BrewerySimpleDto> Breweries { get; set; }
             [JsonProperty(PropertyName = "brewers")]
             public IList<DTOUser> Brewers { get; set; }
-            [JsonProperty(PropertyName = "dataType")]
-            public string DataType { get { return "beer"; } }
+            [JsonProperty(PropertyName = "type")]
+            public string DataType => "beer";
             [JsonProperty(PropertyName = "forks")]
             public IList<BeerSimpleDto> Forks { get; set; }
        

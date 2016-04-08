@@ -12,7 +12,7 @@ namespace Microbrewit.Api.Mapper.CustomResolvers
         {
             var boilStepList = new List<BoilStep>();
             {
-                foreach (var item in recipe.Steps.Where(s => s.Type == "boil"))
+                foreach (var item in recipe.Steps.OfType<BoilStepDto>())
                 {
                     var boilStepDto = (BoilStepDto) item;
                     var boilStep = new BoilStep()

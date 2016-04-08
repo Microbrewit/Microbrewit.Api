@@ -14,7 +14,7 @@ namespace Microbrewit.Api.Mapper.Profile
                 .ForMember(dto => dto.Name, conf => conf.MapFrom(rec => rec.Name))
                 .ForMember(dto => dto.Lovibond, conf => conf.MapFrom(rec => rec.Lovibond))
                 .ForMember(dto => dto.PPG, conf => conf.MapFrom(rec => rec.PPG))
-                .ForMember(dto => dto.Type, conf => conf.MapFrom(rec => rec.Type))
+                .ForMember(dto => dto.SubType, conf => conf.MapFrom(rec => rec.Type))
                 .ForMember(dto => dto.SuperFermentableId, conf => conf.MapFrom(rec => rec.SuperFermentableId))
                 .ForMember(dto => dto.SubFermentables, conf => conf.MapFrom(rec => rec.SubFermentables))
                 .ForMember(dto => dto.Supplier, conf => conf.MapFrom(rec => rec.Supplier));
@@ -38,7 +38,7 @@ namespace Microbrewit.Api.Mapper.Profile
                .ForMember(dto => dto.FermentableId, conf => conf.MapFrom(rec => rec.Id))
                .ForMember(dto => dto.Name, conf => conf.MapFrom(rec => rec.Name))
                .ForMember(dto => dto.PPG, conf => conf.MapFrom(rec => rec.PPG))
-               .ForMember(dto => dto.Type, conf => conf.MapFrom(rec => rec.Type))
+               .ForMember(dto => dto.Type, conf => conf.MapFrom(rec => rec.SubType))
                .ForMember(dto => dto.SupplierId, conf => conf.ResolveUsing<FermentableSupplierResolver>())
                 .ForMember(dto => dto.SuperFermentableId, conf => conf.MapFrom(rec => rec.SuperFermentableId))
                 .ForMember(dto => dto.SubFermentables, conf => conf.MapFrom(rec => rec.SubFermentables))
@@ -48,7 +48,7 @@ namespace Microbrewit.Api.Mapper.Profile
               .ForMember(dto => dto.FermentableId, conf => conf.MapFrom(rec => rec.Id))
               .ForMember(dto => dto.Name, conf => conf.MapFrom(rec => rec.Name))
               .ForMember(dto => dto.PPG, conf => conf.MapFrom(rec => rec.PPG))
-              .ForMember(dto => dto.Type, conf => conf.MapFrom(rec => rec.Type))
+              .ForMember(dto => dto.SubType, conf => conf.MapFrom(rec => rec.SubType))
               .ForMember(dto => dto.Supplier, conf => conf.MapFrom(rec => rec.Supplier));
 
             CreateMap<DTO,Supplier>()

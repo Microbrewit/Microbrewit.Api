@@ -36,7 +36,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
             var result = await _client.SearchAsync<BeerStyleDto>(s => s
                 .Query(q => q
                     .Filtered(fi => fi
-                        .Filter(f => f.Term(t => t.DataType, "beerstyle"))))
+                        .Filter(f => f.Term(t => t.Type, "beerstyle"))))
                 .Size(size)
                 .From(from)
                 );
