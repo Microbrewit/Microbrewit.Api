@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Microbrewit.Api.Configuration;
 using Microbrewit.Api.Settings;
 using Newtonsoft.Json;
 

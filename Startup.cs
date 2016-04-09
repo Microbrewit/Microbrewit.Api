@@ -16,6 +16,7 @@ using Microbrewit.Api.Calculations;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNet.Mvc.Formatters;
 using Microsoft.Extensions.OptionsModel;
+using Microbrewit.Api.Configuration;
 
 namespace Microbrewit.Api
 {
@@ -89,7 +90,6 @@ namespace Microbrewit.Api
             loggerFactory.AddDebug(LogLevel.Verbose);
 
             ApiConfiguration.ApiSettings = app.ApplicationServices.GetService<IOptions<ApiSettings>>().Value;
-
             app.UseIISPlatformHandler();
              app.UseCors(policy =>
             {

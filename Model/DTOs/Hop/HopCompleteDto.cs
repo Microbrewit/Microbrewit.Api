@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
-using Microbrewit.Api.Settings;
+using Microbrewit.Api.Configuration;
 
 namespace Microbrewit.Api.Model.DTOs
 {
@@ -13,6 +13,7 @@ namespace Microbrewit.Api.Model.DTOs
 
         public HopCompleteDto()
         {
+
             Links = new LinksHop()
             {
                 HopOrigins = new Links()
