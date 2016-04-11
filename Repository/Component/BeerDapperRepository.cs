@@ -41,7 +41,7 @@ namespace Microbrewit.Api.Repository.Component
                           "LEFT JOIN srms s ON s.srm_id = b.beer_id " +
                           "LEFT JOIN abvs a ON a.abv_id = b.beer_id " +
                           "LEFT JOIN ibus i ON i.ibu_id = b.beer_id " +
-                          "ORDER BY beer_id LIMIT @Size OFFSET @From";
+                          "ORDER BY created_date DESC LIMIT @Size OFFSET @From";
                 var beers = await connection.QueryAsync<Beer, BeerStyle, Recipe, SRM, ABV, IBU, Beer>(
                      sql, (beer, beerStyle, recipe, srm, abv, ibu) =>
                      {

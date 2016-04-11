@@ -109,6 +109,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
         {
             var result = await _client.SearchAsync<BeerDto>(s => s
                 .Size(BigNumber)
+                .Sort(b => b.Descending(d => d.CreatedDate))
                 .Query(q => q
                 .Filtered(f => f
                     .Query(q2 => q2
