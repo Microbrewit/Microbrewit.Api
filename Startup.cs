@@ -49,7 +49,7 @@ namespace Microbrewit.Api
             services.AddTransient<IBeerStyleRepository, BeerStyleDapperRepository>();
             services.AddTransient<IBeerRepository, BeerDapperRepository>();
             services.AddTransient<IBreweryRepository, BreweryDapperRepository>();
-            services.AddTransient<IOriginService,OriginService>();
+            services.AddTransient<IUserRepository,UserDapperRepository>();
             //Service dependency injection
             services.AddTransient<IHopService,HopService>();
             services.AddTransient<IYeastService, YeastService>();
@@ -60,6 +60,8 @@ namespace Microbrewit.Api
             services.AddTransient<IBeerService, BeerService>();
             services.AddTransient<IBreweryService, BreweryService>();
             services.AddTransient<IIngredientService, IngredientService>();
+            services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IOriginService,OriginService>();
             //ElasticSearch dependency injection
             services.AddTransient<IBeerElasticsearch, BeerElasticsearch>();
             services.AddTransient<IBeerStyleElasticsearch, BeerStyleElasticsearch>();
@@ -71,6 +73,8 @@ namespace Microbrewit.Api
             services.AddTransient<IOtherElasticsearch, OtherElasticsearch>();
             services.AddTransient<ISearchElasticsearch, SearchElasticsearch>();
             services.AddTransient<IYeastElasticsearch, YeastElasticsearch>();
+            services.AddTransient<ISupplierElasticsearch, SupplierElasticsearch>();
+            services.AddTransient<IUserElasticsearch,UserElasticsearch>();
 
             services.AddTransient<ICalculation,Calculation>();
             services.AddTransient<IBeerXmlResolver,BeerXmlResolver>();
@@ -91,7 +95,7 @@ namespace Microbrewit.Api
 
             ApiConfiguration.ApiSettings = app.ApplicationServices.GetService<IOptions<ApiSettings>>().Value;
             app.UseIISPlatformHandler();
-             app.UseCors(policy =>
+            app.UseCors(policy =>
             {
                 policy.WithOrigins("https://microbrew.it","http://microbrew.it", "http://localhost:3000");
                 policy.AllowAnyHeader();
@@ -101,7 +105,7 @@ namespace Microbrewit.Api
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
             app.UseIdentityServerAuthentication(options =>
             {
-                options.Authority = "http://auth.microbrew.it";
+                options.Authority = "http://auth.microbrew.it/";
                 options.ScopeName = "microbrewit-api";
                 options.ScopeSecret = "secret";
 

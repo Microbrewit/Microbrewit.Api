@@ -5,6 +5,7 @@ using Microbrewit.Api.Model.DTOs;
 using Microbrewit.Api.Service.Interface;
 using Microsoft.Extensions.Logging;
 using System.Net;
+using Microbrewit.Api.Configuration;
 
 namespace Microbrewit.Api.Controllers
 {
@@ -24,6 +25,7 @@ namespace Microbrewit.Api.Controllers
         [HttpGet]
         public async Task<HopCompleteDto> GetHops(int from = 0, int size = 20)
         {
+            _logger.LogDebug("Api Url:" + ApiConfiguration.ApiSettings.Url);
             if(size > 1000) size = 1000;
             var hops = await _hopService.GetAllAsync(from,size);
             return new HopCompleteDto { Hops = hops};

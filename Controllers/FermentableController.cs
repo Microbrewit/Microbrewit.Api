@@ -5,8 +5,7 @@ using System.Threading.Tasks;
 using Microbrewit.Api.Model.DTOs;
 using Microbrewit.Api.Service.Interface;
 using Microsoft.AspNet.Mvc;
-
-
+using Microsoft.Extensions.Logging;
 namespace Microbrewit.Api.Controllers
 {
     /// <summary>
@@ -16,10 +15,12 @@ namespace Microbrewit.Api.Controllers
     public class FermentablesController : Controller
     {
         private readonly IFermentableService _fermentableService;
+        private readonly ILogger<FermentablesController> _logger;
 
-        public FermentablesController(IFermentableService fermentableService)
+        public FermentablesController(IFermentableService fermentableService, ILogger<FermentablesController> logger)
         {
             _fermentableService = fermentableService;
+            _logger = logger;
         }
 
         /// <summary>
@@ -86,7 +87,9 @@ namespace Microbrewit.Api.Controllers
             if (!ModelState.IsValid)
                 return HttpBadRequest(ModelState);
             var result = await _fermentableService.AddAsync(fermentableDto);
-            return CreatedAtRoute(new { controller = "fermentables", }, result);
+            _logger.LogInformation(fermentableDto.Name);
+            //return CreatedAtRoute(new { controller = "fermentables", }, result);
+            return Created("fermentables",result);
         }
 
         /// <summary>

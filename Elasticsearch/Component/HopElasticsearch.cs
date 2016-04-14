@@ -22,6 +22,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
             _elasticSearchSettings = elasticsearchSettings.Value;
             this._node = new Uri(_elasticSearchSettings.Url);
             this._settings = new ConnectionSettings(_node);
+            this._settings.DefaultIndex(_elasticSearchSettings.Index);
             this._client = new ElasticClient(_settings);
         }
 
@@ -37,7 +38,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
         {
             // Adds an analayzer to the name property in FermentableDto object.
             await _client.MapAsync<HopDto>(d => d.Properties(p => p.String(s => s.Name(n => n.Name).Analyzer("autocomplete"))));
-            await _client.IndexAsync<HopDto>(hop, idx => idx.Index(_elasticSearchSettings.Index));
+            await _client.IndexAsync<HopDto>(hop);
         }
 
         public async Task<IEnumerable<HopDto>> GetAllAsync(int from, int size)
@@ -48,7 +49,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
                         .From(from)
                         .Size(size)
                         .Query(q => q
-                            .Filtered(fd => fd
+                            .Bool(fd => fd
                                 .Filter(f => f
                                     .Term(h => h.Type, "hop")
                                     ))));
@@ -69,9 +70,9 @@ namespace Microbrewit.Api.ElasticSearch.Component
                                                 .From(from)
                                                 .Size(size)
                                                 .Query(q1 => q1
-                                                .Filtered(fi => fi                                              
+                                                .Bool(fi => fi                                              
                                                     .Filter(f => f.Term(t => t.Type, "hop"))
-                                                .Query(q => q.Match(m => m.Field(f => f.Name)
+                                                .Must(q => q.Match(m => m.Field(f => f.Name)
                                                                           .Query(query))))));
 
             return searchResults.Documents;
@@ -95,9 +96,9 @@ namespace Microbrewit.Api.ElasticSearch.Component
                                                .From(from)
                                                .Size(size)
                                                .Query(q1 => q1
-                                               .Filtered(fi => fi
+                                               .Bool(fi => fi
                                                 .Filter(f => f.Term(t => t.Type, "hop"))
-                                                .Query(q2 => q2.Match(m => m.Field(f => f.Name)
+                                                .Must(q2 => q2.Match(m => m.Field(f => f.Name)
                                                                          .Query(query))))));
 
             return searchResults.Documents;

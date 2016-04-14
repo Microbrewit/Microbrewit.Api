@@ -23,6 +23,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
             _elasticSearchSettings = elasticsearchSettings.Value;
             this._node = new Uri(_elasticSearchSettings.Url);
             this._settings = new ConnectionSettings(_node);
+            _settings.DefaultIndex(_elasticSearchSettings.Index);
             this._client = new ElasticClient(_settings);
         }
 
@@ -40,7 +41,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
                  s => s
                      .Size(_bigNumber)
                      .Query(q => q
-                     .Filtered(fi => fi
+                     .Bool(fi => fi
                         .Filter(f => f.Term(h => h.Type, "other") && f.Term(p => p.Custom, custom)))));
             return res.Documents;
         }
@@ -66,7 +67,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
         public async Task<IBulkResponse> UpdateAllAsync(IEnumerable<OtherDto> others)
         {
             await _client.MapAsync<OtherDto>(d => d.Properties(p => p.String(s => s.Name(n => n.Name).Analyzer("autocomplete"))));
-            return await _client.IndexManyAsync(others,_elasticSearchSettings.Index);
+            return await _client.IndexManyAsync(others);
         }
 
         public Task<IDeleteResponse> DeleteAsync(int id)
@@ -96,7 +97,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
         {
             // Adds an analayzer to the name property in FermentableDto object.
              _client.Map<OtherDto>(d => d.Properties(p => p.String(s => s.Name(n => n.Name).Analyzer("autocomplete"))));
-            _client.Index<OtherDto>(otherDto, idx => idx.Index(_elasticSearchSettings.Index));
+            _client.Index<OtherDto>(otherDto);
         }
     }
 }

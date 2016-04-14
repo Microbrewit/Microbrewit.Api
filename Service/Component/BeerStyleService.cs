@@ -7,6 +7,7 @@ using Microbrewit.Api.Model.Database;
 using Microbrewit.Api.Model.DTOs;
 using Microbrewit.Api.Repository.Interface;
 using Microbrewit.Api.Service.Interface;
+using Microsoft.Extensions.Logging;
 
 namespace Microbrewit.Api.Service.Component
 {
@@ -16,13 +17,16 @@ namespace Microbrewit.Api.Service.Component
         private readonly IBeerStyleElasticsearch _beerStyleElasticsearch;
         private readonly IHopElasticsearch _hopElasticsearch;
         private readonly IHopRepository _hopRepository;
+        private readonly ILogger<BeerStyleService> _logger;
         public BeerStyleService(IBeerStyleElasticsearch beerStyleElasticsearch, 
-        IBeerStyleRepository beerStyleRepository,IHopElasticsearch hopElasticsearch, IHopRepository hopRepository)
+        IBeerStyleRepository beerStyleRepository,IHopElasticsearch hopElasticsearch, IHopRepository hopRepository,
+         ILogger<BeerStyleService> logger)
         {
             _beerStyleElasticsearch = beerStyleElasticsearch;
             _beerStyleRepository = beerStyleRepository;
             _hopElasticsearch = hopElasticsearch;
             _hopRepository = hopRepository;
+            _logger = logger;
         }
         public async Task<IEnumerable<BeerStyleDto>> GetAllAsync(int @from, int size)
         {
@@ -44,8 +48,9 @@ namespace Microbrewit.Api.Service.Component
         {
              var beerStyle = AutoMapper.Mapper.Map<BeerStyleDto, BeerStyle>(beerStyleDto);
             await _beerStyleRepository.AddAsync(beerStyle);
-            var result = await _beerStyleRepository.GetSingleAsync(beerStyle.BeerStyleId);
+            var result = await _beerStyleRepository.GetSingleAsync(beerStyle.BeerStyleId);           
             var mappedResult = AutoMapper.Mapper.Map<BeerStyle, BeerStyleDto>(result);
+            _logger.LogInformation(mappedResult.Name);
             await _beerStyleElasticsearch.UpdateAsync(mappedResult);
             await IndexHopAsync(beerStyle);
             return mappedResult;
@@ -85,10 +90,12 @@ namespace Microbrewit.Api.Service.Component
         
           private async Task IndexHopAsync(BeerStyle beerStyle)
         {
+            if(beerStyle.HopBeerStyles == null) return;
             foreach (var hopBeerStyle in beerStyle.HopBeerStyles)
             {
                 var hop = await _hopRepository.GetSingleAsync(hopBeerStyle.HopId);
-                await _hopElasticsearch.UpdateAsync(AutoMapper.Mapper.Map<Hop, HopDto>(hop));
+                var hopDto = AutoMapper.Mapper.Map<Hop, HopDto>(hop);
+                await _hopElasticsearch.UpdateAsync(hopDto);
             }
         }
     }

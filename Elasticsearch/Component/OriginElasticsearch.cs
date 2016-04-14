@@ -22,13 +22,14 @@ namespace Microbrewit.Api.ElasticSearch.Component
             _elasticSearchSettings = elasticsearchSettings.Value;  
             this._node = new Uri(_elasticSearchSettings.Url);
             this._settings = new ConnectionSettings(_node);
+            _settings.DefaultIndex(_elasticSearchSettings.Index);
             this._client = new ElasticClient(_settings);
         }
 
         public async Task UpdateAsync(OriginDto originDto)
         {
             await _client.MapAsync<OriginDto>(d => d.Properties(p => p.String(s => s.Name(n => n.Name).Analyzer("autocomplete"))));
-            var index =  await _client.IndexAsync<OriginDto>(originDto, idx => idx.Index(_elasticSearchSettings.Index));
+            var index =  await _client.IndexAsync<OriginDto>(originDto);
         }
 
         public async Task<IEnumerable<OriginDto>> GetAllAsync(int from, int size ,string custom)
@@ -36,11 +37,10 @@ namespace Microbrewit.Api.ElasticSearch.Component
             //TODO: Add filter for custom.
             var result = await _client.SearchAsync<OriginDto>(s => s
                 .Query(q => q
-                .Filtered(fi => fi
+                .Bool(fi => fi
                     .Filter(f => f.Term(t => t.Type, "origin"))))
                 .Size(size)
-                .From(from)
-                );
+                .From(from));
             return result.Documents;
         }
 
@@ -71,7 +71,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
         public async Task UpdateAllAsync(IEnumerable<OriginDto> originDtos)
         {
             await _client.MapAsync<OriginDto>(d => d.Properties(p => p.String(s => s.Name(n => n.Name).Analyzer("autocomplete"))));
-            var index = await _client.IndexManyAsync<OriginDto>(originDtos,_elasticSearchSettings.Index);
+            var index = await _client.IndexManyAsync<OriginDto>(originDtos);
         }
 
         public async Task DeleteAsync(int id)

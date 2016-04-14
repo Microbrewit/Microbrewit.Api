@@ -23,6 +23,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
             _elasticSearchSettings = elasticSearchSettings.Value;
             this._node = new Uri( _elasticSearchSettings.Url);
             this._settings = new ConnectionSettings(_node);
+            _settings.DefaultIndex(_elasticSearchSettings.Index);
             this._client = new ElasticClient(_settings);
         }
 
@@ -32,7 +33,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
                 .String(s => s.Name(n => n.Name).Analyzer("autocomplete"))
                 .String(s => s.Name(n => n.ProductCode).Analyzer("autocomplete"))
                 ));
-            await _client.IndexAsync(yeastDto, idx => idx.Index(_elasticSearchSettings.Index));
+            await _client.IndexAsync(yeastDto);
         }
 
         public async Task<IEnumerable<YeastDto>> GetAllAsync(string custom)
@@ -40,7 +41,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
             var res = await _client.SearchAsync<YeastDto>(s => s
                 .Size(_bigNumber)
                 .Query(q => q
-                    .Filtered(fi => fi
+                    .Bool(fi => fi
                     .Filter(f => f.Term(t => t.Type, "yeast") && f.Term(t => t.Custom, custom)))));
             return res.Documents;
         }
@@ -68,7 +69,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
                .String(s => s.Name(n => n.Name).Analyzer("autocomplete"))
                .String(s => s.Name(n => n.ProductCode).Analyzer("autocomplete"))
                ));
-            await _client.IndexManyAsync(yeasts,_elasticSearchSettings.Index);
+            await _client.IndexManyAsync(yeasts);
         }
 
         public async Task DeleteAsync(int id)
