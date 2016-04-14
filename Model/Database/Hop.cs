@@ -35,8 +35,8 @@ namespace Microbrewit.Api.Model.Database
         public string Aliases { get; set; }
         public string FlavourDescription { get; set; }
         public bool Custom { get; set; }
-        public DateTime CreatedDate { get; set; }
-        public DateTime UpdatedDate { get; set; }
+        public DateTimeOffset CreatedDate { get; set; }
+        public DateTimeOffset UpdatedDate { get; set; }
         public int? OriginId { get; set; } 
         public Origin Origin { get; set; }
 

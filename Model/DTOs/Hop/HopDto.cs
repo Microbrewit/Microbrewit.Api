@@ -45,8 +45,8 @@ namespace Microbrewit.Api.Model.DTOs
         public bool Custom { get; set; }
         public string SubType {get; set;}
         [JsonProperty(PropertyName = "createdDate")]
-        public DateTime CreatedDate { get; set; }
+        public DateTimeOffset CreatedDate { get; set; }
         [JsonProperty(PropertyName = "updatedDate")]
-        public DateTime UpdatedDate { get; set; }
+        public DateTimeOffset UpdatedDate { get; set; }
     }
 }
