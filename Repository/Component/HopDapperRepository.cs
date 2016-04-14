@@ -34,7 +34,8 @@ namespace Microbrewit.Api.Repository.Component
                     bpinene_low AS BpineneLow,bpinene_high AS BpineneHigh,linalool_low AS LinaloolLow,linalool_high AS LinaloolHigh,myrcene_low AS MyrceneLow,
                     myrcene_high As MyrceneHigh,caryophyllene_low AS CaryophylleneLow,caryophyllene_high AS CaryophylleneHigh ,farnesene_low AS FarneseneLow,
                     farnesene_high AS FarneseneHigh,humulene_low As HumuleneLow ,humulene_high AS HumuleneHigh,geraniol_low AS GeraniolLow,
-                    geraniol_high AS GeraniolHigh,other_oil_low AS OtherOilLow,other_oil_high AS OtherOilHigh, o.origin_id AS OriginId, o.name";
+                    geraniol_high AS GeraniolHigh,other_oil_low AS OtherOilLow,other_oil_high AS OtherOilHigh,h.created_date AS CreatedDate," + 
+                    "h.updated_date AS UpdatedDate, o.origin_id AS OriginId, o.name";
                 var sql = $"SELECT {hopFields} FROM hops h LEFT JOIN origins o ON h.origin_id = o.origin_id LIMIT @Size OFFSET @From";
                 var hops = (await connection.QueryAsync<Hop, Origin, Hop>(sql,  (hop, origin) =>
                 {
@@ -110,7 +111,8 @@ namespace Microbrewit.Api.Repository.Component
                     "linalool_high AS LinaloolHigh,myrcene_low AS MyrceneLow,myrcene_high As MyrceneHigh,caryophyllene_low AS CaryophylleneLow," +
                     "caryophyllene_high AS CaryophylleneHigh ,farnesene_low AS FarneseneLow,farnesene_high AS FarneseneHigh," +
                     "humulene_low As HumuleneLow ,humulene_high AS HumuleneHigh,geraniol_low AS GeraniolLow,geraniol_high AS GeraniolHigh," +
-                    "other_oil_low AS OtherOilLow,other_oil_high AS OtherOilHigh,o.origin_id AS OriginId, o.name";
+                    "other_oil_low AS OtherOilLow,other_oil_high AS OtherOilHigh,h.created_date AS CreatedDate," + 
+                    "h.updated_date AS UpdatedDate,o.origin_id AS OriginId, o.name";
                 var result = await connection.QueryAsync<Hop, Origin, Hop>($"SELECT {hopFields} FROM hops h LEFT JOIN origins o ON h.origin_id = o.origin_id WHERE h.hop_id = @Id", (h, origin) =>
                 {
                     h.Origin = origin;
@@ -188,13 +190,15 @@ namespace Microbrewit.Api.Repository.Component
                 {
                     try
                     {
+                        hop.CreatedDate = DateTime.Now;
+                        hop.UpdatedDate = DateTime.Now;
                         const string sql = @"INSERT INTO hops(name, aa_low, aa_high, beta_low, beta_high, notes, flavour_description, custom, 
                             origin_id, purpose, aliases, total_oil_low, total_oil_high, bpinene_low, bpinene_high, linalool_low, linalool_high, myrcene_low, 
                             myrcene_high, caryophyllene_low, caryophyllene_high, farnesene_low, farnesene_high, humulene_low, humulene_high, geraniol_low, geraniol_high, 
-                            other_oil_low, other_oil_high) 
+                            other_oil_low, other_oil_high, created_date, updated_date) 
                             VALUES(@Name,@AALow,@AAHigh,@BetaLow,@BetaHigh,@Notes,@FlavourDescription,@Custom,@OriginId,
                             @Purpose,@Aliases,@TotalOilLow,@TotalOilHigh,@BPineneLow,@BPineneHigh,@LinaloolLow,@LinaloolHigh,@MyrceneLow,@MyrceneHigh,@CaryophylleneLow,
-                            @CaryophylleneHigh,@FarneseneLow,@FarneseneHigh,@HumuleneLow,@HumuleneHigh,@GeraniolLow,@GeraniolHigh,@OtherOilLow,@OtherOilHigh);";
+                            @CaryophylleneHigh,@FarneseneLow,@FarneseneHigh,@HumuleneLow,@HumuleneHigh,@GeraniolLow,@GeraniolHigh,@OtherOilLow,@OtherOilHigh,@CreatedDate,@UpdatedDate);";
 
                         var result = await connection.ExecuteAsync(sql, hop, transaction);
                         var hopId = await connection.QueryAsync<int>("SELECT last_value FROM hops_seq;");
@@ -249,6 +253,7 @@ namespace Microbrewit.Api.Repository.Component
                     try
                     {
                         _logger.LogInformation($"Hop name:{hop.Name}");
+                        hop.UpdatedDate = DateTime.Now;
                         var sql =
                             @"Update hops set name = @Name,aa_low = @AALow,aa_high = @AAHigh, beta_low = @BetaLow,beta_high = @BetaHigh, 
                             notes = @Notes,flavour_description = @FlavourDescription, custom = @custom,origin_id = @OriginId,  
@@ -256,7 +261,7 @@ namespace Microbrewit.Api.Repository.Component
                             myrcene_high = @myrceneHigh,caryophyllene_high = @CaryophylleneHigh,farnesene_high = @FarneseneHigh,humulene_high = @HumuleneHigh,
                             geraniol_high = @GeraniolHigh,other_oil_high = @OtherOilHigh,total_oil_low = @TotalOilLow,bpinene_low = @BPineneLow,linalool_low = @LinaloolLow,
                             myrcene_low = @myrceneLow,caryophyllene_low = @CaryophylleneLow,farnesene_low = @FarneseneLow,humulene_low = @humuleneLow,geraniol_low = @GeraniolLow,
-                            other_oil_low = @OtherOilLow WHERE hop_id = @HopId;";
+                            other_oil_low = @OtherOilLow, updated_date = @UpdatedDate WHERE hop_id = @HopId;";
                         var result = await connection.ExecuteAsync(sql, hop, transaction);
                         await UpdateHopFlavourAsync(connection, transaction, hop);
                         await UpdateHopSubstituteAsync(connection, transaction, hop);
