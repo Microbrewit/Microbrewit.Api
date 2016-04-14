@@ -74,7 +74,7 @@ namespace Microbrewit.Api.Service.Component
 
         public async Task<BeerDto> AddAsync(BeerDto beerDto, string username)
         {
-            if (beerDto.Brewers != null && beerDto.Brewers.All(b => b.Username != username))
+            if (beerDto.Brewers != null && beerDto.Brewers.All(b => b.UserId != username))
             {
                 if (beerDto.Breweries.Any())
                 {
@@ -86,8 +86,8 @@ namespace Microbrewit.Api.Service.Component
             else
             {
                 if (beerDto.Brewers == null) beerDto.Brewers = new List<DTOUser>();
-                if (beerDto.Brewers.Any(b => b.Username != username))
-                    beerDto.Brewers.Add(new DTOUser { Username = username });
+                if (beerDto.Brewers.Any(b => b.UserId != username))
+                    beerDto.Brewers.Add(new DTOUser { UserId = username });
             }
             var returnBeer = await AddAsync(beerDto);
             //await _userService.UpdateNotification(username, new NotificationDto { Id = returnBeer.Id, Type = "UserBeer", Value = true });

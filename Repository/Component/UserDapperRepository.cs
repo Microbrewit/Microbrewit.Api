@@ -19,265 +19,57 @@ namespace Microbrewit.Api.Repository.Component
        {
            _databaseSettings = databaseSettings.Value;
        }
-        public IEnumerable<UserSocial> GetUserSocials(string username)
-        {
-            using (DbConnection context = new NpgsqlConnection(_databaseSettings.DbConnection))
-            {
-                return context.Query<UserSocial>("SELECT * FROM UserSocials WHERE Username = @Username",
-                    new {Username = username});
-            }
-        }
 
-        public async Task<IEnumerable<UserBeer>> GetAllUserBeersAsync(string username)
+        public async Task<IList<User>> GetAllAsync()
         {
             using (DbConnection context = new NpgsqlConnection(_databaseSettings.DbConnection))
             {
-                var userBeers = await context.QueryAsync<UserBeer, Beer, SRM, ABV, IBU, BeerStyle, UserBeer>(
-                    "SELECT * " +
-                    "FROM UserBeers ub " +
-                    "LEFT JOIN Beers b ON ub.BeerId = b.BeerId " +
-                    "LEFT JOIN SRMs s ON s.SrmId = b.BeerId " +
-                    "LEFT JOIN ABVs a ON a.AbvId = b.BeerId " +
-                    "LEFT JOIN IBUs i ON i.IbuId = b.BeerId " +
-                    "LEFT JOIN BeerStyles bs ON bs.BeerStyleId = b.BeerStyleId " +
-                    "WHERE ub.Username = @Username", (userBeer, beer, srm, abv, ibu, beerStyle) =>
-                    {
-                        userBeer.Beer = beer;
-                        if (srm != null)
-                            beer.SRM = srm;
-                        if (abv != null)
-                            beer.ABV = abv;
-                        if (ibu != null)
-                            beer.IBU = ibu;
-                        if (beerStyle != null)
-                            beer.BeerStyle = beerStyle;
-                        return userBeer;
-                    }, new { Username = username }, splitOn: "BeerId,SrmId,AbvId,IbuId,BeerStyleId");
-                return userBeers;
-            }
-        }
-        public IList<User> GetAll()
-        {
-            using (DbConnection context = new NpgsqlConnection(_databaseSettings.DbConnection))
-            {
-                var users = context.Query<User>("SELECT * FROM Users;");
-
+                var users = await context.QueryAsync<User>("SELECT user_id AS UserId, username, email, settings, gravatar, longitude, latitude, " +
+                                                           "header_image_url, avatar_url, firstname, lastname FROM users;");
                 foreach (var user in users)
                 {
-                    var userSocials = context.Query<UserSocial>("SELECT * FROM UserSocials WHERE Username = @Username",
-                        new { user.Username });
+                    var userSocials = await context.QueryAsync<UserSocial>("SELECT user_id AS UserId, social_id AS SocialId, site, url FROM user_socials WHERE user_id = @UserId",
+                        new { user.UserId });
                     user.Socials = userSocials.ToList();
+                    var sql = "SELECT bm.brewery_id AS BreweryId,bm.user_id AS UserId,role, confirmed, " + 
+                              " b.brewery_id AS BreweryId, b.name, description, type, created_date AS CreatedDate, updated_date AS UpdatedDate," +
+                              " longitude, latitude, website, established, header_image_url AS HeaderImageUrl," +
+                              " avatar_url AS AvatarUrl, b.origin_id AS OriginId, address, o.origin_id AS OriginId, o.name  " +
+                              " FROM brewery_members bm " +
+                              " LEFT JOIN Breweries b ON bm.Brewery_Id = b.Brewery_Id " +
+                              " LEFT JOIN origins o ON b.origin_id = o.origin_id " +
+                              " WHERE bm.user_id = @UserId";
                     var breweryMembers =
-                        context.Query<BreweryMember, Brewery, BreweryMember>("SELECT * FROM BreweryMembers bm " +
-                                                                             "LEFT JOIN Breweries b ON bm.BreweryId = b.BreweryId " +
-                                                                             "WHERE bm.MemberUsername = @Username",
-                            (breweryMember, brewery) =>
+                        await context.QueryAsync<BreweryMember, Brewery, Origin, BreweryMember>(sql,
+                            (breweryMember, brewery, origin) =>
                             {
                                 breweryMember.Brewery = brewery;
+                                if(brewery != null)
+                                    brewery.Origin = origin;
                                 return breweryMember;
                             },
-                            new { user.Username }, splitOn: "BreweryId");
+                            new { user.UserId }, splitOn: "BreweryId,OriginId");
                     user.Breweries = breweryMembers.ToList();
-
-                    var userBeers = context.Query<UserBeer, Beer, SRM, ABV, IBU, BeerStyle, UserBeer>(
-                        "SELECT * " +
-                        "FROM UserBeers ub " +
-                        "LEFT JOIN Beers b ON ub.BeerId = b.BeerId " +
-                        "LEFT JOIN SRMs s ON s.SrmId = b.BeerId " +
-                        "LEFT JOIN ABVs a ON a.AbvId = b.BeerId " +
-                        "LEFT JOIN IBUs i ON i.IbuId = b.BeerId " +
-                        "LEFT JOIN BeerStyles bs ON bs.BeerStyleId = b.BeerStyleId " +
-                        "WHERE ub.Username = @Username", (userBeer, beer, srm, abv, ibu, beerStyle) =>
-                        {
-                            userBeer.Beer = beer;
-                            if (srm != null)
-                                beer.SRM = srm;
-                            if (abv != null)
-                                beer.ABV = abv;
-                            if (ibu != null)
-                                beer.IBU = ibu;
-                            if (beerStyle != null)
-                                beer.BeerStyle = beerStyle;
-                            return userBeer;
-                        }, new { user.Username }, splitOn: "BeerId,SrmId,AbvId,IbuId,BeerStyleId");
-                    user.Beers = userBeers.ToList();
-                }
-               
-                //foreach (var user in users)
-                //{
-                //    var account = await _authRepository.FindUser(user.Username);
-                //    if (account == null || !account.Roles.Any()) continue;
-                //        user.Roles = account.Roles.Select(r => r.RoleId);
-                //}
-                return users.ToList();
-            }
-        }
-
-        public User GetSingle(string username)
-        {
-            using (DbConnection context = new NpgsqlConnection(_databaseSettings.DbConnection))
-            {
-                var users = context.Query<User>("SELECT * FROM Users WHERE Username = @Username;", new { Username = username });
-                var user = users.SingleOrDefault();
-                if (user == null) return null;
-
-                var userSocials = context.Query<UserSocial>("SELECT * FROM UserSocials WHERE Username = @Username",
-                    new { user.Username });
-                user.Socials = userSocials.ToList();
-                var breweryMembers =
-                    context.Query<BreweryMember, Brewery, BreweryMember>(
-                        "SELECT * FROM BreweryMembers bm " +
-                        "LEFT JOIN Breweries b ON bm.BreweryId = b.BreweryId " +
-                        "WHERE bm.MemberUsername = @Username",
-                        (breweryMember, brewery) =>
-                        {
-                            breweryMember.Brewery = brewery;
-                            return breweryMember;
-                        },
-                        new { user.Username }, splitOn: "BreweryId");
-                user.Breweries = breweryMembers.ToList();
-
-                var userBeers = context.Query<UserBeer, Beer, SRM, ABV, IBU, BeerStyle, UserBeer>(
-                    "SELECT * " +
-                    "FROM UserBeers ub " +
-                    "LEFT JOIN Beers b ON ub.BeerId = b.BeerId " +
-                    "LEFT JOIN SRMs s ON s.SrmId = b.BeerId " +
-                    "LEFT JOIN ABVs a ON a.AbvId = b.BeerId " +
-                    "LEFT JOIN IBUs i ON i.IbuId = b.BeerId " +
-                    "LEFT JOIN BeerStyles bs ON bs.BeerStyleId = b.BeerStyleId " +
-                    "WHERE ub.Username = @Username", (userBeer, beer, srm, abv, ibu, beerStyle) =>
-                    {
-                        userBeer.Beer = beer;
-                        if (srm != null)
-                            beer.SRM = srm;
-                        if (abv != null)
-                            beer.ABV = abv;
-                        if (ibu != null)
-                            beer.IBU = ibu;
-                        if (beerStyle != null)
-                            beer.BeerStyle = beerStyle;
-                        return userBeer;
-                    }, new { user.Username }, splitOn: "BeerId,SrmId,AbvId,IbuId,BeerStyleId");
-                user.Beers = userBeers.ToList();
-
-                return user;
-
-            }
-        }
-
-        public void Add(User user)
-        {
-            using (DbConnection context = new NpgsqlConnection(_databaseSettings.DbConnection))
-            {
-                context.Open();
-                using (var transaction = context.BeginTransaction())
-                {
-                    try
-                    {
-                        context.Execute(
-                            "INSERT Users(Username,Email,Settings,Gravatar,Latitude,Longitude,HeaderImage,Avatar) " +
-                            "VALUES(@Username,@Email,@Settings,@Gravatar,@Latitude,@Longitude,@HeaderImage,@Avatar);",
-                            user, transaction);
-                        if (user.Socials != null)
-                        {
-                            context.Execute(
-                                "INSERT UserSocials(Username,Site,Url) VALUES(@Username,@Site,@Url);",
-                                user.Socials.Select(u => new { user.Username, u.Site, u.Url }), transaction);
-                        }
-
-                        var userSocials =
-                            context.Query<UserSocial>("SELECT * FROM UserSocials WHERE Username = @Username",
-                               new { user.Username }, transaction);
-                        user.Socials = userSocials.ToList();
-                        transaction.Commit();
-                    }
-                    catch (Exception e)
-                    {
-                        transaction.Rollback();
-                        throw;
-                    }
-                }
-            }
-        }
-
-        public void Update(User user)
-        {
-            using (DbConnection context = new NpgsqlConnection(_databaseSettings.DbConnection))
-            {
-                using (var transaction = context.BeginTransaction())
-                {
-                    try
-                    {
-                        context.Execute(
-                            "UPDATE Users set Username = @Username, Email = @Email, Settings = @Settings ,Gravatar = @Gravatar," +
-                            " Latitude = @Latitude, Longitude = @Longitude, HeaderImage = @HeaderImage, Avatar = @Avatar " +
-                            "WHERE Username = @Username;",
-                            user, transaction);
-                        UpdateUserSocials(context, transaction, user);
-                        transaction.Commit();
-                    }
-                    catch (Exception e)
-                    {
-                        transaction.Rollback();
-                        throw;
-                    }
-                }
-            }
-        }
-
-
-        //TODO: Need to define the logic around delete.
-        public void Remove(User user)
-        {
-            using (DbConnection context = new NpgsqlConnection(_databaseSettings.DbConnection))
-            {
-                using (var transaction = context.BeginTransaction())
-                {
-                    try
-                    {
-                        context.Execute("DELETE FROM Users WHERE Username = @Username", new {user.Username},transaction);
-                        transaction.Commit();
-                    }
-                    catch (Exception e)
-                    {
-                        transaction.Rollback();
-                        throw;
-                    }
-                }
-            }
-        }
-
-        public async Task<IList<User>> GetAllAsync(params string[] navigationProperties)
-        {
-            using (DbConnection context = new NpgsqlConnection(_databaseSettings.DbConnection))
-            {
-                var users = await context.QueryAsync<User>("SELECT * FROM Users;");
-                foreach (var user in users)
-                {
-                    var userSocials = await context.QueryAsync<UserSocial>("SELECT * FROM UserSocials WHERE Username = @Username",
-                        new { user.Username });
-                    user.Socials = userSocials.ToList();
-                    var breweryMembers =
-                        await context.QueryAsync<BreweryMember, Brewery, BreweryMember>("SELECT * FROM BreweryMembers bm " +
-                                                                             "LEFT JOIN Breweries b ON bm.BreweryId = b.BreweryId " +
-                                                                             "WHERE bm.MemberUsername = @Username",
-                            (breweryMember, brewery) =>
-                            {
-                                breweryMember.Brewery = brewery;
-                                return breweryMember;
-                            },
-                            new { user.Username }, splitOn: "BreweryId");
-                    user.Breweries = breweryMembers.ToList();
-
+                    
+                    ;
+                var userBeerSql = $"SELECT ub.user_id AS UserId,ub.beer_id AS BeerId, b.beer_id AS BeerId, b.name, b.beerstyle_id AS BeerStyleId, b.created_date AS CreatedDate, b.updated_date AS UpdatedDate, b.fork_of_id AS ForkOfId," +
+                      "bs.beerstyle_id AS BeerStyleId, bs.name, bs.superstyle_id AS SuperStyleId, bs.og_low AS OGLow , bs.og_high AS OGHigh, bs.fg_low AS FGLow, bs.fg_high FGHigh," +
+                      "bs.ibu_low AS IBULow, bs.ibu_high AS IBUHigh, bs.srm_low AS SRMLow, bs.srm_high AS SRMHig, bs.abv_low AS ABVLow, bs.abv_high AS ABVHigh, bs.comments, " +
+                      "r.recipe_id AS RecipeId, r.volume, r.notes, r.og, r.fg, r.efficiency, r.total_boil_time AS TotalBoilTime," +
+                      "s.srm_id AS SrmId, s.standard, s.mosher, s.daniels, s.morey, " +
+                      "a.abv_id AS AbvId, a.standard, a.miller, a.advanced, a.advanced_alternative AS AdvancedAlternative, a.simple, a.simple_alternative AS SimpleAlternative," +
+                      "i.ibu_id AS IbuId, i.standard, i.tinseth, i.rager " +
+                      "FROM user_beers ub " +
+                      " INNER JOIN beers b ON ub.beer_id = b.beer_id " +
+                           "LEFT JOIN beerstyles bs ON bs.beerstyle_id = b.beerstyle_id " +
+                          "LEFT JOIN recipes r ON r.recipe_Id = b.beer_id " +
+                          "LEFT JOIN srms s ON s.srm_id = b.beer_id " +
+                          "LEFT JOIN abvs a ON a.abv_id = b.beer_id " +
+                          "LEFT JOIN ibus i ON i.ibu_id = b.beer_id " +
+                          "WHERE ub.user_id = @UserId";
+                    
                     var userBeers = await context.QueryAsync<UserBeer, Beer, SRM, ABV, IBU, BeerStyle, UserBeer>(
-                        "SELECT * " +
-                        "FROM UserBeers ub " +
-                        "LEFT JOIN Beers b ON ub.BeerId = b.BeerId " +
-                        "LEFT JOIN SRMs s ON s.SrmId = b.BeerId " +
-                        "LEFT JOIN ABVs a ON a.AbvId = b.BeerId " +
-                        "LEFT JOIN IBUs i ON i.IbuId = b.BeerId " +
-                        "LEFT JOIN BeerStyles bs ON bs.BeerStyleId = b.BeerStyleId " +
-                        "WHERE ub.Username = @Username", (userBeer, beer, srm, abv, ibu, beerStyle) =>
+                        userBeerSql, (userBeer, beer, srm, abv, ibu, beerStyle) =>
                         {
                             userBeer.Beer = beer;
                             if (srm != null)
@@ -289,31 +81,20 @@ namespace Microbrewit.Api.Repository.Component
                             if (beerStyle != null)
                                 beer.BeerStyle = beerStyle;
                             return userBeer;
-                        }, new { user.Username }, splitOn: "BeerId,SrmId,AbvId,IbuId,BeerStyleId");
+                        }, new { user.UserId }, splitOn: "BeerId,SrmId,AbvId,IbuId,BeerStyleId");
                     user.Beers = userBeers.ToList();
                 }
-                foreach (var user in users)
-                {
-                    user.Roles = new List<string>();
-                    // var identityUser = await _authRepository.FindUser(user.Username);
-                    // if (identityUser != null && identityUser.Roles.Any())
-                    // {
-                    //     if(identityUser.Roles.Any(r => r.RoleId == "1"))
-                    //         user.Roles.Add("Admin");
-                    // }
-                }
-
                 return users.ToList();
 
             }
         }
 
-        public async Task<User> GetSingleAsync(string username, params string[] navigtionProperties)
+        public async Task<User> GetSingleAsync(string userId)
         {
             using (DbConnection context = new NpgsqlConnection(_databaseSettings.DbConnection))
             {
                 //Dapper returns IEnumerable, but result should always be single row.
-                var users = await context.QueryAsync<User>("SELECT * FROM Users WHERE Username = @Username;", new { Username = username });
+                var users = await context.QueryAsync<User>("SELECT * FROM Users WHERE Username = @Username;", new { Username = userId });
                 var user = users.SingleOrDefault();
                 if (user == null) return null;
 
@@ -376,18 +157,18 @@ namespace Microbrewit.Api.Repository.Component
                     try
                     {
                         await context.ExecuteAsync(
-                            "INSERT Users(Username,Email,Settings,Gravatar,Latitude,Longitude,HeaderImage,Avatar) " +
-                            "VALUES(@Username,@Email,@Settings,@Gravatar,@Latitude,@Longitude,@HeaderImage,@Avatar);",
+                            "INSERT users(user_id,username,email,settings,gravatar,latitude,longitude,header_image_url,avatar_url,firstname,lastname)" +
+                            "VALUES(@Username,@Email,@Settings,@Gravatar,@Latitude,@Longitude,@HeaderImage,@Avatar,@Firstname,@Lastname);",
                             user, transaction);
                         if (user.Socials != null)
                         {
                             await context.ExecuteAsync(
-                                "INSERT UserSocials(Username,Site,Url) VALUES(@Username,@Site,@Url);",
-                                user.Socials.Select(u => new { user.Username, u.Site, u.Url }), transaction);
+                                "INSERT UserSocials(user_id,site,url) VALUES(@UserId,@Site,@Url);",
+                                user.Socials.Select(u => new { user.UserId, u.Site, u.Url }), transaction);
                         }
 
                         var userSocials =
-                            await context.QueryAsync<UserSocial>("SELECT * FROM UserSocials WHERE Username = @Username",
+                            await context.QueryAsync<UserSocial>("SELECT user_id AS UserId,site,url FROM UserSocials WHERE Username = @Username",
                                new { user.Username }, transaction);
                         user.Socials = userSocials.ToList();
                         transaction.Commit();
@@ -427,6 +208,49 @@ namespace Microbrewit.Api.Repository.Component
             }
         }
 
+        public Task RemoveAsync(User user)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<UserSocial> GetUserSocials(string username)
+        {
+            using (DbConnection context = new NpgsqlConnection(_databaseSettings.DbConnection))
+            {
+                return context.Query<UserSocial>("SELECT * FROM UserSocials WHERE Username = @Username",
+                    new { Username = username });
+            }
+        }
+
+        public async Task<IEnumerable<UserBeer>> GetAllUserBeersAsync(string username)
+        {
+            using (DbConnection context = new NpgsqlConnection(_databaseSettings.DbConnection))
+            {
+                var userBeers = await context.QueryAsync<UserBeer, Beer, SRM, ABV, IBU, BeerStyle, UserBeer>(
+                    "SELECT * " +
+                    "FROM UserBeers ub " +
+                    "LEFT JOIN Beers b ON ub.BeerId = b.BeerId " +
+                    "LEFT JOIN SRMs s ON s.SrmId = b.BeerId " +
+                    "LEFT JOIN ABVs a ON a.AbvId = b.BeerId " +
+                    "LEFT JOIN IBUs i ON i.IbuId = b.BeerId " +
+                    "LEFT JOIN BeerStyles bs ON bs.BeerStyleId = b.BeerStyleId " +
+                    "WHERE ub.Username = @Username", (userBeer, beer, srm, abv, ibu, beerStyle) =>
+                    {
+                        userBeer.Beer = beer;
+                        if (srm != null)
+                            beer.SRM = srm;
+                        if (abv != null)
+                            beer.ABV = abv;
+                        if (ibu != null)
+                            beer.IBU = ibu;
+                        if (beerStyle != null)
+                            beer.BeerStyle = beerStyle;
+                        return userBeer;
+                    }, new { Username = username }, splitOn: "BeerId,SrmId,AbvId,IbuId,BeerStyleId");
+                return userBeers;
+            }
+        }
+
         private void UpdateUserSocials(DbConnection context, DbTransaction transaction, User user)
         {
             var userSocials = context.Query<UserSocial>("SELECT * FROM UserSocials WHERE Username = @Username",
@@ -443,7 +267,7 @@ namespace Microbrewit.Api.Repository.Component
 
             context.Execute("INSERT UserSocials(Username,Site,Url) VALUES(@Username,@Site,@Url);",
                 user.Socials.Where(
-                    s => userSocials.All(u => s.Username != u.Username && u.SocialId != s.SocialId)).Select(s => new { user.Username, s.Site, s.Url }),
+                    s => userSocials.All(u => s.UserId != u.UserId && u.SocialId != s.SocialId)).Select(s => new { user.Username, s.Site, s.Url }),
                 transaction);
         }
 
@@ -463,23 +287,8 @@ namespace Microbrewit.Api.Repository.Component
 
             await context.ExecuteAsync("INSERT UserSocials(Username,Site,Url) VALUES(@Username,@Site,@Url);",
                 user.Socials.Where(
-                    s => userSocials.All(u => s.Username != u.Username && u.SocialId != s.SocialId)).Select(s => new { user.Username, s.Site, s.Url }),
+                    s => userSocials.All(u => s.UserId != u.UserId && u.SocialId != s.SocialId)).Select(s => new { user.Username, s.Site, s.Url }),
                 transaction);
-        }
-
-        public Task<IList<User>> GetAllAsync()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<User> GetSingleAsync(string username)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task RemoveAsync(User user)
-        {
-            throw new NotImplementedException();
         }
     }
 }

@@ -12,7 +12,7 @@ namespace Microbrewit.Api.Mapper.Profile
         protected override void Configure()
         {
             CreateMap<User, UserDto>()
-                .ForMember(dest => dest.Id, conf => conf.MapFrom(src => src.Username))
+                .ForMember(dest => dest.UserId, conf => conf.MapFrom(src => src.Username))
                 .ForMember(dest => dest.Username, conf => conf.MapFrom(src => src.Username))
                 .ForMember(dest => dest.Gravatar, conf => conf.MapFrom(src => src.Gravatar))
                 .ForMember(dest => dest.Breweries, conf => conf.MapFrom(src => src.Breweries))
@@ -47,7 +47,7 @@ namespace Microbrewit.Api.Mapper.Profile
                 .ForMember(dest => dest.GeoLocation, conf => conf.MapFrom(src => src.GeoLocation));
 
             CreateMap<UserDto, User>()
-               .ForMember(dest => dest.Username, conf => conf.MapFrom(src => src.Id))
+               .ForMember(dest => dest.Username, conf => conf.MapFrom(src => src.UserId))
                .ForMember(dest => dest.Username, conf => conf.MapFrom(src => src.Username))
                .ForMember(dest => dest.Gravatar, conf => conf.MapFrom(src => src.Gravatar))
                .ForMember(dest => dest.Breweries, conf => conf.ResolveUsing<UserDtoBreweryMemberResolver>())
@@ -61,7 +61,7 @@ namespace Microbrewit.Api.Mapper.Profile
 
 
             CreateMap<User, DTOUser>()
-                .ForMember(dest => dest.Username, conf => conf.MapFrom(src => src.Username))
+                .ForMember(dest => dest.UserId, conf => conf.MapFrom(src => src.Username))
                 .ForMember(dest => dest.Gravatar, conf => conf.MapFrom(src => src.Gravatar));
         }
 

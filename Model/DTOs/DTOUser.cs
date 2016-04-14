@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 
 namespace Microbrewit.Api.Model.DTOs
@@ -11,8 +6,8 @@ namespace Microbrewit.Api.Model.DTOs
     public class DTOUser
     {
         [Required]
-        [JsonProperty(PropertyName = "username")]
-        public string Username { get; set; }
+        [JsonProperty(PropertyName = "id")]
+        public string UserId { get; set; }
         [JsonProperty(PropertyName = "gravatar")]
         public string Gravatar { get; set; }
         [JsonProperty(PropertyName = "role")]

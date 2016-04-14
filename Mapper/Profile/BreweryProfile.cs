@@ -25,12 +25,12 @@ namespace Microbrewit.Api.Mapper.Profile
                 .ForMember(dest => dest.Socials, conf => conf.ResolveUsing<BrewerySocialResolver>());
 
             CreateMap<BreweryMember, DTOUser>()
-                .ForMember(dest => dest.Username, conf => conf.MapFrom(src => src.MemberUsername))
+                .ForMember(dest => dest.UserId, conf => conf.MapFrom(src => src.UserId))
                 .ForMember(dest => dest.Role, conf => conf.MapFrom(src => src.Role))
                 .ForMember(dest => dest.Gravatar, conf => conf.MapFrom(src => src.Member.Gravatar));
 
             CreateMap<BreweryMember, BreweryMemberDto>()
-                .ForMember(dest => dest.Username, conf => conf.MapFrom(src => src.MemberUsername))
+                .ForMember(dest => dest.Username, conf => conf.MapFrom(src => src.UserId))
                 .ForMember(dest => dest.Role, conf => conf.MapFrom(src => src.Role))
                 .ForMember(dest => dest.Avatar, conf => conf.MapFrom(src => (src.Member.Avatar != null && src.Member.Avatar.Any()) ? _imagePath + "avatar/" + src.Member.Avatar : null))
                 .ForMember(dest => dest.Gravatar, conf => conf.MapFrom(src => src.Member.Gravatar));
@@ -65,7 +65,7 @@ namespace Microbrewit.Api.Mapper.Profile
                 .ForMember(dest => dest.Socials, conf => conf.ResolveUsing<BreweryDtoSocialResolver>());
 
             CreateMap<BreweryMemberDto, BreweryMember>()
-               .ForMember(dest => dest.MemberUsername, conf => conf.MapFrom(src => src.Username))
+               .ForMember(dest => dest.UserId, conf => conf.MapFrom(src => src.Username))
                .ForMember(dest => dest.Role, conf => conf.MapFrom(src => src.Role));
 
         }

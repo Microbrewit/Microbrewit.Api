@@ -18,7 +18,7 @@ namespace Microbrewit.Api.Mapper.CustomResolvers
                 var member = new BreweryMember()
                 {
                     BreweryId = source.Id,
-                    MemberUsername = memberDto.Username,
+                    UserId = memberDto.Username,
                     //Role = memberDto.Role,
                 };
                 members.Add(member);

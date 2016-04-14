@@ -186,7 +186,7 @@ namespace Microbrewit.Api.Repository.Component
             //    userBeer.Username = userBeer.Username.ToLower();
             //}
             var brewers = beer.Brewers.Distinct();
-            var distinct = brewers.Select(b => new { beer.BeerId, b.Username, b.Confirmed });
+            var distinct = brewers.Select(b => new { beer.BeerId, b.UserId, b.Confirmed });
             connection.Execute("INSERT UserBeers(BeerId,Username,Confirmed) VALUES(@BeerId,@Username,@Confirmed);", distinct, transaction);
         }
 
@@ -288,7 +288,7 @@ namespace Microbrewit.Api.Repository.Component
             }
         }
 
-        public async Task<IEnumerable<Beer>> GetAllUserBeerAsync(string username)
+        public async Task<IEnumerable<Beer>> GetAllUserBeerAsync(string userId)
         {
             using (DbConnection connection = new NpgsqlConnection(_databaseSettings.DbConnection))
             {
@@ -307,7 +307,7 @@ namespace Microbrewit.Api.Repository.Component
                           "LEFT JOIN srms s ON s.srm_id = b.beer_id " +
                           "LEFT JOIN abvs a ON a.abv_id = b.beer_id " +
                           "LEFT JOIN ibus i ON i.ibu_id = b.beer_id " +
-                          "WHERE ub.Username = @Username; ";
+                          "WHERE ub.user_id = @UserId; ";
                 var beers =
                     await
                         connection.QueryAsync<Beer, BeerStyle, Recipe, SRM, ABV, IBU, Beer>(
@@ -325,7 +325,7 @@ namespace Microbrewit.Api.Repository.Component
                                  if (ibu != null)
                                      beer.IBU = ibu;
                                  return beer;
-                             }, new { Username = username }, splitOn: "BeerStyleId,RecipeId,SrmId,AbvId,IbuId");
+                             }, new { UserId = userId }, splitOn: "BeerStyleId,RecipeId,SrmId,AbvId,IbuId");
 
                 foreach (var beer in beers)
                 {

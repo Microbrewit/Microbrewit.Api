@@ -147,7 +147,7 @@ namespace Microbrewit.Api.Repository.Component
                         {
                             await connection.ExecuteAsync(
                                 "INSERT INTO brewery_members(brewery_id,member_username,role) VALUES(@BreweryId,@MemberUsername,@Role);",
-                                brewery.Members.Select(u => new { brewery.BreweryId, u.MemberUsername, u.Role }), transaction);
+                                brewery.Members.Select(u => new { brewery.BreweryId, u.UserId, u.Role }), transaction);
                         }
                         if (brewery.Beers != null)
                         {
@@ -323,14 +323,14 @@ namespace Microbrewit.Api.Repository.Component
                 "SELECT brewery_id AS BreweryId, member_username AS MemberUsername FROM brewery_members WHERE brewery_id = @BreweryId", new { brewery.BreweryId }, transaction);
 
             await connection.ExecuteAsync("DELETE FROM brewery_members WHERE brewery_id = @BreweryId and member_username = @MemberUsername;",
-                breweryMembers.Where(bm => brewery.Members.All(m => bm.MemberUsername != m.MemberUsername)).Select(bm => new { brewery.BreweryId, bm.MemberUsername }), transaction);
+                breweryMembers.Where(bm => brewery.Members.All(m => bm.UserId != m.UserId)).Select(bm => new { brewery.BreweryId, bm.UserId }), transaction);
 
             await connection.ExecuteAsync(
                 "UPDATE brewery_members set role = @Role, confirmed = @Confirmed WHERE brewery_id = @BreweryId and member_username = @MemberUsername;",
-                brewery.Members.Where(m => breweryMembers.Any(bm => m.MemberUsername == bm.MemberUsername)), transaction);
+                brewery.Members.Where(m => breweryMembers.Any(bm => m.UserId == bm.UserId)), transaction);
 
             await connection.ExecuteAsync("INSERT INTO brewery_members(brewery_id,member_username,role,confirmed) VALUES(@BreweryId,@MemberUsername,@Role,@Confirmed);",
-                brewery.Members.Where(m => breweryMembers.All(bm => m.MemberUsername != bm.MemberUsername)).Select(bm => new { brewery.BreweryId, bm.MemberUsername,bm.Role,bm.Confirmed }), transaction);
+                brewery.Members.Where(m => breweryMembers.All(bm => m.UserId != bm.UserId)).Select(bm => new { brewery.BreweryId, bm.UserId,bm.Role,bm.Confirmed }), transaction);
 
         }
 

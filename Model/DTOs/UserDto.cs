@@ -7,8 +7,8 @@ namespace Microbrewit.Api.Model.DTOs
     [ElasticsearchType(Name = "user")]
     public class UserDto
     {
-        [JsonProperty(PropertyName = "userId")]
-        public string Id { get; set; }
+        [JsonProperty(PropertyName = "id")]
+        public string UserId { get; set; }
         [JsonProperty(PropertyName = "username")]
         public string Username { get; set; }
         [JsonProperty(PropertyName = "gravatar")]

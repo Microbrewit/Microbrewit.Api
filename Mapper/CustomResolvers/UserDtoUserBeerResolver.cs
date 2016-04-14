@@ -16,7 +16,7 @@ namespace Microbrewit.Api.Mapper.CustomResolvers
             {
                 var userBeer = new UserBeer
                 {
-                    Username = userDto.Username,
+                    UserId = userDto.UserId,
                     BeerId = beerDto.Id,
                 };
                 userBeers.Add(userBeer);
