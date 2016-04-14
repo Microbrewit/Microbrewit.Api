@@ -157,7 +157,7 @@ namespace Microbrewit.Api.Repository.Component
                         }
                         transaction.Commit();
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                         transaction.Rollback();
                         throw;
@@ -185,7 +185,7 @@ namespace Microbrewit.Api.Repository.Component
                         transaction.Commit();
                         return result;
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                         transaction.Rollback();
                         throw;

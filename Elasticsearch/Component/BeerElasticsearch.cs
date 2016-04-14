@@ -40,7 +40,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
                      .From(from)
                      .Size(size)
                      .Query(q => q
-                        .Filtered(fi => fi
+                        .Bool(fi => fi
                             .Filter(f => f.Term(h => h.DataType, "beer"))
                      )));
             return res.Documents;
@@ -96,8 +96,8 @@ namespace Microbrewit.Api.ElasticSearch.Component
             var result = await _client.SearchAsync<BeerDto>(s => s
                 .Size(BigNumber)
                 .Query(q => q
-                .Filtered(f => f
-                    .Query(q2 => q2
+                .Bool(f => f
+                    .Must(q2 => q2
                     .Term("brewers.username", username))
                     .Filter(filter => filter
                         .Term(t => t.DataType, "beer")
@@ -111,8 +111,8 @@ namespace Microbrewit.Api.ElasticSearch.Component
                 .Size(BigNumber)
                 .Sort(b => b.Descending(d => d.CreatedDate))
                 .Query(q => q
-                .Filtered(f => f
-                    .Query(q2 => q2
+                .Bool(f => f
+                    .Must(q2 => q2
                     .Term("breweries.breweryId", breweryId))
                     .Filter(filter => filter
                         .Term(t => t.DataType, "beer")

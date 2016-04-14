@@ -251,7 +251,7 @@ namespace Microbrewit.Api.Mapper
 
             return recipeDto;
             }
-            catch(Exception ex)
+            catch(Exception)
             {
                 throw;
             }

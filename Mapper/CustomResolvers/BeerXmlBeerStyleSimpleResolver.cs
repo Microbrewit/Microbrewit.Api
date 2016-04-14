@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using AutoMapper;
+﻿using AutoMapper;
 using Microbrewit.Api.Model.Database;
 using Microbrewit.Api.Model.DTOs;
 

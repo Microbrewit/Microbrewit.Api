@@ -52,7 +52,7 @@ namespace Microbrewit.Api.Repository.Component
                         other.OtherId = otherId.SingleOrDefault();
                         transaction.Commit();
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                         transaction.Rollback();
                     }
@@ -75,7 +75,7 @@ namespace Microbrewit.Api.Repository.Component
                         transaction.Commit();
                         return result;
                     }
-                    catch (Exception exception)
+                    catch (Exception)
                     {
                         transaction.Rollback();
                         throw;
@@ -96,7 +96,7 @@ namespace Microbrewit.Api.Repository.Component
                         await connection.ExecuteAsync("DELETE FROM others WHERE other_id = @OtherId", new { other.OtherId }, transaction);
                         transaction.Commit();
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                         transaction.Rollback();
                         throw;

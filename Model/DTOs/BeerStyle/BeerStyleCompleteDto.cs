@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using Microbrewit.Api.Configuration;
-using Microbrewit.Api.Settings;
 using Newtonsoft.Json;
+using Microbrewit.Api.Configuration;
 
 namespace Microbrewit.Api.Model.DTOs
 {

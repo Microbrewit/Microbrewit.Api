@@ -1,7 +1,6 @@
-﻿using Newtonsoft.Json;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using Nest;
-using System;
+using Newtonsoft.Json;
 
 namespace Microbrewit.Api.Model.DTOs
 {

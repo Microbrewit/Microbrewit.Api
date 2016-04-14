@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
+using Microsoft.Extensions.OptionsModel;
+using Npgsql;
 using Microbrewit.Api.Model.Database;
 using Microbrewit.Api.Repository.Interface;
 using Microbrewit.Api.Settings;
-using Microsoft.Extensions.OptionsModel;
-using Npgsql;
 
 namespace Microbrewit.Api.Repository.Component
 {

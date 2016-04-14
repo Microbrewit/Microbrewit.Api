@@ -24,21 +24,21 @@ namespace Microbrewit.Api.ElasticSearch.Component
         }
 
 
-        public async Task<string> SearchAllAsync(string query, int @from, int size)
+        public Task<string> SearchAllAsync(string query, int @from, int size)
         {
             //var queryString = "{\"from\" : " + from + ", \"size\" : " + size + ", \"query\":{\"match\": {\"name\": {\"query\": \" " + query + " \",\"operator\": \"and\"}}}}";
             //            _client.SearchAsync<string>();
             //var res = await _client.SearchAsync<string>(s => s.Query(q => q.QueryString(qs => qs.Query(queryString))));
             //return res;
-            return "";
+            return Task.FromResult("");
         }
 
-        public async Task<string> SearchIngredientsAsync(string query, int @from, int size)
+        public Task<string> SearchIngredientsAsync(string query, int @from, int size)
         {
             // var queryString = "{\"from\": " + from +", \"size\": " + size +", \"filter\": { \"or\": [{\"term\": { \"dataType\": \"hop\"}},{\"term\": {\"dataType\": \"fermentable\"}},{\"term\": {\"dataType\": \"yeast\"}},{\"term\": {\"dataType\": \"other\"}}]},\"query\": {\"match\": {\"name\": {\"query\": \"" + query +"\"}}}}";
             // var res = await _client.SearchAsync<string>(_index, queryString);
             //return res.Response;
-            return "";
+            return Task.FromResult("");
         }
     }
 }

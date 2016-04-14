@@ -234,7 +234,7 @@ namespace Microbrewit.Api.Repository.Component
                         }
                         transaction.Commit();
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                         transaction.Rollback();
                         throw;
@@ -346,7 +346,7 @@ namespace Microbrewit.Api.Repository.Component
                         var result = await connection.ExecuteAsync("DELETE FROM hops WHERE hop_id = @HopId", new { hop.HopId }, transaction);
                         transaction.Commit();
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                         transaction.Rollback();
                     }

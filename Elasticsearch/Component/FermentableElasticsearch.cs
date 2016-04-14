@@ -39,7 +39,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
                 .Size(size)
                 .From(from)
                 .Query(q => q
-                    .Filtered(fi => fi
+                    .Bool(fi => fi
                         .Filter(f => f.Term(t => t.Type, "fermentable") && f.Term(t => t.Custom, custom)))));
             return res.Documents;
         }

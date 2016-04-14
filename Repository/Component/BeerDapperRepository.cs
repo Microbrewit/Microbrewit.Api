@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
@@ -168,7 +167,7 @@ namespace Microbrewit.Api.Repository.Component
                         }
                         transaction.Commit();
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                         transaction.Rollback();
                         throw;
@@ -220,7 +219,7 @@ namespace Microbrewit.Api.Repository.Component
                         transaction.Commit();
                         return result;
                     }
-                    catch (Exception exception)
+                    catch (Exception)
                     {
 
                         transaction.Rollback();

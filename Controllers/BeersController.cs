@@ -153,10 +153,10 @@ namespace Microbrewit.Api.Controllers
         }
 
         [HttpPost("beerxml")]
-        public async Task<IActionResult> PostBeerXml([FromBody] Model.BeerXml.RecipesComplete recipes)
+        public Task<IActionResult> PostBeerXml([FromBody] Model.BeerXml.RecipesComplete recipes)
         {
             if (!ModelState.IsValid)
-                return HttpBadRequest(ModelState);
+                return  HttpBadRequest(ModelState);
             if (Request.Body.CanSeek)
             {
                 // Reset the position to zero to read from the beginning.
@@ -188,7 +188,7 @@ namespace Microbrewit.Api.Controllers
             // CalculateRecipes(beersDto);
 
 
-            return Ok(new BeerCompleteDto { Beers = beersDto });
+            return Task.FromResult(Ok(new BeerCompleteDto { Beers = beersDto }));
             //return Ok(beersDto);
         }
     }

@@ -1,6 +1,5 @@
 
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 using Microsoft.AspNet.Mvc;
 using Microbrewit.Api.Model.DTOs;
 using Microbrewit.Api.Service.Interface;

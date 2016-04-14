@@ -65,7 +65,7 @@ namespace Microbrewit.Api.Repository.Component
                         supplier.SupplierId = supplierId.SingleOrDefault();
                         transaction.Commit();
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                         transaction.Rollback();
                     }
@@ -88,7 +88,7 @@ namespace Microbrewit.Api.Repository.Component
                         transaction.Commit();
                         return result;
                     }
-                    catch (Exception exception)
+                    catch (Exception)
                     {
                         transaction.Rollback();
                         throw;
@@ -109,7 +109,7 @@ namespace Microbrewit.Api.Repository.Component
                         await connection.ExecuteAsync("DELETE FROM Suppliers WHERE supplier_id = @SupplierId", new { supplier.SupplierId }, transaction);
                         transaction.Commit();
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                         transaction.Rollback();
                         throw;

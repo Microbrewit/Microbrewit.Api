@@ -2,7 +2,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
 using Nest;
-using System;
 
 namespace Microbrewit.Api.Model.DTOs
 {

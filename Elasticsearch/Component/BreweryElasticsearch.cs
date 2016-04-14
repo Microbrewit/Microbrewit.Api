@@ -41,7 +41,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
                 .Size(size)
                 .From(from)
                 .Query(q => q
-                    .Filtered(fi => fi
+                    .Bool(fi => fi
                         .Filter(f => f.Term(t => t.Type, "brewery")))));
             return res.Documents;
         }
@@ -93,8 +93,8 @@ namespace Microbrewit.Api.ElasticSearch.Component
             var breweryDto =_client.Search<BreweryDto>(s => s
                 .Size(BigNumber)
                 .Query(q => q
-                    .Filtered(f => f
-                        .Query(qu => qu.MatchAll())
+                    .Bool(f => f
+                        .Must(qu => qu.MatchAll())
                         .Filter(fi => fi
                             .Nested(n => n
                                .Path("members")
