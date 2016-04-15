@@ -12,7 +12,6 @@ namespace Microbrewit.Api.ElasticSearch.Component
         private Uri _node;
         private ConnectionSettings _settings;
         private ElasticClient _client;
-        private int _bigNumber = 10000;
         private string _index;
 
         public UserElasticsearch()

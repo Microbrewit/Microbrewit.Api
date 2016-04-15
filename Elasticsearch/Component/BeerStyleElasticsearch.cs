@@ -16,7 +16,6 @@ namespace Microbrewit.Api.ElasticSearch.Component
         private readonly Uri _node;
         private ConnectionSettings _settings;
         private ElasticClient _client;
-        private const int BigNumber = 10000;
         private readonly ILogger<BeerStyleElasticsearch> _logger;
 
         public BeerStyleElasticsearch(IOptions<ElasticSearchSettings> elasticsearchSettings, ILogger<BeerStyleElasticsearch> logger)

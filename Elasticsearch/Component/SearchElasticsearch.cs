@@ -13,7 +13,6 @@ namespace Microbrewit.Api.ElasticSearch.Component
         private Uri _node;
         private ConnectionSettings _settings;
         private ElasticClient _client;
-        private int _bigNumber = 10000;
 
         public SearchElasticsearch(IOptions<ElasticSearchSettings> elasticsearchSettings)
         {

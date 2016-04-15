@@ -17,7 +17,6 @@ namespace Microbrewit.Api.ElasticSearch.Component
         private ConnectionSettings _settings;
         private ElasticClient _client;
         private const int BigNumber = 10000;
-        private string _index;
 
         public BreweryElasticsearch(IOptions<ElasticSearchSettings> elasticsearchSettings)
         {
@@ -48,7 +47,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
 
         public async Task<BreweryDto> GetSingleAsync(int id)
         {
-            IGetRequest getRequest = new GetRequest(_index, "brewery", id.ToString());
+            IGetRequest getRequest = new GetRequest(_elasticSearchSettings.Index, "brewery", id.ToString());
             var result = await _client.GetAsync<BreweryDto>(getRequest);
             return (BreweryDto)result.Source;
         }
