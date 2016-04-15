@@ -23,8 +23,8 @@ namespace Microbrewit.Api.Service.Component
         {
             var fermentableDtos = await _fermentableElasticsearch.GetAllAsync(from,size,custom);
             if (fermentableDtos .Any()) return fermentableDtos ;
-            var yeasts = await _fermentableRepository.GetAllAsync(from,size);
-            fermentableDtos = AutoMapper.Mapper.Map<IEnumerable<Fermentable>, IEnumerable<FermentableDto>>(yeasts);
+            var fermentables = await _fermentableRepository.GetAllAsync(from,size);
+            fermentableDtos = AutoMapper.Mapper.Map<IEnumerable<Fermentable>, IEnumerable<FermentableDto>>(fermentables);
             return fermentableDtos;
         }
 

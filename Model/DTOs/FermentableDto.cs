@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
 using Nest;
+using System;
 
 namespace Microbrewit.Api.Model.DTOs
 {
@@ -30,7 +31,12 @@ namespace Microbrewit.Api.Model.DTOs
         [JsonProperty(PropertyName = "superFermentableId")]
         public int? SuperFermentableId { get; set; }
         [JsonProperty(PropertyName = "subFermentables")]
+        
         public IList<DTO> SubFermentables { get; set; }
+        [JsonProperty(PropertyName = "createdDate")]
+        public DateTimeOffset CreatedDate { get; set; }
+        [JsonProperty(PropertyName = "updatedDate")]
+        public DateTimeOffset UpdatedDate { get; set; }
     }
 
 }

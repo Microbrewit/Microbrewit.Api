@@ -26,7 +26,7 @@ namespace Microbrewit.Api.Repository.Component
             {
                 var fermentables = await connection.QueryAsync<Fermentable, Supplier, Origin, Fermentable>(
                     "SELECT fermentable_id AS FermentableId, f.name, ebc, lovibond, ppg, f.supplier_id AS SupplierId, type," +
-                    "custom, super_fermentable_id AS SuperFermentableId, " +
+                    "custom, super_fermentable_id AS SuperFermentableId,f.created_date AS CreatedDate, updated_date As UpdatedDate, " +
                     "s.supplier_id AS SupplierId, s.name, s.origin_id AS OriginId, o.origin_id AS OriginId, o.name " +
                     "FROM fermentables f " +
                     "LEFT JOIN suppliers s ON f.supplier_id = s.supplier_id " +
@@ -67,7 +67,7 @@ namespace Microbrewit.Api.Repository.Component
             {
                 var fermentables = await connection.QueryAsync<Fermentable, Supplier, Origin, Fermentable>(
                     "SELECT fermentable_id AS FermentableId, f.name, ebc, lovibond, ppg, f.supplier_id AS SupplierId, type," +
-                    "custom, super_fermentable_id AS SuperFermentableId, " +
+                    "custom, super_fermentable_id AS SuperFermentableId,f.created_date AS CreatedDate, updated_date As UpdatedDate, " +
                     "s.supplier_id AS SupplierId, s.name, s.origin_id AS OriginId, o.origin_id AS OriginId, o.name " +
                     "FROM fermentables f " +
                     "LEFT JOIN suppliers s ON f.supplier_id = s.supplier_id " +
@@ -111,8 +111,8 @@ namespace Microbrewit.Api.Repository.Component
                     try
                     {
                        var result =
-                            await connection.ExecuteAsync("INSERT INTO fermentables(name,super_fermentable_id,EBC,Lovibond,PPG,supplier_id,Type,Custom) " +
-                                               "VALUES(@Name,@SuperFermentableId,@EBC,@Lovibond,@PPG,@SupplierId,@Type,@Custom);", fermentable, transaction);
+                            await connection.ExecuteAsync("INSERT INTO fermentables(name,super_fermentable_id,EBC,Lovibond,PPG,supplier_id,Type,Custom,created_date,updated_date) " +
+                                               "VALUES(@Name,@SuperFermentableId,@EBC,@Lovibond,@PPG,@SupplierId,@Type,@Custom,@CreatedDate,@UpdatedDate);", fermentable, transaction);
                         var fermentableId = await connection.QueryAsync<int>("SELECT last_value FROM fermentables_seq;");
                         fermentable.FermentableId = fermentableId.SingleOrDefault();
                         transaction.Commit();
@@ -136,7 +136,10 @@ namespace Microbrewit.Api.Repository.Component
                 {
                     try
                     {
-                        var result = await connection.ExecuteAsync("Update Fermentables set Name = @Name,super_fermentable_id = @SuperFermentableId,EBC = @EBC,Lovibond = @Lovibond,PPG= @PPG,supplier_id = @SupplierId,Type = @Type, Custom = @Custom " +
+                        var result = await connection.ExecuteAsync(
+                                        "Update Fermentables set Name = @Name,super_fermentable_id = @SuperFermentableId,EBC = @EBC," + 
+                                        "Lovibond = @Lovibond,PPG= @PPG,supplier_id = @SupplierId,Type = @Type, Custom = @Custom, " +
+                                        "updated_date = @UpdatedDate " +
                                         "WHERE fermentable_id = @FermentableId;",
                                               fermentable, transaction);
                         transaction.Commit();

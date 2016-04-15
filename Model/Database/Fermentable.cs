@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Microbrewit.Api.Model.Database
 {
@@ -18,6 +19,8 @@ namespace Microbrewit.Api.Model.Database
         public ICollection<Fermentable> SubFermentables { get; set; }
       
         public Supplier Supplier { get; set; }
+        public DateTimeOffset CreatedDate { get; set; }
+        public DateTimeOffset UpdatedDate { get; set; }
         public ICollection<MashStepFermentable> MashSteps { get; set; }
         public ICollection<BoilStepFermentable> BoilSteps { get; set; }
         public ICollection<FermentationStepFermentable> FermentationSteps { get; set; }
