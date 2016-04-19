@@ -16,16 +16,17 @@
     "Microsoft.AspNet.Cors": "6.0.0-rc1-final",
     "Microsoft.AspNet.IISPlatformHandler": "1.0.0-rc1-final",
     "Microsoft.AspNet.Mvc": "6.0.0-rc1-final",
+    "Microsoft.AspNet.Mvc.Formatters.Xml": "6.0.0-rc1-final",
     "Microsoft.AspNet.Server.Kestrel": "1.0.0-rc1-final",
     "Microsoft.AspNet.StaticFiles": "1.0.0-rc1-final",
     "Microsoft.Extensions.Configuration.FileProviderExtensions": "1.0.0-rc1-final",
     "Microsoft.Extensions.Logging": "1.0.0-rc1-final",
     "Microsoft.Extensions.Logging.Console": "1.0.0-rc1-final",
     "Microsoft.Extensions.Logging.Debug": "1.0.0-rc1-final",
-    "Microsoft.AspNet.Mvc.Formatters.Xml": "6.0.0-rc1-final",
-    "System.Runtime.Serialization.Xml": "4.0.11",
     "NEST": "2.0.4",
-    "Npgsql": "3.1.0-alpha6"
+    "Npgsql": "3.1.0-alpha6",
+    "System.Runtime.Serialization.Xml": "4.0.11",
+    "Microsoft.NETCore.Platforms": "1.0.1-*"
   },
 
   "commands": {
@@ -34,7 +35,8 @@
 
   "frameworks": {
     "dnx451": { },
-    "dnxcore50": { }
+    "dnxcore50": {
+    }
   },
 
   "exclude": [
