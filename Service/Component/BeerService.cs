@@ -10,6 +10,7 @@ using Microbrewit.Api.Service.Interface;
 using Microbrewit.Api.Settings;
 using Microbrewit.Api.Calculations;
 using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Logging;
 
 namespace Microbrewit.Api.Service.Component
 {
@@ -19,17 +20,19 @@ namespace Microbrewit.Api.Service.Component
         private readonly ElasticSearchSettings _elasticsearchSettings;
         private readonly IBeerRepository _beerRepository;
         private readonly IBreweryService _breweryService;
+        private readonly ILogger<BeerService> _logger;
         //private IUserService _userService;
         private IBeerElasticsearch _beerElasticsearch;
 
         public BeerService(IOptions<ElasticSearchSettings> elasticsearchSettings ,IBeerElasticsearch beerElasticsearch, 
-        IBeerRepository beerRepository, IBreweryService breweryService, ICalculation calculation)
+        IBeerRepository beerRepository, IBreweryService breweryService, ICalculation calculation, ILogger<BeerService> logger)
         {
             _elasticsearchSettings = elasticsearchSettings.Value;
             _beerRepository = beerRepository;
             _breweryService = breweryService;
             _beerElasticsearch = beerElasticsearch;
             _calculation = calculation;
+            _logger = logger;
         }
         public async Task<IEnumerable<BeerDto>> GetAllAsync(int @from, int size)
         {
@@ -50,13 +53,10 @@ namespace Microbrewit.Api.Service.Component
         public async Task<BeerDto> AddAsync(BeerDto beerDto)
         {
              var beer = AutoMapper.Mapper.Map<BeerDto, Beer>(beerDto);
-            if (beerDto.Recipe != null)
+            if (beerDto.Recipe != null && beerDto.Recipe.Steps != null)
             {
                 BeerCalculations(beer);
             }
-            beer.BeerStyle = null;
-            beer.CreatedDate = DateTime.Now;
-            beer.UpdatedDate = DateTime.Now;
 
             await _beerRepository.AddAsync(beer);
             var result = await _beerRepository.GetSingleAsync(beer.BeerId);

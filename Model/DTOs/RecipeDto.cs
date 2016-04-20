@@ -22,7 +22,6 @@ namespace Microbrewit.Api.Model.DTOs
         public double Efficiency { get; set; }
         [JsonProperty(PropertyName = "totalBoilTime")]
         public double TotalBoilTime { get; set; }
-        [Required]
         [JsonConverter(typeof(StepsJsonTypeConverter))]
         [JsonProperty(PropertyName = "steps")]
         public IList<IStepDto> Steps { get; set; }

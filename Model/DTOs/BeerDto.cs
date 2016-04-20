@@ -34,6 +34,8 @@ namespace Microbrewit.Api.Model.DTOs
             public DateTime CreatedDate { get; set; }
             [JsonProperty(PropertyName = "updatedDate")]
             public DateTime UpdatedDate { get; set; }
+            [JsonProperty(PropertyName = "isCommercial")]
+            public bool IsCommercial { get; set; }
             [JsonProperty(PropertyName = "breweries")]
             public IList<BrewerySimpleDto> Breweries { get; set; }
             [JsonProperty(PropertyName = "brewers")]

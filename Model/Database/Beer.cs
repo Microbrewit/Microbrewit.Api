@@ -18,7 +18,7 @@ namespace Microbrewit.Api.Model.Database
         public Beer ForkeOf { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime UpdatedDate { get; set; }
-
+        public bool IsCommercial {get; set;}
         public ICollection<Beer> Forks { get; set; }
       
         public ICollection<BreweryBeer> Breweries { get; set; }

@@ -15,6 +15,13 @@ namespace Microbrewit.Api.Repository.Component
     public class BeerDapperRepository : IBeerRepository
     {
         private DatabaseSettings _databaseSettings;
+        const string BeerFields =  "b.beer_id AS BeerId, b.name, b.beerstyle_id AS BeerStyleId, b.created_date AS CreatedDate, b.updated_date AS UpdatedDate,b.is_commercial AS IsCommercial, b.fork_of_id AS ForkOfId," +
+                   "bs.beerstyle_id AS BeerStyleId, bs.name, bs.superstyle_id AS SuperStyleId, bs.og_low AS OGLow , bs.og_high AS OGHigh, bs.fg_low AS FGLow, bs.fg_high FGHigh," +
+                   "bs.ibu_low AS IBULow, bs.ibu_high AS IBUHigh, bs.srm_low AS SRMLow, bs.srm_high AS SRMHig, bs.abv_low AS ABVLow, bs.abv_high AS ABVHigh, bs.comments, " +
+                   "r.recipe_id AS RecipeId, r.volume, r.notes, r.og, r.fg, r.efficiency, r.total_boil_time AS TotalBoilTime," +
+                   "s.srm_id AS SrmId, s.standard, s.mosher, s.daniels, s.morey, " +
+                   "a.abv_id AS AbvId, a.standard, a.miller, a.advanced, a.advanced_alternative AS AdvancedAlternative, a.simple, a.simple_alternative AS SimpleAlternative," +
+                   "i.ibu_id AS IbuId, i.standard, i.tinseth, i.rager ";
         public BeerDapperRepository(IOptions<DatabaseSettings> databaseSettings)
         {
             _databaseSettings = databaseSettings.Value;
@@ -25,16 +32,8 @@ namespace Microbrewit.Api.Repository.Component
         {
             using (DbConnection connection = new NpgsqlConnection(_databaseSettings.DbConnection))
             {
-                connection.Open();
-                var beerfields =
-                   "b.beer_id AS BeerId, b.name, b.beerstyle_id AS BeerStyleId, b.created_date AS CreatedDate, b.updated_date AS UpdatedDate, b.fork_of_id AS ForkOfId," +
-                   "bs.beerstyle_id AS BeerStyleId, bs.name, bs.superstyle_id AS SuperStyleId, bs.og_low AS OGLow , bs.og_high AS OGHigh, bs.fg_low AS FGLow, bs.fg_high FGHigh," +
-                   "bs.ibu_low AS IBULow, bs.ibu_high AS IBUHigh, bs.srm_low AS SRMLow, bs.srm_high AS SRMHig, bs.abv_low AS ABVLow, bs.abv_high AS ABVHigh, bs.comments, " +
-                   "r.recipe_id AS RecipeId, r.volume, r.notes, r.og, r.fg, r.efficiency, r.total_boil_time AS TotalBoilTime," +
-                   "s.srm_id AS SrmId, s.standard, s.mosher, s.daniels, s.morey, " +
-                   "a.abv_id AS AbvId, a.standard, a.miller, a.advanced, a.advanced_alternative AS AdvancedAlternative, a.simple, a.simple_alternative AS SimpleAlternative," +
-                   "i.ibu_id AS IbuId, i.standard, i.tinseth, i.rager ";
-                var sql = $"SELECT {beerfields} FROM Beers AS b " +
+                connection.Open();             
+                var sql = $"SELECT {BeerFields} FROM Beers AS b " +
                           "LEFT JOIN beerstyles bs ON bs.beerstyle_id = b.beerstyle_id " +
                           "LEFT JOIN recipes r ON r.recipe_Id = b.beer_id " +
                           "LEFT JOIN srms s ON s.srm_id = b.beer_id " +
@@ -80,16 +79,9 @@ namespace Microbrewit.Api.Repository.Component
             using (DbConnection connection = new NpgsqlConnection(_databaseSettings.DbConnection))
             {
                 connection.Open();
-                var beerfields =
-                   "b.beer_id AS BeerId, b.name, b.beerstyle_id AS BeerStyleId, b.created_date AS CreatedDate, b.updated_date AS UpdatedDate, b.fork_of_id AS ForkOfId," +
-                   "bs.beerstyle_id AS BeerStyleId, bs.name, bs.superstyle_id AS SuperStyleId, bs.og_low AS OGLow , bs.og_high AS OGHigh, bs.fg_low AS FGLow, bs.fg_high FGHigh," +
-                   "bs.ibu_low AS IBULow, bs.ibu_high AS IBUHigh, bs.srm_low AS SRMLow, bs.srm_high AS SRMHig, bs.abv_low AS ABVLow, bs.abv_high AS ABVHigh, bs.comments, " +
-                   "r.recipe_id AS RecipeId, r.volume, r.notes, r.og, r.fg, r.efficiency, r.total_boil_time AS TotalBoilTime," +
-                   "s.srm_id AS SrmId, s.standard, s.mosher, s.daniels, s.morey, " +
-                   "a.abv_id AS AbvId, a.standard, a.miller, a.advanced, a.advanced_alternative AS AdvancedAlternative, a.simple, a.simple_alternative AS AlternativeSimple," +
-                   "i.ibu_id AS IbuId, i.standard, i.tinseth, i.rager ";
+               
                 var beers = await connection.QueryAsync<Beer, BeerStyle, Recipe, SRM, ABV, IBU, Beer>(
-                    $"SELECT {beerfields} FROM Beers AS b " +
+                    $"SELECT {BeerFields} FROM Beers AS b " +
                           "LEFT JOIN beerstyles bs ON bs.beerstyle_id = b.beerstyle_id " +
                           "LEFT JOIN recipes r ON r.recipe_Id = b.beer_id " +
                           "LEFT JOIN srms s ON s.srm_id = b.beer_id " +
@@ -139,8 +131,8 @@ namespace Microbrewit.Api.Repository.Component
                         beer.CreatedDate = DateTime.Now;
                         beer.UpdatedDate = DateTime.Now;
                         var result = await connection.ExecuteAsync(
-                            "INSERT INTO Beers(name,beerstyle_id,created_date,updated_date,fork_of_id) " +
-                            "VALUES(@Name,@BeerStyleId,@CreatedDate,@UpdatedDate,@ForkeOfId);", beer, transaction);
+                            "INSERT INTO Beers(name,beerstyle_id,created_date,updated_date,fork_of_id,is_commercial) " +
+                            "VALUES(@Name,@BeerStyleId,@CreatedDate,@UpdatedDate,@ForkeOfId,@IsCommercial);", beer, transaction);
                         var beerId = await connection.QueryAsync<int>("SELECT last_value FROM beers_seq");
                         beer.BeerId = beerId.SingleOrDefault();
 
@@ -200,7 +192,8 @@ namespace Microbrewit.Api.Repository.Component
                     {
                         beer.UpdatedDate = DateTime.Now;
                         var result = await connection.ExecuteAsync(
-                            "UPDATE beers set name = @Name, beerstyle_id = @BeerStyleId, updated_date = @UpdatedDate, fork_of_id = @ForkeOfId WHERE beer_id = @BeerId;",
+                            "UPDATE beers set name = @Name, beerstyle_id = @BeerStyleId, updated_date = @UpdatedDate, fork_of_id = @ForkeOfId, is_commercial = IsCommercial " + 
+                            "WHERE beer_id = @BeerId;",
                             beer, transaction);
 
                         await connection.ExecuteAsync("UPDATE srms set standard = @Standard, mosher = @Mosher, daniels = @Daniels, morey = @Morey " +
@@ -237,19 +230,11 @@ namespace Microbrewit.Api.Repository.Component
         public async Task<IEnumerable<Beer>> GetLastAsync(int @from, int size)
         {
             using (DbConnection connection = new NpgsqlConnection(_databaseSettings.DbConnection))
-            {
-                var beerfields =
-                  "b.beer_id AS BeerId, b.name, b.beerstyle_id AS BeerStyleId, b.created_date AS CreatedDate, b.updated_date AS UpdatedDate, b.fork_of_id AS ForkOfId," +
-                  "bs.beerstyle_id AS BeerStyleId, bs.name, bs.superstyle_id AS SuperStyleId, bs.og_low AS OGLow , bs.og_high AS OGHigh, bs.fg_low AS FGLow, bs.fg_high FGHigh," +
-                  "bs.ibu_low AS IBULow, bs.ibu_high AS IBUHigh, bs.srm_low AS SRMLow, bs.srm_high AS SRMHig, bs.abv_low AS ABVLow, bs.abv_high AS ABVHigh, bs.comments, " +
-                  "r.recipe_id AS RecipeId, r.volume, r.notes, r.og, r.fg, r.efficiency, r.total_boil_time AS TotalBoilTime," +
-                  "s.srm_id AS SrmId, s.standard, s.mosher, s.daniels, s.morey, " +
-                  "a.abv_id AS AbvId, a.standard, a.miller, a.advanced, a.advanced_alternative AS AdvancedAlternative, a.simple, a.simple_alternative AS SimpleAlternative," +
-                  "i.ibu_id AS IbuId, i.standard, i.tinseth, i.rager ";
+            {    
                 var beers =
                     await
                         connection.QueryAsync<Beer, BeerStyle, Recipe, SRM, ABV, IBU, Beer>(
-                           $"SELECT {beerfields} FROM Beers AS b " +
+                           $"SELECT {BeerFields} FROM Beers AS b " +
                           "LEFT JOIN beerstyles bs ON bs.beerstyle_id = b.beerstyle_id " +
                           "LEFT JOIN recipes r ON r.recipe_Id = b.beer_id " +
                           "LEFT JOIN srms s ON s.srm_id = b.beer_id " +
@@ -291,15 +276,8 @@ namespace Microbrewit.Api.Repository.Component
         {
             using (DbConnection connection = new NpgsqlConnection(_databaseSettings.DbConnection))
             {
-                var beerfields =
-                      "b.beer_id AS BeerId, b.name, b.beerstyle_id AS BeerStyleId, b.created_date AS CreatedDate, b.updated_date AS UpdatedDate, b.fork_of_id AS ForkOfId," +
-                      "bs.beerstyle_id AS BeerStyleId, bs.name, bs.superstyle_id AS SuperStyleId, bs.og_low AS OGLow , bs.og_high AS OGHigh, bs.fg_low AS FGLow, bs.fg_high FGHigh," +
-                      "bs.ibu_low AS IBULow, bs.ibu_high AS IBUHigh, bs.srm_low AS SRMLow, bs.srm_high AS SRMHig, bs.abv_low AS ABVLow, bs.abv_high AS ABVHigh, bs.comments, " +
-                      "r.recipe_id AS RecipeId, r.volume, r.notes, r.og, r.fg, r.efficiency, r.total_boil_time AS TotalBoilTime," +
-                      "s.srm_id AS SrmId, s.standard, s.mosher, s.daniels, s.morey, " +
-                      "a.abv_id AS AbvId, a.standard, a.miller, a.advanced, a.advanced_alternative AS AdvancedAlternative, a.simple, a.simple_alternative AS SimpleAlternative," +
-                      "i.ibu_id AS IbuId, i.standard, i.tinseth, i.rager ";
-                var sql = $"SELECT {beerfields} FROM Beers AS b " +
+            
+                var sql = $"SELECT {BeerFields} FROM Beers AS b " +
                            "INNER JOIN user_beers ub ON ub.beer_id = b.beer_id " +
                            "LEFT JOIN beerstyles bs ON bs.beerstyle_id = b.beerstyle_id " +
                           "LEFT JOIN recipes r ON r.recipe_Id = b.beer_id " +
@@ -345,15 +323,7 @@ namespace Microbrewit.Api.Repository.Component
         {
             using (DbConnection connection = new NpgsqlConnection(_databaseSettings.DbConnection))
             {
-                var beerfields =
-                        "b.beer_id AS BeerId, b.name, b.beerstyle_id AS BeerStyleId, b.created_date AS CreatedDate, b.updated_date AS UpdatedDate, b.fork_of_id AS ForkOfId," +
-                        "bs.beerstyle_id AS BeerStyleId, bs.name, bs.superstyle_id AS SuperStyleId, bs.og_low AS OGLow , bs.og_high AS OGHigh, bs.fg_low AS FGLow, bs.fg_high FGHigh," +
-                        "bs.ibu_low AS IBULow, bs.ibu_high AS IBUHigh, bs.srm_low AS SRMLow, bs.srm_high AS SRMHig, bs.abv_low AS ABVLow, bs.abv_high AS ABVHigh, bs.comments, " +
-                        "r.recipe_id AS RecipeId, r.volume, r.notes, r.og, r.fg, r.efficiency, r.total_boil_time AS TotalBoilTime," +
-                        "s.srm_id AS SrmId, s.standard, s.mosher, s.daniels, s.morey, " +
-                        "a.abv_id AS AbvId, a.standard, a.miller, a.advanced, a.advanced_alternative AS AdvancedAlternative, a.simple, a.simple_alternative AS SimpleAlternative," +
-                        "i.ibu_id AS IbuId, i.standard, i.tinseth, i.rager ";
-                var sql = $"SELECT {beerfields} FROM Beers AS b " +
+                var sql = $"SELECT {BeerFields} FROM Beers AS b " +
                           "INNER JOIN brewery_beers bb ON bb.beer_id = b.beer_id " +
                           "LEFT JOIN beerstyles bs ON bs.beerstyle_id = b.beerstyle_id " +
                           "LEFT JOIN recipes r ON r.recipe_Id = b.beer_id " +
@@ -686,16 +656,16 @@ namespace Microbrewit.Api.Repository.Component
         {
             if (connection == null) throw new ArgumentNullException("connection is missing");
             var brewers = await connection.QueryAsync<UserBeer, User, UserBeer>(
-                "SELECT ub.beer_id AS BeerId, ub.username AS Username, ub.confirmed, " +
+                "SELECT ub.beer_id AS BeerId, ub.user_id AS UserId, ub.confirmed, " +
                 "u.username AS Username, u.email, u.settings, gravatar, longitude, latitude, header_image_url, " +
                 "avatar_url AS Avatar FROM user_beers ub " +
-                "LEFT JOIN Users u ON ub.Username = u.Username " +
+                "LEFT JOIN Users u ON ub.user_id = u.user_id " +
                 "WHERE ub.beer_id = @BeerId;",
                 (userBeer, user) =>
                 {
                     userBeer.User = user;
                     return userBeer;
-                }, new { beer.BeerId }, splitOn: "Username");
+                }, new { beer.BeerId }, splitOn: "UserId");
             beer.Brewers = brewers.ToList();
         }
 

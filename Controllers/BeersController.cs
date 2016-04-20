@@ -94,17 +94,25 @@ namespace Microbrewit.Api.Controllers
         /// <response code="400">Bad Request</response>
         /// <param name="beerDto"></param>
         /// <returns></returns>
-        [Authorize(Roles = "User")]
-        [HttpPost("")]
-        public async Task<IActionResult> PostBeer(BeerDto beerDto)
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> PostBeer([FromBody]BeerDto beerDto)
         {
+            BeerDto beer;
+            _logger.LogInformation("Beer isCommercial: " + beerDto.IsCommercial);
             if (beerDto == null) return HttpBadRequest("Missing data");
             if (!ModelState.IsValid) return HttpBadRequest(ModelState);
-
-            var username = HttpContext.User.Identity.Name;
-            if (username == null) return HttpBadRequest("Missing user");
-            var beer = await _beerService.AddAsync(beerDto, username);
+         
+            if (beerDto.IsCommercial) 
+                beer = await _beerService.AddAsync(beerDto);
+            else 
+            {
+                var username = HttpContext.User.Identity.Name;
+                if(username == null) return HttpBadRequest("Missing user");           
+                beer  = await _beerService.AddAsync(beerDto, username);                         
+            }
             if (beer == null) return HttpBadRequest();
+            
             return CreatedAtRoute(new { controller = "beers" }, beer);
         }
 

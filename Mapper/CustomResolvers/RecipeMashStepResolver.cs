@@ -10,7 +10,11 @@ namespace Microbrewit.Api.Mapper.CustomResolvers
     {
         protected override IList<MashStep> ResolveCore(RecipeDto recipe)
         {
+           
             var mashStepList = new List<MashStep>();
+            if(recipe == null || recipe.Steps == null)
+                return mashStepList;
+            
             foreach (var mashStepDto in recipe.Steps.OfType<MashStepDto>())
             {
                 var mashStep = new MashStep()

@@ -11,6 +11,7 @@ namespace Microbrewit.Api.Mapper.CustomResolvers
         protected override IList<FermentationStep> ResolveCore(RecipeDto recipe)
         {
             var fermentationStepList = new List<FermentationStep>();
+            if(recipe == null || recipe.Steps == null) return fermentationStepList;
             foreach (var fermentationStepDto in recipe.Steps.OfType<FermentationStepDto>())
             {
                 var fermentationStep = new FermentationStep()

@@ -11,7 +11,8 @@ namespace Microbrewit.Api.Mapper.CustomResolvers
         protected override IList<BoilStep> ResolveCore(RecipeDto recipe)
         {
             var boilStepList = new List<BoilStep>();
-            {
+            if(recipe == null || recipe.Steps == null) return boilStepList;
+            
                 foreach (var item in recipe.Steps.OfType<BoilStepDto>())
                 {
                     var boilStepDto = (BoilStepDto) item;
@@ -62,8 +63,7 @@ namespace Microbrewit.Api.Mapper.CustomResolvers
                     boilStepList.Add(boilStep);
                 }
 
-                return boilStepList;
-            }
+                return boilStepList;           
         }
     }
 }
