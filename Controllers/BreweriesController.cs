@@ -25,10 +25,10 @@ namespace Microbrewit.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<BreweryCompleteDto> GetBreweries(int from = 0, int size = 20)
+        public async Task<BreweryCompleteDto> GetBreweries(int from = 0, int size = 20, bool? isCommercial = null)
         {
             if (size > 1000) size = 1000;
-            var breweriesDto = await _breweryService.GetAllAsync(from, size);
+            var breweriesDto = await _breweryService.GetAllAsync(from, size,isCommercial);
             var result = new BreweryCompleteDto { Breweries = breweriesDto};
             return result;
         }

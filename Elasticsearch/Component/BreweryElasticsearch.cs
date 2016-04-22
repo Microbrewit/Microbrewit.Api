@@ -34,14 +34,15 @@ namespace Microbrewit.Api.ElasticSearch.Component
             await _client.IndexAsync(breweryDto, idx => idx.Index(_elasticSearchSettings.Index));
         }
 
-        public async Task<IEnumerable<BreweryDto>> GetAllAsync(int from, int size)
+        public async Task<IEnumerable<BreweryDto>> GetAllAsync(int from, int size, bool? isCommercial)
         {
             var res = await _client.SearchAsync<BreweryDto>(s => s
                 .Size(size)
                 .From(from)
                 .Query(q => q
                     .Bool(fi => fi
-                        .Filter(f => f.Term(t => t.Type, "brewery")))));
+                        .Filter(f => f.Term(t => t.Type, "brewery"))
+                        .Must(f => f.Term(t => t.Field(v => isCommercial == null || v.IsCommercial == isCommercial))))));
             return res.Documents;
         }
 

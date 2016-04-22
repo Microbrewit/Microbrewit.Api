@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using Microbrewit.Api.Model.Database;
@@ -21,23 +22,37 @@ namespace Microbrewit.Api.Repository.Component
           _databaseSettings = databaseSettings.Value;
       }
       
-      public async Task<IEnumerable<Brewery>> GetAllAsync(int from, int size)
+      public async Task<IEnumerable<Brewery>> GetAllAsync(int from, int size,bool? isCommercial)
         {
             using (DbConnection connection = new NpgsqlConnection(_databaseSettings.DbConnection))
             {
+                var parameters = new { From = from, Size = size,IsCommercial = isCommercial };
                 var sql =
                     "SELECT brewery_id AS BreweryId, b.name, description, type, created_date AS CreatedDate, updated_date AS UpdatedDate," +
                     "longitude, latitude, website, established, header_image_url AS HeaderImageUrl, b.is_commercial AS IsCommercial," +
                     "avatar_url AS AvatarUrl, b.origin_id AS OriginId, address, o.origin_id AS OriginId, o.name  " +
-                    "FROM Breweries b LEFT JOIN Origins o ON b.origin_id = o.origin_id " +
-                    "ORDER BY brewery_id LIMIT @Size OFFSET @From;";
-                var breweries = (await connection.QueryAsync<Brewery, Origin, Brewery>(sql
+                    "FROM Breweries b LEFT JOIN Origins o ON b.origin_id = o.origin_id ";
+
+                
+
+                StringBuilder where = new StringBuilder();
+                if (isCommercial != null)
+                {
+                    where.Append("is_commercial = @IsCommercial ");
+                }
+
+                if (where.Length > 0)
+                    sql += " WHERE " + where;
+
+
+                var orderby = " ORDER BY brewery_id LIMIT @Size OFFSET @From;";
+                var breweries = (await connection.QueryAsync<Brewery, Origin, Brewery>(sql + orderby
                    , (brewery, origin) =>
                     {
                         if (origin != null)
                             brewery.Origin = origin;
                         return brewery;
-                    }, new { From = from, Size = size }, splitOn: "OriginId")).ToList();
+                    }, parameters, splitOn: "OriginId")).ToList();
 
                 foreach (var brewery in breweries)
                 {
