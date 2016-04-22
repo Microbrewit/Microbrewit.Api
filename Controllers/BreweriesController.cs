@@ -3,6 +3,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Microbrewit.Api.Model.DTOs;
 using Microbrewit.Api.Service.Interface;
+using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Mvc;
 
 
@@ -57,6 +58,7 @@ namespace Microbrewit.Api.Controllers
         /// <param name="id">Brewery id</param>
         /// <param name="breweryDto">Brewery object</param>
         /// <returns></returns>
+        [Authorize]
         [HttpPut("{id:int}")]
        public async Task<IActionResult> PutBrewery(int id,[FromBody] BreweryDto breweryDto)
         {
@@ -81,13 +83,14 @@ namespace Microbrewit.Api.Controllers
         /// <response code="400">Bad Request</response>
         /// <param name="brewery">List of brewery objects</param>
         /// <returns></returns>
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> PostBrewery([FromBody]BreweryDto brewery)
         {
             if (brewery == null) return HttpBadRequest();
             if (!ModelState.IsValid) return HttpBadRequest(ModelState);
             var result = await _breweryService.AddAsync(brewery);
-            return CreatedAtRoute("DefaultApi", new {controller = "breweries"}, result);
+            return CreatedAtRoute(new { controller = "breweries" }, result);
         }
 
 
@@ -164,7 +167,7 @@ namespace Microbrewit.Api.Controllers
        public async Task<IActionResult> PutBreweryMember(int id, string username, [FromBody]BreweryMemberDto breweryMember)
         {
             if (!ModelState.IsValid) return HttpBadRequest(ModelState);
-            if (username != breweryMember.Username) return HttpBadRequest();
+            if (username != breweryMember.UserId) return HttpBadRequest();
             await _breweryService.UpdateBreweryMember(id, breweryMember);
             return new HttpStatusCodeResult((int) HttpStatusCode.Created);
         }
@@ -196,7 +199,7 @@ namespace Microbrewit.Api.Controllers
         /// <param name="from">Start point of the search.</param>
         /// <param name="size">Number of results returned.</param>
         /// <returns></returns>
-        [HttpGet]
+        [HttpGet("search")]
         public async Task<BreweryCompleteDto> GetBreweriesBySearch(string query, int from = 0, int size = 20)
         {
             if (size > 1000) size = 1000;

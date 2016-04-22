@@ -38,6 +38,8 @@ namespace Microbrewit.Api.Model.DTOs
         public string HeaderImage { get; set; }
         [JsonProperty(PropertyName = "avatar")]
         public string Avatar { get; set; }
+        [JsonProperty(PropertyName = "isCommercial")]
+        public string IsCommecial { get; set; }
         [JsonProperty(PropertyName = "socials")]
         public Dictionary<string,string> Socials { get; set; }
     }

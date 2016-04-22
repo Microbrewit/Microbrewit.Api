@@ -15,6 +15,6 @@ namespace Microbrewit.Api.ElasticSearch.Interface
         Task DeleteAsync(int id);
         Task<IEnumerable<BreweryMemberDto>> GetAllMembersAsync(int breweryId);
         Task<BreweryMemberDto> GetSingleMemberAsync(int breweryId, string username);
-        IEnumerable<BreweryMemberDto> GetMemberships(string username);
+        IEnumerable<BreweryMemberDto> GetMemberships(string userId);
     }
 }

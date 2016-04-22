@@ -149,7 +149,7 @@ namespace Microbrewit.Api.Service.Component
             var breweryDto = AutoMapper.Mapper.Map<Brewery, BreweryDto>(brewery);
             await _breweryElasticsearch.UpdateAsync(breweryDto);
             //await _userService.ReIndexUserElasticSearch(breweryMemberDto.Username);
-            return breweryDto.Members.SingleOrDefault(b => b.Username.Equals(breweryMemberDto.Username));
+            return breweryDto.Members.SingleOrDefault(b => b.UserId.Equals(breweryMemberDto.UserId));
         }
 
         public async Task<IEnumerable<BreweryMember>> GetMembershipsAsync(string username)

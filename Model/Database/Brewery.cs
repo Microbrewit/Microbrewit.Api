@@ -20,6 +20,7 @@ namespace Microbrewit.Api.Model.Database
         public int OriginId { get; set; }
         public Origin Origin { get; set; }
         public string Address { get; set; }
+        public bool IsCommercial { get; set; }
 
         public ICollection<BreweryMember> Members { get; set; }
         public ICollection<BreweryBeer> Beers { get; set; }

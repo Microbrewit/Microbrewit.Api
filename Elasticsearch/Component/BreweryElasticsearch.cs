@@ -84,10 +84,10 @@ namespace Microbrewit.Api.ElasticSearch.Component
         public async Task<BreweryMemberDto> GetSingleMemberAsync(int breweryId, string username)
         {
             var result = await GetSingleAsync(breweryId);
-            return result.Members.SingleOrDefault(m => m.Username.Equals(username));
+            return result.Members.SingleOrDefault(m => m.UserId.Equals(username));
         }
 
-        public IEnumerable<BreweryMemberDto> GetMemberships(string username)
+        public IEnumerable<BreweryMemberDto> GetMemberships(string userId)
         {
             var breweryDto =_client.Search<BreweryDto>(s => s
                 .Size(BigNumber)
@@ -105,7 +105,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
                         )))));
             var breweryMemberDtos = from brewery in breweryDto.Documents
                 from member in brewery.Members
-                where member.Username.Equals(username)
+                where member.UserId.Equals(userId)
                 select member;
             return breweryMemberDtos;
         }

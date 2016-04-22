@@ -13,12 +13,12 @@ namespace Microbrewit.Api.Repository.Interface
         Task<int> UpdateAsync(Brewery brewery);
         Task RemoveAsync(Brewery brewery);
 
-        Task<BreweryMember> GetSingleMemberAsync(int breweryId,string username);
+        Task<BreweryMember> GetSingleMemberAsync(int breweryId,string userId);
         Task<IEnumerable<BreweryMember>> GetAllMembersAsync(int breweryId);
         Task DeleteMemberAsync(int breweryId, string username);
         Task UpdateMemberAsync(BreweryMember breweryMember);
         Task AddMemberAsync(BreweryMember breweryMember);
-        Task<IEnumerable<BreweryMember>> GetMembershipsAsync(string username);
+        Task<IEnumerable<BreweryMember>> GetMembershipsAsync(string userId);
         Task<IEnumerable<BrewerySocial>> GetBrewerySocialAsync(int breweryId);
 
 

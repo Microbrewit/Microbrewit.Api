@@ -27,7 +27,7 @@ namespace Microbrewit.Api.Repository.Component
             {
                 var sql =
                     "SELECT brewery_id AS BreweryId, b.name, description, type, created_date AS CreatedDate, updated_date AS UpdatedDate," +
-                    "longitude, latitude, website, established, header_image_url AS HeaderImageUrl," +
+                    "longitude, latitude, website, established, header_image_url AS HeaderImageUrl, b.is_commercial AS IsCommercial," +
                     "avatar_url AS AvatarUrl, b.origin_id AS OriginId, address, o.origin_id AS OriginId, o.name  " +
                     "FROM Breweries b LEFT JOIN Origins o ON b.origin_id = o.origin_id " +
                     "ORDER BY brewery_id LIMIT @Size OFFSET @From;";
@@ -52,13 +52,13 @@ namespace Microbrewit.Api.Repository.Component
             if (brewery == null) return;
             var breweryMembers =
                 connection.Query<BreweryMember>(
-                    "SELECT brewery_id AS BreweryId, member_username AS MemberUsername, role,confirmed FROM brewery_members bm " +
+                    "SELECT brewery_id AS BreweryId, user_id AS UserId, role,confirmed FROM brewery_members bm " +
                     "WHERE bm.brewery_id = @BreweryId;",
                     new {brewery.BreweryId});
             brewery.Members = breweryMembers.ToList();
 
             var sql = "SELECT bb.beer_id AS BeerId, bb.brewery_id AS BreweryId," +
-                      "b.beer_id AS BeerId, b.name, b.beerstyle_id AS BeerStyleId, b.created_date AS CreatedDate, b.updated_date AS UpdatedDate, b.fork_of_id AS ForkOfId," +
+                      "b.beer_id AS BeerId, b.name, b.beerstyle_id AS BeerStyleId, b.created_date AS CreatedDate, b.updated_date AS UpdatedDate, b.fork_of_id AS ForkOfId, b.is_commercial AS IsCommercial," +
                       "s.srm_id AS SrmId, s.standard, s.mosher, s.daniels, s.morey, " +
                       "a.abv_id AS AbvId, a.standard, a.miller, a.advanced, a.advanced_alternative AS AdvancedAlternative, a.simple, a.simple_alternative AS SimpleAlternative," +
                       "i.ibu_id AS IbuId, i.standard, i.tinseth, i.rager, " +
@@ -102,7 +102,7 @@ namespace Microbrewit.Api.Repository.Component
 
                 var sql =
                     "SELECT brewery_id AS BreweryId, b.name, description, type, created_date AS CreatedDate, updated_date AS UpdatedDate," +
-                    "longitude, latitude, website, established, header_image_url AS HeaderImageUrl," +
+                    "longitude, latitude, website, established, header_image_url AS HeaderImageUrl, b.is_commercial AS IsCommercial," +
                     "avatar_url AS AvatarUrl, b.origin_id AS OriginId, address, o.origin_id AS OriginId, o.name  " +
                     "FROM breweries b LEFT JOIN origins o ON b.origin_id = o.origin_id " +
                     "WHERE brewery_id = @BreweryId;";
@@ -132,8 +132,8 @@ namespace Microbrewit.Api.Repository.Component
                         brewery.CreatedDate = DateTime.Now;
                         var result =
                             await connection.ExecuteAsync(
-                                "INSERT INTO breweries(name,description,type,created_date,updated_date,longitude,latitude,website,established,header_image_url,avatar_url,origin_id,address) " +
-                                "VALUES (@Name,@Description,@Type,@CreatedDate,@UpdatedDate,@Longitude,@Latitude,@Website,@Established,@HeaderImage,@Avatar,@OriginId,@Address);", 
+                                "INSERT INTO breweries(name,description,type,created_date,updated_date,longitude,latitude,website,established,header_image_url,avatar_url,origin_id,address, is_commercial) " +
+                                "VALUES (@Name,@Description,@Type,@CreatedDate,@UpdatedDate,@Longitude,@Latitude,@Website,@Established,@HeaderImage,@Avatar,@OriginId,@Address, @IsCommercial);", 
                                 brewery, transaction);
                         var breweryId = await connection.QueryAsync<int>("SELECT last_value FROM breweries_seq;");
                         brewery.BreweryId = breweryId.SingleOrDefault();
@@ -146,7 +146,7 @@ namespace Microbrewit.Api.Repository.Component
                         if (brewery.Members != null)
                         {
                             await connection.ExecuteAsync(
-                                "INSERT INTO brewery_members(brewery_id,member_username,role) VALUES(@BreweryId,@MemberUsername,@Role);",
+                                "INSERT INTO brewery_members(brewery_id,user_id,role) VALUES(@BreweryId,@UserId,@Role);",
                                 brewery.Members.Select(u => new { brewery.BreweryId, u.UserId, u.Role }), transaction);
                         }
                         if (brewery.Beers != null)
@@ -176,7 +176,7 @@ namespace Microbrewit.Api.Repository.Component
                     try
                     {
                         var result = await connection.ExecuteAsync(
-                            "UPDATE Breweries set name = @Name,description = @Name, type = @Type, created_date = @CreatedDate, updated_date = @UpdatedDate," +
+                            "UPDATE Breweries set name = @Name,description = @Name, type = @Type, updated_date = @UpdatedDate, is_commercial = @IsCommercial, " +
                             "longitude = @Longitude, latitude = @Latitude, website = @Website, established = @Established, header_image_url = @HeaderImage, avatar_url = @Avatar," +
                             "origin_id = @OriginId, address = @Address WHERE brewery_id = @BreweryId;", brewery,
                             transaction);
@@ -200,14 +200,14 @@ namespace Microbrewit.Api.Repository.Component
             throw new NotImplementedException();
         }
 
-        public async Task<BreweryMember> GetSingleMemberAsync(int breweryId, string username)
+        public async Task<BreweryMember> GetSingleMemberAsync(int breweryId, string userId)
         {
             using (DbConnection connection = new NpgsqlConnection(_databaseSettings.DbConnection))
             {
                 var members =
                     await connection.QueryAsync<BreweryMember>(
-                        "SELECT brewery_id AS BreweryId, member_username AS MemberUsername FROM brewery_members WHERE brewery_id = @BreweryId and member_username = @MemberUsername;",
-                        new { BreweryId = breweryId, MemberUsername = username });
+                        "SELECT brewery_id AS BreweryId, user_id AS UserId FROM brewery_members WHERE brewery_id = @BreweryId and user_id = @UserId;",
+                        new { BreweryId = breweryId, MemberUsername = userId });
                 return members.SingleOrDefault();
             }
         }
@@ -218,7 +218,7 @@ namespace Microbrewit.Api.Repository.Component
             {
                 var members =
                     await connection.QueryAsync<BreweryMember>(
-                        "SELECT brewery_id AS BreweryId, member_username AS MemberUsername FROM brewery_members WHERE brewery_id = @BreweryId;",
+                        "SELECT brewery_id AS BreweryId, user_id AS UserId FROM brewery_members WHERE brewery_id = @BreweryId;",
                         new { BreweryId = breweryId });
                 return members.ToList();
             }
@@ -230,7 +230,7 @@ namespace Microbrewit.Api.Repository.Component
             {
                 using (var transaction = connection.BeginTransaction())
                 {
-                    await connection.ExecuteAsync("DELETE FROM brewery_Members WHERE brewery_id = @BreweryId and member_username = @MemberUsername;",
+                    await connection.ExecuteAsync("DELETE FROM brewery_Members WHERE brewery_id = @BreweryId and user_id = @UserId;",
                             new { BreweryId = breweryId, MemberUsername = username }, transaction);
                 }
             }
@@ -243,7 +243,7 @@ namespace Microbrewit.Api.Repository.Component
                 using (var transaction = connection.BeginTransaction())
                 {
                     await connection.ExecuteAsync(
-                        "UPDATE brewery_members set Role = @Role, Confirmed = @Confirmed WHERE brewery_id = @BreweryId and member_username = @MemberUsername;",
+                        "UPDATE brewery_members set Role = @Role, Confirmed = @Confirmed WHERE brewery_id = @BreweryId and user_id = @UserId;",
                         breweryMember, transaction);
                 }
             }
@@ -255,19 +255,19 @@ namespace Microbrewit.Api.Repository.Component
             {
                 using (var transaction = connection.BeginTransaction())
                 {
-                    await connection.ExecuteAsync("INSERT INTO brewery_members(brewery_id,member_username,Role,Confirmed) VALUES(@BreweryId,@MemberUsername,@Role,@Confirmed);",
+                    await connection.ExecuteAsync("INSERT INTO brewery_members(brewery_id,user_id,Role,Confirmed) VALUES(@BreweryId,@UserId,@Role,@Confirmed);",
                 breweryMember, transaction);
                 }
             }
         }
 
-        public async Task<IEnumerable<BreweryMember>> GetMembershipsAsync(string username)
+        public async Task<IEnumerable<BreweryMember>> GetMembershipsAsync(string userId)
         {
             using (DbConnection connection = new NpgsqlConnection(_databaseSettings.DbConnection))
             {
                 var memberships =
-                    await connection.QueryAsync<BreweryMember>("SELECT brewery_id AS BreweryId, member_username AS MemberUsername FROM brewery_members WHERE member_username = @MemberUsername;",
-                        new {MemberUsername = username});
+                    await connection.QueryAsync<BreweryMember>("SELECT brewery_id AS BreweryId, user_id AS UserId FROM brewery_members WHERE user_id = @UserId;",
+                        new {MemberUsername = userId});
                 return memberships.ToList();
             }
         }
@@ -279,7 +279,7 @@ namespace Microbrewit.Api.Repository.Component
             {
                 var members =
                      await connection.QueryAsync<BreweryMember>(
-                        "SELECT  brewery_id AS BreweryId, member_username AS MemberUsername FROM brewery_members WHERE brewery_id = @BreweryId;",
+                        "SELECT  brewery_id AS BreweryId, user_id AS UserId FROM brewery_members WHERE brewery_id = @BreweryId;",
                         new { BreweryId = breweryId });
                 return members.ToList();
             }
@@ -320,16 +320,16 @@ namespace Microbrewit.Api.Repository.Component
         private async Task UpdateBreweryMembersAsync(DbConnection connection, DbTransaction transaction, Brewery brewery)
         {
             var breweryMembers = await connection.QueryAsync<BreweryMember>(
-                "SELECT brewery_id AS BreweryId, member_username AS MemberUsername FROM brewery_members WHERE brewery_id = @BreweryId", new { brewery.BreweryId }, transaction);
+                "SELECT brewery_id AS BreweryId, user_id AS UserId FROM brewery_members WHERE brewery_id = @BreweryId", new { brewery.BreweryId }, transaction);
 
-            await connection.ExecuteAsync("DELETE FROM brewery_members WHERE brewery_id = @BreweryId and member_username = @MemberUsername;",
+            await connection.ExecuteAsync("DELETE FROM brewery_members WHERE brewery_id = @BreweryId and user_id = @UserId;",
                 breweryMembers.Where(bm => brewery.Members.All(m => bm.UserId != m.UserId)).Select(bm => new { brewery.BreweryId, bm.UserId }), transaction);
 
             await connection.ExecuteAsync(
-                "UPDATE brewery_members set role = @Role, confirmed = @Confirmed WHERE brewery_id = @BreweryId and member_username = @MemberUsername;",
+                "UPDATE brewery_members set role = @Role, confirmed = @Confirmed WHERE brewery_id = @BreweryId and user_id = @UserId;",
                 brewery.Members.Where(m => breweryMembers.Any(bm => m.UserId == bm.UserId)), transaction);
 
-            await connection.ExecuteAsync("INSERT INTO brewery_members(brewery_id,member_username,role,confirmed) VALUES(@BreweryId,@MemberUsername,@Role,@Confirmed);",
+            await connection.ExecuteAsync("INSERT INTO brewery_members(brewery_id,user_id,role,confirmed) VALUES(@BreweryId,@UserId,@Role,@Confirmed);",
                 brewery.Members.Where(m => breweryMembers.All(bm => m.UserId != bm.UserId)).Select(bm => new { brewery.BreweryId, bm.UserId,bm.Role,bm.Confirmed }), transaction);
 
         }
