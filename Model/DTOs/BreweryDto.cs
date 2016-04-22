@@ -39,7 +39,7 @@ namespace Microbrewit.Api.Model.DTOs
         [JsonProperty(PropertyName = "avatar")]
         public string Avatar { get; set; }
         [JsonProperty(PropertyName = "isCommercial")]
-        public string IsCommecial { get; set; }
+        public bool IsCommercial { get; set; }
         [JsonProperty(PropertyName = "socials")]
         public Dictionary<string,string> Socials { get; set; }
     }
