@@ -36,13 +36,24 @@ namespace Microbrewit.Api.ElasticSearch.Component
 
         public async Task<IEnumerable<BreweryDto>> GetAllAsync(int from, int size, bool? isCommercial)
         {
-            var res = await _client.SearchAsync<BreweryDto>(s => s
-                .Size(size)
-                .From(from)
-                .Query(q => q
-                    .Bool(fi => fi
-                        .Filter(f => f.Term(t => t.Type, "brewery"))
-                        .Must(f => f.Term(t => t.Field(v => isCommercial == null || v.IsCommercial == isCommercial))))));
+            //var res = await _client.SearchAsync<BreweryDto>(s => s
+            //    .Size(size)
+            //    .From(from)
+            //    .Query(q => q
+            //        .Bool(fi => fi
+            //            .Filter(f => f.Term(t => t.Type, "brewery")))));
+            //return res.Documents;
+            var query = Query<BreweryDto>.Bool(fi => fi.Filter(f => f.Term(t => t.Type, "brewery")));
+            if (isCommercial != null)
+            {
+                query = query && Query<BreweryDto>.Term("isCommercial", isCommercial);
+            }
+            var res = await _client.SearchAsync<BreweryDto>(new SearchRequest()
+            {
+                From = from,
+                Size = size,
+                Query = query,
+            });
             return res.Documents;
         }
 
