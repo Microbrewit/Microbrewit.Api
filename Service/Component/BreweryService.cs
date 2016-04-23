@@ -24,8 +24,8 @@ namespace Microbrewit.Api.Service.Component
         public async Task<IEnumerable<BreweryDto>> GetAllAsync(int @from, int size, bool? isCommercial, string origin)
         {
             var brewerysDto = await _breweryElasticsearch.GetAllAsync(from,size,isCommercial,origin);
-            if (brewerysDto .Any()) return brewerysDto ;
-            var brewerys = await _breweryRepository.GetAllAsync(from, size,isCommercial);
+            if (brewerysDto.Any()) return brewerysDto ;
+            var brewerys = await _breweryRepository.GetAllAsync(from, size,isCommercial,origin);
             brewerysDto = AutoMapper.Mapper.Map<IEnumerable<Brewery>, IEnumerable<BreweryDto>>(brewerys);
             return brewerysDto;
         }
@@ -77,7 +77,7 @@ namespace Microbrewit.Api.Service.Component
 
         public async Task ReIndexElasticSearch()
         {
-             var brewerys = await _breweryRepository.GetAllAsync(0,int.MaxValue,null);
+             var brewerys = await _breweryRepository.GetAllAsync(0,int.MaxValue,null,null);
             var brewerysDto = AutoMapper.Mapper.Map<IEnumerable<Brewery>, IEnumerable<BreweryDto>>(brewerys);
             await _breweryElasticsearch.UpdateAllAsync(brewerysDto);
         }

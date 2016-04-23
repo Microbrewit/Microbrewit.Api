@@ -53,8 +53,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
             if(origin != null)
             {
                 _logger.LogInformation($"Brewery origin {origin}");
-                query = query && Query<BreweryDto>.Term(t => 
-                                                    t.Field(f => f.Origin.Name).Value(origin));
+                query = query && Query<BreweryDto>.Match(m => m.Field(f => f.Origin.Name).Query(origin));
             }
             var res = await _client.SearchAsync<BreweryDto>(new SearchRequest()
             {

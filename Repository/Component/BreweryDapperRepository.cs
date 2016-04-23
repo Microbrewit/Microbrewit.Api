@@ -22,11 +22,11 @@ namespace Microbrewit.Api.Repository.Component
           _databaseSettings = databaseSettings.Value;
       }
       
-      public async Task<IEnumerable<Brewery>> GetAllAsync(int from, int size,bool? isCommercial)
+      public async Task<IEnumerable<Brewery>> GetAllAsync(int from, int size,bool? isCommercial, string originName)
         {
             using (DbConnection connection = new NpgsqlConnection(_databaseSettings.DbConnection))
             {
-                var parameters = new { From = from, Size = size,IsCommercial = isCommercial };
+                var parameters = new { From = from, Size = size,IsCommercial = isCommercial,Origin = originName };
                 var sql =
                     "SELECT brewery_id AS BreweryId, b.name, description, type, created_date AS CreatedDate, updated_date AS UpdatedDate," +
                     "longitude, latitude, website, established, header_image_url AS HeaderImageUrl, b.is_commercial AS IsCommercial," +
@@ -35,14 +35,17 @@ namespace Microbrewit.Api.Repository.Component
 
                 
 
-                StringBuilder where = new StringBuilder();
+                var whereAddList = new List<string>();
                 if (isCommercial != null)
                 {
-                    where.Append("is_commercial = @IsCommercial ");
+                    whereAddList.Add(" is_commercial = @IsCommercial ");
                 }
-
-                if (where.Length > 0)
-                    sql += " WHERE " + where;
+                if (originName != null)
+                {
+                    whereAddList.Add(" o.name = @Origin ");
+                }
+                if (whereAddList.Count > 0)
+                    sql += " WHERE " + string.Join("AND",whereAddList);
 
 
                 var orderby = " ORDER BY brewery_id LIMIT @Size OFFSET @From;";

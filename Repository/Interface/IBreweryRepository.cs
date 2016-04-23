@@ -7,7 +7,7 @@ namespace Microbrewit.Api.Repository.Interface
     public interface IBreweryRepository
     {
 
-        Task<IEnumerable<Brewery>> GetAllAsync(int from, int size,bool? isCommercial);
+        Task<IEnumerable<Brewery>> GetAllAsync(int from, int size,bool? isCommercial, string origin);
         Task<Brewery> GetSingleAsync(int id);
         Task AddAsync(Brewery brewery);
         Task<int> UpdateAsync(Brewery brewery);
