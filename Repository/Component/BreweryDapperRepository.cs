@@ -22,7 +22,7 @@ namespace Microbrewit.Api.Repository.Component
           _databaseSettings = databaseSettings.Value;
       }
       
-      public async Task<IEnumerable<Brewery>> GetAllAsync(int from, int size,bool? isCommercial, string originName)
+      public async Task<IEnumerable<Brewery>> GetAllAsync(int from, int size,bool? isCommercial, string originName, bool? hasBeers)
         {
             using (DbConnection connection = new NpgsqlConnection(_databaseSettings.DbConnection))
             {
@@ -44,9 +44,10 @@ namespace Microbrewit.Api.Repository.Component
                 {
                     whereAddList.Add(" o.name = @Origin ");
                 }
+              
                 if (whereAddList.Count > 0)
                     sql += " WHERE " + string.Join("AND",whereAddList);
-
+               
 
                 var orderby = " ORDER BY brewery_id LIMIT @Size OFFSET @From;";
                 var breweries = (await connection.QueryAsync<Brewery, Origin, Brewery>(sql + orderby
@@ -60,6 +61,13 @@ namespace Microbrewit.Api.Repository.Component
                 foreach (var brewery in breweries)
                 {
                     await GetBreweryProperties(connection, brewery);
+                }
+                if (hasBeers != null)
+                {
+                    if (hasBeers.Value)
+                        return breweries.Where(b => b.Beers.Any()).ToList();
+                    else
+                        return breweries.Where(b => !b.Beers.Any()).ToList();
                 }
                 return breweries.ToList();
             }

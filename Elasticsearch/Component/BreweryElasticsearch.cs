@@ -38,7 +38,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
             await _client.IndexAsync(breweryDto, idx => idx.Index(_elasticSearchSettings.Index));
         }
 
-        public async Task<IEnumerable<BreweryDto>> GetAllAsync(int from, int size, bool? isCommercial,string origin)
+        public async Task<IEnumerable<BreweryDto>> GetAllAsync(int from, int size, bool? isCommercial,string origin,bool? hasBeers)
         {
             //var res = await _client.SearchAsync<BreweryDto>(s => s
             //    .Size(size)
@@ -54,6 +54,13 @@ namespace Microbrewit.Api.ElasticSearch.Component
             {
                 _logger.LogInformation($"Brewery origin {origin}");
                 query = query && Query<BreweryDto>.Match(m => m.Field(f => f.Origin.Name).Query(origin));
+            }
+            if (hasBeers != null)
+            {
+                if (hasBeers.Value)
+                    query = query && Query<BreweryDto>.Exists(e => e.Field(f => f.Beers));
+                else
+                    query = query && Query<BreweryDto>.Bool(b => b.MustNot(m => m.Exists(e => e.Field(f => f.Beers))));
             }
             var res = await _client.SearchAsync<BreweryDto>(new SearchRequest()
             {
