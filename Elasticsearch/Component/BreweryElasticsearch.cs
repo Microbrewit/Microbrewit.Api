@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microbrewit.Api.ElasticSearch.Interface;
 using Microbrewit.Api.Model.DTOs;
 using Microbrewit.Api.Settings;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.OptionsModel;
 using Nest;
 
@@ -13,17 +14,20 @@ namespace Microbrewit.Api.ElasticSearch.Component
     public class BreweryElasticsearch : IBreweryElasticsearch
     {
         private readonly ElasticSearchSettings _elasticSearchSettings;
+        private readonly ILogger<BreweryElasticsearch> _logger;
         private Uri _node;
         private ConnectionSettings _settings;
         private ElasticClient _client;
         private const int BigNumber = 10000;
+        
 
-        public BreweryElasticsearch(IOptions<ElasticSearchSettings> elasticsearchSettings)
+        public BreweryElasticsearch(IOptions<ElasticSearchSettings> elasticsearchSettings, ILogger<BreweryElasticsearch> logger)
         {
             _elasticSearchSettings = elasticsearchSettings.Value;
             this._node = new Uri(_elasticSearchSettings.Url);
             this._settings = new ConnectionSettings(_node);
             this._client = new ElasticClient(_settings);
+            _logger = logger;
         }
 
         public async Task UpdateAsync(BreweryDto breweryDto)
@@ -34,7 +38,7 @@ namespace Microbrewit.Api.ElasticSearch.Component
             await _client.IndexAsync(breweryDto, idx => idx.Index(_elasticSearchSettings.Index));
         }
 
-        public async Task<IEnumerable<BreweryDto>> GetAllAsync(int from, int size, bool? isCommercial)
+        public async Task<IEnumerable<BreweryDto>> GetAllAsync(int from, int size, bool? isCommercial,string origin)
         {
             //var res = await _client.SearchAsync<BreweryDto>(s => s
             //    .Size(size)
@@ -45,8 +49,12 @@ namespace Microbrewit.Api.ElasticSearch.Component
             //return res.Documents;
             var query = Query<BreweryDto>.Bool(fi => fi.Filter(f => f.Term(t => t.Type, "brewery")));
             if (isCommercial != null)
-            {
                 query = query && Query<BreweryDto>.Term("isCommercial", isCommercial);
+            if(origin != null)
+            {
+                _logger.LogInformation($"Brewery origin {origin}");
+                query = query && Query<BreweryDto>.Term(t => 
+                                                    t.Field(f => f.Origin.Name).Value(origin));
             }
             var res = await _client.SearchAsync<BreweryDto>(new SearchRequest()
             {

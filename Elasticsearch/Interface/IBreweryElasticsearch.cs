@@ -8,7 +8,7 @@ namespace Microbrewit.Api.ElasticSearch.Interface
     {
         Task UpdateAsync(BreweryDto breweryDto);
 
-        Task<IEnumerable<BreweryDto>> GetAllAsync(int from, int size, bool? isCommerical);
+        Task<IEnumerable<BreweryDto>> GetAllAsync(int from, int size, bool? isCommerical,string origin);
         Task<BreweryDto> GetSingleAsync(int id);
         Task<IEnumerable<BreweryDto>> SearchAsync(string query, int from, int size);
         Task UpdateAllAsync(IEnumerable<BreweryDto> breweryDtos);

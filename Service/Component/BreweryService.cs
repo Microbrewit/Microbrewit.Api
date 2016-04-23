@@ -21,9 +21,9 @@ namespace Microbrewit.Api.Service.Component
             _breweryRepository = breweryRepository;
         }
 
-        public async Task<IEnumerable<BreweryDto>> GetAllAsync(int @from, int size, bool? isCommercial)
+        public async Task<IEnumerable<BreweryDto>> GetAllAsync(int @from, int size, bool? isCommercial, string origin)
         {
-            var brewerysDto = await _breweryElasticsearch.GetAllAsync(from,size,isCommercial);
+            var brewerysDto = await _breweryElasticsearch.GetAllAsync(from,size,isCommercial,origin);
             if (brewerysDto .Any()) return brewerysDto ;
             var brewerys = await _breweryRepository.GetAllAsync(from, size,isCommercial);
             brewerysDto = AutoMapper.Mapper.Map<IEnumerable<Brewery>, IEnumerable<BreweryDto>>(brewerys);
