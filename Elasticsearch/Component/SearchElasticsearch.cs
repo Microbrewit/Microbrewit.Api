@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microbrewit.Api.ElasticSearch.Interface;
 using Microbrewit.Api.Settings;
@@ -23,13 +24,15 @@ namespace Microbrewit.Api.ElasticSearch.Component
         }
 
 
-        public Task<string> SearchAllAsync(string query, int @from, int size)
+        public async Task<IEnumerable<string>> SearchAllAsync(string query, int @from, int size)
         {
-            //var queryString = "{\"from\" : " + from + ", \"size\" : " + size + ", \"query\":{\"match\": {\"name\": {\"query\": \" " + query + " \",\"operator\": \"and\"}}}}";
+            
+            var queryString = "{\"from\" : " + from + ", \"size\" : " + size + ", \"query\":{\"match\": {\"name\": {\"query\": \" " + query + " \",\"operator\": \"and\"}}}}";
             //            _client.SearchAsync<string>();
             //var res = await _client.SearchAsync<string>(s => s.Query(q => q.QueryString(qs => qs.Query(queryString))));
-            //return res;
-            return Task.FromResult("");
+            var res = await _client.SearchAsync<string>(s => s.Query(q => q.QueryString(gs => gs.Query(queryString))));
+            return res.Documents;
+            //return Task.FromResult("");
         }
 
         public Task<string> SearchIngredientsAsync(string query, int @from, int size)
