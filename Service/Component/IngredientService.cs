@@ -1,23 +1,27 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microbrewit.Api.ElasticSearch.Interface;
 using Microbrewit.Api.Model.DTOs;
 using Microbrewit.Api.Service.Interface;
 namespace Microbrewit.Api.Service.Component
 {
     public class IngredientService : IIngredientService
     {
-        IHopService _hopService;
-        IFermentableService _fermentableService;
-        IOtherService _otherService;
-        IYeastService _yeastService;
+        readonly IHopService _hopService;
+        readonly IFermentableService _fermentableService;
+        readonly IOtherService _otherService;
+        readonly IYeastService _yeastService;
+        readonly ISearchElasticsearch _searchElasticsearch;
+
         public IngredientService(IHopService hopService, IFermentableService fermentableService,
-        IOtherService otherService, IYeastService yeastService)
+        IOtherService otherService, IYeastService yeastService, ISearchElasticsearch searchElasticsearch)
         {
             _hopService = hopService;
             _fermentableService = fermentableService;
             _otherService = otherService;
             _yeastService = yeastService;
+            _searchElasticsearch = searchElasticsearch;
         }
         public async Task<IEnumerable<IIngredientDto>> GetAllAsync(string custom)
         {
@@ -35,9 +39,9 @@ namespace Microbrewit.Api.Service.Component
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<IIngredientDto>> SearchAsync(string query, int from, int size)
+        public async Task<IEnumerable<dynamic>> SearchAsync(string query, int from, int size)
         {
-            throw new NotImplementedException();
+            return await _searchElasticsearch.SearchIngredientsAsync(query, from, size);
         }
     }
 }

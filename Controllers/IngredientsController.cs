@@ -4,6 +4,7 @@ using Microsoft.AspNet.Mvc;
 using Microbrewit.Api.Model.DTOs;
 using Microbrewit.Api.Service.Interface;
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
 namespace Microbrewit.Api.Controllers
 {
@@ -34,9 +35,8 @@ namespace Microbrewit.Api.Controllers
         public async Task<IActionResult> GetAllIngredients(string query, int from = 0, int size = 20)
         {
             if (size > 1000) size = 1000; 
-            //var result = await _searchElasticsearch.SearchIngredientsAsync(query, from, size);
-            //return Ok(JObject.Parse(result));
-            return Ok();
+            var result = await _ingredientsService.SearchAsync(query, from, size);
+            return Ok(result);
         }
     }
 }

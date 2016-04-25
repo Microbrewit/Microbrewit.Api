@@ -7,7 +7,7 @@ namespace Microbrewit.Api.Service.Interface
     public interface IIngredientService
     {
         Task<IEnumerable<IIngredientDto>> GetAllAsync(string custom);
-        Task<IEnumerable<IIngredientDto>> SearchAsync(string query, int from, int size);
+        Task<IEnumerable<dynamic>> SearchAsync(string query, int from, int size);
         Task ReIndexElasticSearch();
     }
 }
