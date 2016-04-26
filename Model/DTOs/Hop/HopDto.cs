@@ -29,6 +29,7 @@ namespace Microbrewit.Api.Model.DTOs
         [JsonProperty(PropertyName = "aliases")]
         public IList<string> Aliases { get; set; }
         [Required]
+        [StringLength(50)]
         [JsonProperty(PropertyName = "purpose")]
         public string Purpose { get; set; }
         [JsonProperty(PropertyName = "substitutes")]
