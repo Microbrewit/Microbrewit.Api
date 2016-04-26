@@ -26,7 +26,6 @@ namespace Microbrewit.Api.Controllers
         /// </summary>
         /// <returns>Ok 200 on success</returns>
         /// <errorCode code="400"></errorCode>
-        [Authorize]
         [HttpGet]
         public async Task<OtherCompleteDto> GetOthers(string custom = "false")
         {
