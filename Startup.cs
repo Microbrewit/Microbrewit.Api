@@ -50,6 +50,7 @@ namespace Microbrewit.Api
             services.AddTransient<IBeerRepository, BeerDapperRepository>();
             services.AddTransient<IBreweryRepository, BreweryDapperRepository>();
             services.AddTransient<IUserRepository,UserDapperRepository>();
+            services.AddTransient<IGlassRepository, GlassDapperRepository>();
             //Service dependency injection
             services.AddTransient<IHopService,HopService>();
             services.AddTransient<IYeastService, YeastService>();
@@ -62,6 +63,7 @@ namespace Microbrewit.Api
             services.AddTransient<IIngredientService, IngredientService>();
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IOriginService,OriginService>();
+            services.AddTransient<IGlassService, GlassService>();
             //ElasticSearch dependency injection
             services.AddTransient<IBeerElasticsearch, BeerElasticsearch>();
             services.AddTransient<IBeerStyleElasticsearch, BeerStyleElasticsearch>();
