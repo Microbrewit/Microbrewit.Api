@@ -17,7 +17,7 @@ namespace Microbrewit.Api.Model.DTOs
             {
                 YeastsSupplier = new Links()
                 {
-                    Href = ApiConfiguration.ApiSettings.Url + "/suplliers/:id",
+                    Href = ApiConfiguration.ApiSettings.Url + "/suppliers/:id",
                     Type = "supplier",
                 }
 
