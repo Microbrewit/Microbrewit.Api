@@ -8,7 +8,8 @@ namespace Microbrewit.Api.Service.Interface
     public interface IUserService
     {
         Task<IEnumerable<UserDto>> GetAllAsync(int from, int size);
-        Task<UserDto> GetSingleAsync(string username);
+        Task<UserDto> GetSingleByUserIdAsync(string userId);
+        Task<UserDto> GetSingleByUsernameAsync(string username);
         Task<UserDto> AddAsync(User user);
         Task<UserDto> DeleteAsync(string username);
         Task UpdateAsync(UserDto userDto);

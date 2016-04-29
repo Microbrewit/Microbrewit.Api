@@ -21,7 +21,7 @@ namespace Microbrewit.Api.Mapper.Profile
                 .ForMember(dest => dest.Avatar, conf => conf.MapFrom(src => (src.Avatar != null && src.Avatar.Any()) ? _imagePath + "avatar/" + src.Avatar : null))
                 .ForMember(dest => dest.HeaderImage, conf => conf.MapFrom(src => (src.HeaderImage != null && src.HeaderImage.Any()) ? _imagePath + "header/" + src.HeaderImage : null))
                 .ForMember(dest => dest.GeoLocation, conf => conf.ResolveUsing<UserGeoLocationResolver>())
-                .ForMember(dest => dest.EmailConfirmed, conf => conf.ResolveUsing<UserEmailConfirmedResolver>())
+                .ForMember(dest => dest.EmailConfirmed, conf => conf.MapFrom(src => src.EmailConfirmed))
                 .ForMember(dest => dest.Socials, conf => conf.ResolveUsing<UserSocialResolver>())
                 .ForMember(dest => dest.Settings, conf => conf.MapFrom(src => src.Settings));
 
@@ -57,6 +57,7 @@ namespace Microbrewit.Api.Mapper.Profile
                .ForMember(dest => dest.Avatar, conf => conf.ResolveUsing<UserAvatarResolver>())
                .ForMember(dest => dest.HeaderImage, conf => conf.ResolveUsing<UserHeaderImageResolver>())
                .ForMember(dest => dest.Socials, conf => conf.ResolveUsing<UserDtoSocialResolver>())
+               .ForMember(dest => dest.EmailConfirmed, conf => conf.MapFrom(src => src.EmailConfirmed))
                .ForMember(dest => dest.Settings, conf => conf.MapFrom(src => src.Settings));
 
 

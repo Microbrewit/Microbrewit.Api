@@ -13,6 +13,7 @@ namespace Microbrewit.Api.Model.Database
         public double Longitude { get; set; }
         public string HeaderImage { get; set; }
         public string Avatar { get; set; }
+        public bool EmailConfirmed { get; set; }
         public IList<string> Roles { get; set; }
 
         public ICollection<UserSocial> Socials { get; set; }

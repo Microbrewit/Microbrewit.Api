@@ -7,7 +7,8 @@ namespace Microbrewit.Api.Repository.Interface
     public interface IUserRepository
     {
         Task<IList<User>> GetAllAsync();
-        Task<User> GetSingleAsync(string user_id);
+        Task<User> GetSingleByUserIdAsync(string userId);
+        Task<User> GetSingleByUsernameAsync(string username);
         Task AddAsync(User user);
         Task<int> UpdateAsync(User user);
         Task RemoveAsync(User user);        

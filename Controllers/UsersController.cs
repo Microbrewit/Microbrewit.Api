@@ -36,7 +36,7 @@ namespace Microbrewit.Api.Controllers
         [HttpGet("{username}")]
         public async Task<IActionResult> GetUser(string username)
         {
-            var user = await _userService.GetSingleAsync(username);
+            var user = await _userService.GetSingleByUsernameAsync(username);
             if (user == null)
             {
                 return HttpNotFound();

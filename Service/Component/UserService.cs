@@ -19,7 +19,13 @@ namespace Microbrewit.Api.Service.Component
             _userRepository = userRepository;
             _userElasticsearch = userElasticsearch;
         }
-        
+
+        public async Task<UserDto> GetSingleByUsernameAsync(string username)
+        {
+            var user = await _userRepository.GetSingleByUsernameAsync(username);
+            return AutoMapper.Mapper.Map<User, UserDto>(user);
+        }
+
         public Task<UserDto> AddAsync(User user)
         {
             throw new NotImplementedException();
@@ -36,9 +42,9 @@ namespace Microbrewit.Api.Service.Component
             return AutoMapper.Mapper.Map<IEnumerable<User>,IList<UserDto>>(users);
         }
 
-        public async Task<UserDto> GetSingleAsync(string userId)
+        public async Task<UserDto> GetSingleByUserIdAsync(string userId)
         {
-            var user = await _userRepository.GetSingleAsync(userId);
+            var user = await _userRepository.GetSingleByUserIdAsync(userId);
             return AutoMapper.Mapper.Map<User,UserDto>(user);
         }
 
