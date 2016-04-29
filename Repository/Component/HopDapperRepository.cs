@@ -284,23 +284,17 @@ namespace Microbrewit.Api.Repository.Component
             var hopBeerStyles = (await context.QueryAsync<HopBeerStyle>(@"SELECT hop_id AS HopId, beerstyle_id AS BeerStyleId FROM hop_beerStyles WHERE hop_id = @HopId", new { hop.HopId },
                transaction)).ToList();
 
-            var toDelete = hopBeerStyles.Where(h => hop.HopBeerStyles.All(f => f.BeerStyleId != h.BeerStyleId));
+            var toDelete = hopBeerStyles.Where(h => hop.HopBeerStyles.All(f => f.BeerStyleId != h.BeerStyleId)).Select(b => b.BeerStyleId).Distinct();
             await context.ExecuteAsync("DELETE FROM hop_beerStyles WHERE hop_id = @HopId and beerstyle_id = @BeerStyleId;",
-                toDelete.Select(h => new { h.HopId, h.BeerStyleId }), transaction);
+                toDelete.Select(i => new { HopId = hop.HopId, BeerStyleId = i }), transaction);
 
-            var toAdd = hop.HopBeerStyles.Where(h => hopBeerStyles.All(f => f.BeerStyleId != h.BeerStyleId));
-            await context.ExecuteAsync(@"INSERT INTO hop_beerStyles(beerstyle_id, hop_id) VALUES(@BeerStyleId,@HopId);", toAdd.Select(h => new { h.HopId, h.BeerStyleId }), transaction);
+            var toAdd = hop.HopBeerStyles.Where(h => hopBeerStyles.All(f => f.BeerStyleId != h.BeerStyleId)).Select(b => b.BeerStyleId).Distinct();
+            await context.ExecuteAsync(@"INSERT INTO hop_beerStyles(beerstyle_id, hop_id) VALUES(@BeerStyleId,@HopId);", toAdd.Select(i => new { HopId = hop.HopId, BeerStyleId = i }), transaction);
         }
 
         private async Task UpdateHopSubstituteAsync(DbConnection connection, DbTransaction transaction, Hop hop)
         {
-            //var hopSubstitutes = (await connection.QueryAsync<Substitute>(@"SELECT hop_id AS HopId, substitute_id AS SubstituteId FROM substitutes WHERE hop_id = @HopId",
-            //    new { hop.HopId }, transaction)).ToList();
-
-            //var toDelete = hopSubstitutes.Where(h => hop.Substituts.All(s => s.HopId != h.HopId && h.SubstituteId != s.HopId));
             await connection.ExecuteAsync("DELETE FROM substitutes WHERE hop_id = @HopId", hop, transaction);
-
-            //var toAdd = hop.Substituts.Where(h => hopSubstitutes.All(s => s.HopId != h.HopId && h.HopId != s.SubstituteId)).Select(c => new Substitute { HopId = hop.HopId, SubstituteId = c.HopId });
 
             var add = hop.Substituts.Select(s => new Substitute { SubstituteId = s.HopId, HopId = hop.HopId }).ToList();
             await connection.ExecuteAsync(@"INSERT INTO substitutes(substitute_id, hop_id) VALUES(@SubstituteId,@HopId);", add, transaction);
