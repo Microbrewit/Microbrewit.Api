@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using Microbrewit.Api.ElasticSearch.Interface;
+using Microbrewit.Api.Elasticsearch.Interface;
 using Microbrewit.Api.Model.Database;
 using Microbrewit.Api.Model.DTOs;
 using Microbrewit.Api.Repository.Interface;

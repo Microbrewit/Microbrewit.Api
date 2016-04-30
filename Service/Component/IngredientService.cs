@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microbrewit.Api.ElasticSearch.Interface;
+using Microbrewit.Api.Elasticsearch.Interface;
 using Microbrewit.Api.Model.DTOs;
 using Microbrewit.Api.Service.Interface;
+
 namespace Microbrewit.Api.Service.Component
 {
     public class IngredientService : IIngredientService
@@ -12,16 +13,16 @@ namespace Microbrewit.Api.Service.Component
         readonly IFermentableService _fermentableService;
         readonly IOtherService _otherService;
         readonly IYeastService _yeastService;
-        readonly ISearchElasticsearch _searchElasticsearch;
+        readonly IIngredientElasticsearch _ingredientElasticsearch;
 
         public IngredientService(IHopService hopService, IFermentableService fermentableService,
-        IOtherService otherService, IYeastService yeastService, ISearchElasticsearch searchElasticsearch)
+        IOtherService otherService, IYeastService yeastService, IIngredientElasticsearch ingredientElasticsearch)
         {
             _hopService = hopService;
             _fermentableService = fermentableService;
             _otherService = otherService;
             _yeastService = yeastService;
-            _searchElasticsearch = searchElasticsearch;
+            _ingredientElasticsearch = ingredientElasticsearch;
         }
         public async Task<IEnumerable<IIngredientDto>> GetAllAsync(string custom)
         {
@@ -41,7 +42,13 @@ namespace Microbrewit.Api.Service.Component
 
         public async Task<IEnumerable<dynamic>> SearchAsync(string query, int from, int size)
         {
-            return await _searchElasticsearch.SearchIngredientsAsync(query, from, size);
+            return await _ingredientElasticsearch.SearchIngredientsAsync(query, from, size);
+        }
+
+        public async Task<bool> HasIngredientsBeenUpdated(DateTime lastUpdateTime)
+        {
+            return await _ingredientElasticsearch.HasIngredientsBeenUpdated(lastUpdateTime);
+            
         }
     }
 }

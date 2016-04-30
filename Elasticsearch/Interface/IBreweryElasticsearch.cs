@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Microbrewit.Api.Model.DTOs;
 
-namespace Microbrewit.Api.ElasticSearch.Interface
+namespace Microbrewit.Api.Elasticsearch.Interface
 {
     public interface IBreweryElasticsearch
     {

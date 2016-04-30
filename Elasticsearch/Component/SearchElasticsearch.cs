@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microbrewit.Api.ElasticSearch.Interface;
+using Microbrewit.Api.Elasticsearch.Interface;
 using Microbrewit.Api.Settings;
 using Microsoft.Extensions.OptionsModel;
 using Nest;
 
-namespace Microbrewit.Api.ElasticSearch.Component
+namespace Microbrewit.Api.Elasticsearch.Component
 {
     public class SearchElasticsearch : ISearchElasticsearch
     {
@@ -35,17 +35,6 @@ namespace Microbrewit.Api.ElasticSearch.Component
             //return Task.FromResult("");
         }
 
-        public async Task<IEnumerable<dynamic>> SearchIngredientsAsync(string query, int @from, int size)
-        {
-            var ingredients = new[]{"hop","other","fermentable","yeast"};
-            var boolQuery = Query<dynamic>.Bool(b => b.Filter(f => f.Terms(t => t.Field("type").Terms(ingredients))).Must(m => m.Match(ma => ma.Field("name").Query(query))));
-            var res = await _client.SearchAsync<dynamic>(new SearchRequest()
-            {
-                From = from,
-                Size = size,
-                Query = boolQuery
-            });
-            return res.Documents;
-        }
+     
     }
 }

@@ -1,7 +1,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microbrewit.Api.ElasticSearch.Interface;
+using Microbrewit.Api.Elasticsearch.Interface;
 using Microbrewit.Api.Model.Database;
 using Microbrewit.Api.Model.DTOs;
 using Microbrewit.Api.Repository.Interface;

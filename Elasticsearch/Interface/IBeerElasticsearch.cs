@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microbrewit.Api.Model.DTOs;
 using Nest;
 
-namespace Microbrewit.Api.ElasticSearch.Interface
+namespace Microbrewit.Api.Elasticsearch.Interface
 {
     public interface IBeerElasticsearch
     {

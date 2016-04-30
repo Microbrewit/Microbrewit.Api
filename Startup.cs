@@ -1,5 +1,5 @@
-using Microbrewit.Api.ElasticSearch.Component;
-using Microbrewit.Api.ElasticSearch.Interface;
+using Microbrewit.Api.Elasticsearch.Component;
+using Microbrewit.Api.Elasticsearch.Interface;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -64,6 +64,8 @@ namespace Microbrewit.Api
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IOriginService,OriginService>();
             services.AddTransient<IGlassService, GlassService>();
+            services.AddTransient<IIngredientService, IngredientService>();
+            
             //ElasticSearch dependency injection
             services.AddTransient<IBeerElasticsearch, BeerElasticsearch>();
             services.AddTransient<IBeerStyleElasticsearch, BeerStyleElasticsearch>();
@@ -77,6 +79,7 @@ namespace Microbrewit.Api
             services.AddTransient<IYeastElasticsearch, YeastElasticsearch>();
             services.AddTransient<ISupplierElasticsearch, SupplierElasticsearch>();
             services.AddTransient<IUserElasticsearch,UserElasticsearch>();
+            services.AddTransient<IIngredientElasticsearch, IngredientElasticsearch>();
 
             services.AddTransient<ICalculation,Calculation>();
             services.AddTransient<IBeerXmlResolver,BeerXmlResolver>();

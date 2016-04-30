@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microbrewit.Api.ElasticSearch.Interface;
+using Microbrewit.Api.Elasticsearch.Interface;
 using Microbrewit.Api.Model.DTOs;
 using Nest;
 
-namespace Microbrewit.Api.ElasticSearch.Component
+namespace Microbrewit.Api.Elasticsearch.Component
 {
     public class UserElasticsearch : IUserElasticsearch
     {

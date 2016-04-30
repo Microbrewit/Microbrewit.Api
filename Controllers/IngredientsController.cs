@@ -38,5 +38,12 @@ namespace Microbrewit.Api.Controllers
             var result = await _ingredientsService.SearchAsync(query, from, size);
             return Ok(result);
         }
+
+        [HttpGet("updated")]
+        public async Task<IActionResult> HasIngredientsBeenUpdated(System.DateTime lastUpdateTime)
+        {
+            var updated = await _ingredientsService.HasIngredientsBeenUpdated(lastUpdateTime);
+            return Ok();
+        }
     }
 }

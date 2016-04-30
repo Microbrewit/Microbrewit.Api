@@ -1,7 +1,7 @@
 ﻿
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
-using Microbrewit.Api.ElasticSearch.Interface;
+using Microbrewit.Api.Elasticsearch.Interface;
 
 namespace Microbrewit.Api.Controllers
 {
