@@ -43,7 +43,7 @@ namespace Microbrewit.Api.Controllers
         public async Task<IActionResult> HasIngredientsBeenUpdated(System.DateTime lastUpdateTime)
         {
             var updated = await _ingredientsService.HasIngredientsBeenUpdated(lastUpdateTime);
-            return Ok();
+            return Ok(updated);
         }
     }
 }
