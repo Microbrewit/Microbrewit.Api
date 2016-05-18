@@ -11,6 +11,7 @@ public static void Main(string[] args)
     .UseContentRoot(Directory.GetCurrentDirectory())
     .UseIISIntegration()
     .UseStartup<Startup>()
+    .UserUrls("http://0.0.0.0:5000")
     .Build();
  
   host.Run();
