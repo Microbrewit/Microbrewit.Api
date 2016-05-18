@@ -41,6 +41,7 @@
   "Microsoft.VisualStudio.Web.CodeGeneration.Tools": {
     "version": "1.0.0-preview1-final",
     "imports": [
+      "dnxcore50",
       "portable-net45+win8+dnxcore50",
       "portable-net45+win8"
     ]
