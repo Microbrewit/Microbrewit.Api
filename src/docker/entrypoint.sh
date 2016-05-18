@@ -10,8 +10,8 @@ sed -i \
     ./docker/appsettings.json
 
 # Remove default config and replace with environment variable based config.
-rm ./src/appsettings.json
-mv ./src/docker/appsettings.json ./src/appsettings.json
+rm ./appsettings.json
+mv ./docker/appsettings.json ./appsettings.json
 
 
 echo "START ALL THE THINGS!"
