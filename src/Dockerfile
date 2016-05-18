@@ -9,4 +9,5 @@ RUN ["dotnet","restore"]
 
 EXPOSE 5005/tcp
 
+ENTRYPOINT ["/app/docker/entrypoint.sh"]
 CMD ["dotnet", "run"]
