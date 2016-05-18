@@ -7,7 +7,7 @@ RUN ["dotnet", "restore"]
 COPY . /app
 RUN ["dotnet","restore"]
 
-EXPOSE 5005/tcp
+EXPOSE 5000/tcp
 
 ENTRYPOINT ["/app/docker/entrypoint.sh"]
 CMD ["dotnet", "run"]
