@@ -10,11 +10,11 @@ sed -i \
     ./docker/appsettings.json
 
 # Remove default config and replace with environment variable based config.
-rm ./appsettings.json
-mv ./docker/appsettings.json ./appsettings.json
+rm ./src/appsettings.json
+mv ./src/docker/appsettings.json ./src/appsettings.json
 
 
 echo "START ALL THE THINGS!"
 
 # Exec docker run invokers original command
-dotnet -p project.json run
+dotnet run
