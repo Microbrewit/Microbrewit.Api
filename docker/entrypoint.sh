@@ -17,4 +17,4 @@ mv ./docker/appsettings.json ./appsettings.json
 echo "START ALL THE THINGS!"
 
 # Exec docker run invokers original command
-dnx -p project.json web
+dotnet -p project.json run
