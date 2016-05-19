@@ -12,9 +12,9 @@ namespace Microbrewit.Api.Model.DTOs
         [Required]
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
-        [JsonProperty(PropertyName = "type")]
+        [JsonProperty(PropertyName = "subType")]
         public string SubType { get; set; }
-        [JsonProperty(PropertyName = "subtype")]
+        [JsonProperty(PropertyName = "type")]
         public string Type => "other";
 
         [JsonProperty(PropertyName = "custom")]
