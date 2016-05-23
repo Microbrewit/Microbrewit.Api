@@ -42,6 +42,7 @@ namespace Microbrewit.Api.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles=("Admin"))]
         [HttpPut("{id:int}")]
         public async Task<IActionResult> PutHop(int id, [FromBody]HopDto hopDto)
         {
@@ -53,7 +54,8 @@ namespace Microbrewit.Api.Controllers
             await _hopService.UpdateHopAsync(hopDto);
             return new StatusCodeResult((int)HttpStatusCode.NoContent);
         }
-
+        
+        [Authorize(Roles=("Admin"))]
         [HttpPost]
         public async Task<IActionResult> PostHop([FromBody] HopDto hopDto)
         {
@@ -63,6 +65,7 @@ namespace Microbrewit.Api.Controllers
             return CreatedAtRoute(new { controller = "hops", }, result);
         }
 
+        [Authorize(Roles=("Admin"))]
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteHop(int id)
         {
@@ -78,7 +81,7 @@ namespace Microbrewit.Api.Controllers
             return await _hopService.GetHopFromsAsync();
         }
 
-        [Authorize]
+        [Authorize(Roles=("Admin"))]
         [Route("es")]
         [HttpGet]
         public async Task<IActionResult> UpdateHopsElasticSearch()
