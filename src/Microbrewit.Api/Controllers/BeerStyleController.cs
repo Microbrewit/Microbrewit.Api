@@ -59,6 +59,7 @@ namespace Microbrewit.Api.Controllers
         /// <param name="id">Beerstyle id</param>
         /// <param name="beerstyle">BeerStyle object</param>
         /// <returns></returns>
+        [Authorize(Roles=("Admin"))]
         [HttpPut("{id:int}")]
         public async Task<IActionResult> PutBeerStyle(int id, [FromBody]BeerStyleDto beerstyle)
         {
@@ -75,6 +76,7 @@ namespace Microbrewit.Api.Controllers
         /// <response code="400">Bad Request</response>
         /// <param name="beerStylesDto">Beerstyle object.</param>
         /// <returns></returns>
+        [Authorize(Roles=("Admin"))]
         [HttpPost]
         public async Task<IActionResult> PostBeerStyle([FromBody]BeerStyleDto beerStylesDto)
         {
@@ -112,6 +114,7 @@ namespace Microbrewit.Api.Controllers
         }
 
 
+        [Authorize(Roles=("Admin"))]
         [HttpGet]
         [Route("es")]
         public async Task<IActionResult> UpdateBeerStyleElasticSearch()

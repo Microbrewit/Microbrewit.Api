@@ -61,6 +61,7 @@ namespace Microbrewit.Api.Controllers
         /// <response code="204">No Content</response>
         /// <response code="400">Bad Request</response>
         /// <returns></returns>
+        [Authorize(Roles=("Admin"))]
         [HttpPut("{id:int}")]
         public async Task<IActionResult> PutFermentable(int id, [FromBody]FermentableDto fermentableDto)
         {
@@ -81,6 +82,7 @@ namespace Microbrewit.Api.Controllers
         /// <response code="400">Bad Request</response>
         /// <param name="fermentableDto">List of fermentable transfer objects</param>
         /// <returns></returns>
+        [Authorize(Roles=("Admin"))]
         [HttpPost]
         public async Task<IActionResult> PostFermentable([FromBody]FermentableDto fermentableDto)
         {
@@ -99,6 +101,7 @@ namespace Microbrewit.Api.Controllers
         /// <response code="404">Not Found</response>
         /// <param name="id">Fermentable id</param>
         /// <returns></returns>
+        [Authorize(Roles=("Admin"))]
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteFermentable(int id)
         {
@@ -109,6 +112,7 @@ namespace Microbrewit.Api.Controllers
         }
 
         [ApiExplorerSettings(IgnoreApi = true)]
+        [Authorize(Roles=("Admin"))]
         [HttpGet("es")]
         public async Task<IActionResult> UpdateFermentableElasticSearch()
         {

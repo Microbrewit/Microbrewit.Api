@@ -56,6 +56,7 @@ namespace Microbrewit.Api.Controllers
         /// <param name="id"></param>
         /// <param name="glassDto"></param>
         /// <returns></returns>
+        [Authorize(Roles=("Admin"))]
         [HttpPut("{id:int}")]
         public async Task<IActionResult> PutGlass(int id,[FromBody]GlassDto glassDto)
         {
@@ -71,6 +72,7 @@ namespace Microbrewit.Api.Controllers
         /// </summary>
         /// <param name="glassDtos"></param>
         /// <returns></returns>
+        [Authorize(Roles=("Admin"))]
         [HttpPost] 
         public async Task<IActionResult> PostGlass([FromBody]GlassDto glassDto)
         {
@@ -87,9 +89,9 @@ namespace Microbrewit.Api.Controllers
         /// <response code="404">Not Found</response>
         /// <param name="id">Glass id</param>
         /// <returns></returns>
-        [ApiExplorerSettings(IgnoreApi = true)]
+        [Authorize(Roles=("Admin"))]
         [HttpDelete("{id:int}")]
-       public async Task<IActionResult> DeleteGlass(int id)
+        public async Task<IActionResult> DeleteGlass(int id)
         {
             var glass = await _glassService.DeleteAsync(id);
             if (glass == null)
@@ -97,6 +99,7 @@ namespace Microbrewit.Api.Controllers
             return Ok(glass);
         }
 
+        [Authorize(Roles=("Admin"))]
         [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet("es")]
         public async Task<IActionResult> UpdateGlassElasticSearch()

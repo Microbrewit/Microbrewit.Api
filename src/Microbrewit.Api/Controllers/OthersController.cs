@@ -60,6 +60,7 @@ namespace Microbrewit.Api.Controllers
         /// <param name="id"></param>
         /// <param name="otherDto"></param>
         /// <returns></returns>
+        [Authorize(Roles=("Admin"))]
         [HttpPut("{id:int}")]
         public async Task<IActionResult> PutOther(int id, [FromBody]OtherDto otherDto)
         {
@@ -75,9 +76,10 @@ namespace Microbrewit.Api.Controllers
         /// </summary>
         /// <param name="otherDto"></param>
         /// <returns></returns>
+        [Authorize(Roles=("Admin"))]
         [HttpPost]
         public async Task<IActionResult> PostOther([FromBody]OtherDto otherDto)
-       {
+        {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             var result = await _otherService.AddAsync(otherDto);
@@ -92,7 +94,7 @@ namespace Microbrewit.Api.Controllers
         /// <response code="404">Not Found</response>
         /// <param name="id">Other id</param>
         /// <returns></returns>
-        [ApiExplorerSettings(IgnoreApi=true)]
+        [Authorize(Roles=("Admin"))]
         [Route("{id:int}")]
         public async Task<IActionResult> DeleteOther(int id)
         {
@@ -101,6 +103,9 @@ namespace Microbrewit.Api.Controllers
                 return NotFound();
             return Ok(other);
         }
+        
+        [Authorize(Roles=("Admin"))]
+        [ApiExplorerSettings(IgnoreApi=true)]
         [HttpGet("es")]
         public async Task<IActionResult> UpdateOtherElasticSearch()
         {

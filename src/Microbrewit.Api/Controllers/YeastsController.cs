@@ -54,6 +54,7 @@ namespace Microbrewit.Api.Controllers
         /// <param name="id">Yeast Id</param>
         /// <param name="yeastDto">Json of the YeastDto object</param>
         /// <returns>No Content 204</returns>
+        [Authorize(Roles=("Admin"))]
         [HttpPut("{id:int}")]
         public async Task<IActionResult> PutYeast(int id, [FromBody] YeastDto yeastDto)
         {
@@ -70,7 +71,7 @@ namespace Microbrewit.Api.Controllers
         /// </summary>
         /// <param name="yeastDto">Takes a list of YeastDto objects in form of json</param>
         /// <returns>201 Created</returns>
-        //   [ClaimsAuthorize("Post","Yeast")]
+        [Authorize(Roles=("Admin"))]
         [HttpPost]
         public async Task<IActionResult> PostYeast([FromBody]YeastDto yeastDto)
         {
@@ -87,6 +88,7 @@ namespace Microbrewit.Api.Controllers
         /// </summary>
         /// <param name="id">Yeast id</param>
         /// <returns>200 OK</returns>
+        [Authorize(Roles=("Admin"))]
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteYeast(int id)
         {
@@ -98,6 +100,8 @@ namespace Microbrewit.Api.Controllers
             return Ok(yeast);
         }
 
+        [Authorize(Roles=("Admin"))]
+        [ApiExplorerSettings(IgnoreApi=true)]
         [HttpGet("es")]
         public async Task<IActionResult> UpdateElasticSearchYeast()
         {

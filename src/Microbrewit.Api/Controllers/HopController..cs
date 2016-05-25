@@ -82,6 +82,7 @@ namespace Microbrewit.Api.Controllers
         }
 
         [Authorize(Roles=("Admin"))]
+        [ApiExplorerSettings(IgnoreApi = true)]
         [Route("es")]
         [HttpGet]
         public async Task<IActionResult> UpdateHopsElasticSearch()

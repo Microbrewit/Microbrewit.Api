@@ -59,6 +59,7 @@ namespace Microbrewit.Api.Controllers
         /// <param name="id">Supplier id</param>
         /// <param name="supplierDto">Supplier transfer object</param>
         /// <returns></returns>
+        [Authorize(Roles=("Admin"))]
         [HttpPut("{id:int}")]
         public async Task<IActionResult> PutSupplier(int id, [FromBody]SupplierDto supplierDto)
         {
@@ -82,6 +83,7 @@ namespace Microbrewit.Api.Controllers
         /// <response code="201">Created</response>
         /// <response code="400">Bad Request</response>
         /// <returns></returns>
+        [Authorize(Roles=("Admin"))]
         [HttpPost]
         public async Task<IActionResult> PostSupplier([FromBody]SupplierDto supplierDto)
         {
@@ -101,6 +103,7 @@ namespace Microbrewit.Api.Controllers
         /// <response code="404">Not Found</response>
         /// <param name="id"></param>
         /// <returns></returns>
+        [Authorize(Roles=("Admin"))]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSupplier(int id)
         {
@@ -111,7 +114,9 @@ namespace Microbrewit.Api.Controllers
             }
             return Ok(supplier);
         }
-
+        
+        [Authorize(Roles=("Admin"))]
+        [ApiExplorerSettings(IgnoreApi=true)]
         [HttpGet("es")]
         public async Task<IActionResult> UpdateSupplierElasticSearch()
         {

@@ -54,6 +54,7 @@ namespace Microbrewit.Api.Controllers
         /// <param name="id">Origin id</param>
         /// <param name="origin"></param>
         /// <returns></returns>
+        [Authorize(Roles=("Admin"))]
         [HttpPut("{id}")]
         public async Task<IActionResult> Put([FromRoute]int id, [FromBody]OriginDto origin)
         {
@@ -71,6 +72,7 @@ namespace Microbrewit.Api.Controllers
         /// <response code="400">Bad Request</response>
         /// <param name="origin"></param>
         /// <returns></returns>
+        [Authorize(Roles=("Admin"))]
         [HttpPost]
         public async Task<IActionResult> Post([FromBody]OriginDto origin)
         {
@@ -87,8 +89,9 @@ namespace Microbrewit.Api.Controllers
         /// <response code="404">Not Found</response>
         /// <param name="id">Origin id</param>
         /// <returns></returns>
+        [Authorize(Roles=("Admin"))]
         [Route("{id}")]
-       public async Task<IActionResult> Delete([FromRoute]int id)
+        public async Task<IActionResult> Delete([FromRoute]int id)
         {
 
             var origin = await _originService.DeleteAsync(id);
@@ -100,6 +103,7 @@ namespace Microbrewit.Api.Controllers
         /// Updates elasticsearch with data from the database.
         /// </summary>
         /// <returns>200 OK</returns>
+        [Authorize(Roles=("Admin"))]
         [HttpGet("es")]
         public async Task<IActionResult> UpdateOriginElasticSearch()
         {

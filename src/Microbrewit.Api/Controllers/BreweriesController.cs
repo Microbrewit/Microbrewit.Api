@@ -42,7 +42,7 @@ namespace Microbrewit.Api.Controllers
         /// <param name="id">Beerstyle id</param>
         /// <returns></returns>
         [HttpGet("{id:int}")]
-      public async Task<IActionResult> GetBrewery(int id)
+        public async Task<IActionResult> GetBrewery(int id)
         {
             var breweryDto = await _breweryService.GetSingleAsync(id);
             if (breweryDto == null) return NotFound();
@@ -60,7 +60,7 @@ namespace Microbrewit.Api.Controllers
         /// <returns></returns>
         [Authorize]
         [HttpPut("{id:int}")]
-       public async Task<IActionResult> PutBrewery(int id,[FromBody] BreweryDto breweryDto)
+        public async Task<IActionResult> PutBrewery(int id,[FromBody] BreweryDto breweryDto)
         {
             // Checks if login user is allowed to change brewery.
             if (!ModelState.IsValid)
