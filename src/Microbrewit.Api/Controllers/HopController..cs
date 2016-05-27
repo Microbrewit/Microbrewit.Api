@@ -80,6 +80,12 @@ namespace Microbrewit.Api.Controllers
         {
             return await _hopService.GetHopFromsAsync();
         }
+        
+        [HttpGet("aromawheels")]
+        public async Task<IEnumerable<AromaWheelDto>> GetHopAromaWheel()
+        {
+            return await _hopService.GetAromaWheelsAsync();
+        }
 
         [Authorize(Roles=("Admin"))]
         [ApiExplorerSettings(IgnoreApi = true)]

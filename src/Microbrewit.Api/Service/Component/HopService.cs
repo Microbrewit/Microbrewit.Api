@@ -6,6 +6,7 @@ using Microbrewit.Api.Model.Database;
 using Microbrewit.Api.Model.DTOs;
 using Microbrewit.Api.Repository.Interface;
 using Microbrewit.Api.Service.Interface;
+
 namespace Microbrewit.Api.Service.Component
 {
     public class HopService : IHopService
@@ -74,6 +75,7 @@ namespace Microbrewit.Api.Service.Component
             var hops = await _hopRepository.GetAllAsync(0,10000);
             var hopsDto = AutoMapper.Mapper.Map<IEnumerable<Hop>, IList<HopDto>>(hops);
             await _hopElasticsearch.UpdateAllAsync(hopsDto);
+            await IndexAromaWheel();
         }
 
         public async Task<IEnumerable<HopDto>> SearchHop(string query, int from, int size)
@@ -89,8 +91,14 @@ namespace Microbrewit.Api.Service.Component
             var mappedResult = AutoMapper.Mapper.Map<Hop, HopDto>(result);
             await _hopElasticsearch.UpdateAsync(mappedResult);
             await IndexBeerStylesAsync(hop);
+            
         }
         
+        private async Task IndexAromaWheel()
+        {
+            var aromaWheels = AutoMapper.Mapper.Map<IEnumerable<AromaWheel>,IEnumerable<AromaWheelDto>>(await _hopRepository.GetAromaWheelsAsync());
+            await _hopElasticsearch.UpdateAllAromaWheelAsync(aromaWheels);
+        }
           private async Task IndexBeerStylesAsync(Hop hop)
         {
             foreach (var hopBeerStyle in hop.HopBeerStyles)
@@ -98,6 +106,14 @@ namespace Microbrewit.Api.Service.Component
                 var beerStyle = await _beerStyleRepository.GetSingleAsync(hopBeerStyle.BeerStyleId);
                 await _beerStyleElasticsearch.UpdateAsync(AutoMapper.Mapper.Map<BeerStyle, BeerStyleDto>(beerStyle));
             }
+        }
+
+        public async Task<IEnumerable<AromaWheelDto>> GetAromaWheelsAsync()
+        {
+           var aromaWheelsDto = await _hopElasticsearch.GetAromaWheelsAsync();
+           if(aromaWheelsDto.Any()) return aromaWheelsDto;
+           var aromaWheels = await _hopRepository.GetAromaWheelsAsync();
+           return AutoMapper.Mapper.Map<IEnumerable<AromaWheel>,IEnumerable<AromaWheelDto>>(aromaWheels);
         }
     }
 }

@@ -11,10 +11,10 @@ namespace Microbrewit.Api.Repository.Interface
         Task AddAsync(Hop item);
         Task<int> UpdateAsync(Hop item);
         Task RemoveAsync(Hop item);
-
         Task<Flavour> AddFlavourAsync(string name);
         Task<HopForm> GetFormAsync(int id);
         Task<IEnumerable<HopForm>> GetHopFormsAsync();
         Task<IEnumerable<Flavour>> GetFlavoursAsync();
+        Task<IEnumerable<AromaWheel>> GetAromaWheelsAsync();
     }
 }

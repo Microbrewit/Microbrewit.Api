@@ -91,6 +91,9 @@ namespace Microbrewit.Api.Mapper.Profile
                   .ForMember(dto => dto.Id, conf => conf.MapFrom(rec => rec.Id))
                .ForMember(dto => dto.Name, conf => conf.MapFrom(rec => rec.Name));
 
+            CreateMap<AromaWheel,AromaWheelDto>()
+            .ForMember(dto => dto.Id, conf => conf.MapFrom(source => source.Id))
+            .ForMember(dto => dto.Name, conf => conf.MapFrom(source => source.Name));
             //CreateMap<DTO,HopFlavour>()
             //     .ForMember(dto => dto.FlavourId, conf => conf.MapFrom(rec => rec.Id));
         }

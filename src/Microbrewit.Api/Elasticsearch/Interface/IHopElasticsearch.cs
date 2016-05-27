@@ -14,5 +14,8 @@ namespace Microbrewit.Api.Elasticsearch.Interface
         Task DeleteAsync(int id);
         HopDto GetSingle(int hopId);
         IEnumerable<HopDto> Search(string query, int from, int size);
+        Task UpdateAromaWheelAsync(AromaWheelDto aromaWheelDto);
+        Task UpdateAllAromaWheelAsync(IEnumerable<AromaWheelDto> aromaWheels);
+        Task<IEnumerable<AromaWheelDto>> GetAromaWheelsAsync();
     }
 }

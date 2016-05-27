@@ -38,6 +38,8 @@ namespace Microbrewit.Api.Elasticsearch.Component
             // Adds an analayzer to the name property in FermentableDto object.
             await _client.MapAsync<HopDto>(d => d.Properties(p => p.String(s => s.Name(n => n.Name).Analyzer("autocomplete"))));
             await _client.IndexAsync<HopDto>(hop);
+            
+            
         }
 
         public async Task<IEnumerable<HopDto>> GetAllAsync(int from, int size)
@@ -103,5 +105,33 @@ namespace Microbrewit.Api.Elasticsearch.Component
             return searchResults.Documents;
         }
 
+        public async Task UpdateAromaWheelAsync(AromaWheelDto aromaWheelDto)
+        {
+            await _client.MapAsync<AromaWheelDto>(d => d.Properties(p => p.String(s => s.Name(n => n.Name).Analyzer("autocomplete"))));
+            await _client.IndexAsync<AromaWheelDto>(aromaWheelDto);    
+        }
+
+        public async Task UpdateAllAromaWheelAsync(IEnumerable<AromaWheelDto> aromaWheels)
+        {
+            foreach (var aromaWheel in aromaWheels)
+            {
+                await UpdateAromaWheelAsync(aromaWheel);
+            }
+        }
+
+        public async Task<IEnumerable<AromaWheelDto>> GetAromaWheelsAsync()
+        {
+            
+            var res =
+               await _client.SearchAsync<AromaWheelDto>(
+                    s => s
+                        .Size(10000)
+                        .Query(q => q
+                            .Bool(fd => fd
+                                .Filter(f => f
+                                    .Term(h => h.Type, "aromawheel")
+                                    ))));
+            return res.Documents;
+        }
     }
 }

@@ -388,6 +388,14 @@ namespace Microbrewit.Api.Repository.Component
             {
                 return await connection.QueryAsync<Flavour>("SELECT flavour_id AS FlavourId, name FROM flavours;");
             }
-        }                      
+        }
+
+        public async Task<IEnumerable<AromaWheel>> GetAromaWheelsAsync()
+        {
+            using(DbConnection connection = new NpgsqlConnection(_databaseSettings.DbConnection))
+            {
+                return await connection.QueryAsync<AromaWheel>("SELECT aroma_wheel_id AS Id, name FROM aroma_wheels;"); 
+            }
+        }
     }
 }
