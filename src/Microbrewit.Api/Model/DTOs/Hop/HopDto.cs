@@ -25,7 +25,7 @@ namespace Microbrewit.Api.Model.DTOs
         [JsonProperty(PropertyName = "flavours")]
         public IList<string> Flavours { get; set; }
         [JsonProperty(PropertyName = "aromaWheel")]
-        public IList<string> AromaWheel { get; set; }
+        public IEnumerable<AromaWheelDto> AromaWheels { get; set; }
         [JsonProperty(PropertyName = "aliases")]
         public IList<string> Aliases { get; set; }
         [Required]

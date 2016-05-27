@@ -41,7 +41,7 @@ namespace Microbrewit.Api.Model.Database
         public Origin Origin { get; set; }
 
         public ICollection<HopFlavour> Flavours { get; set; }
-        public ICollection<HopFlavour> AromaWheel { get; set; }
+        public IEnumerable<AromaWheel> AromaWheels { get; set; }
         public ICollection<FermentationStepHop> FermentationSteps { get; set; }
         public ICollection<MashStepHop> MashSteps { get; set; }
         public ICollection<BoilStepHop> BoilSteps { get; set; }

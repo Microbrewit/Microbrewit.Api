@@ -5,11 +5,11 @@ using Microbrewit.Api.Model.Database;
 
 namespace Microbrewit.Api.Mapper.CustomResolvers
 {
-    public class HopAromaWheelResolver : ValueResolver<Hop, IList<string>>
+    public class HopAromaWheelResolver : ValueResolver<Hop, IEnumerable<string>>
     {
-        protected override IList<string> ResolveCore(Hop hop)
+        protected override IEnumerable<string> ResolveCore(Hop hop)
         {
-            return (from hopFlavour in hop.AromaWheel where hopFlavour.Flavour != null select hopFlavour.Flavour.Name).ToList();
+            return hop.AromaWheels.Select(a => a.Name);
         }
     }
 }

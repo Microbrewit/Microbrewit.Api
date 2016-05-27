@@ -40,7 +40,7 @@ namespace Microbrewit.Api.Repository.Component
                 var hops = (await connection.QueryAsync<Hop, Origin, Hop>(sql,  (hop, origin) =>
                 {
                     hop.Flavours = new List<HopFlavour>();
-                    hop.AromaWheel = new List<HopFlavour>();
+                    hop.AromaWheels = new List<AromaWheel>();
                     hop.Substituts = new List<Hop>();
                     hop.HopBeerStyles = new List<HopBeerStyle>();
                     hop.Origin = origin;
@@ -49,7 +49,7 @@ namespace Microbrewit.Api.Repository.Component
 
                 var hopFlavours = await connection.QueryAsync<HopFlavour>("SELECT flavour_id AS FlavourId, hop_id AS HopId FROM hop_flavours WHERE hop_id = ANY(@Ids)",
                     new { Ids = hops.Select(h => h.HopId).Distinct().ToArray() });
-
+                
                 var flavours = await connection.QueryAsync<Flavour>("SELECT flavour_id AS FlavourId, name FROM Flavours WHERE flavour_id = ANY(@Ids)",
                     new { Ids = hopFlavours.Select(m => m.FlavourId).Distinct().ToList() });
 
@@ -94,6 +94,13 @@ namespace Microbrewit.Api.Repository.Component
                         }, new { Id = hop.HopId }, splitOn: "HopId,BeerStyleId");
                     if (hopBeerStyles != null)
                         hop.HopBeerStyles = hopBeerStyles.ToList();
+                        
+               var aromaWheelsSql = "SELECT aw.aroma_wheel_id AS Id, aw.name FROM hop_aroma_wheels haw " + 
+                                    "INNER JOIN aroma_wheels aw ON aw.aroma_wheel_id = haw.aroma_wheel_id WHERE hop_id = @Id";
+                var aromaWheels = await connection.QueryAsync<AromaWheel>(aromaWheelsSql,
+                  new { id = hop.HopId });
+                if(aromaWheels.Any())
+                  hop.AromaWheels = aromaWheels;
                 }
 
                 return hops.ToList();
@@ -118,7 +125,7 @@ namespace Microbrewit.Api.Repository.Component
                     h.Origin = origin;
                     h.Flavours = new List<HopFlavour>();
                     h.Substituts = new List<Hop>();
-                    h.AromaWheel = new List<HopFlavour>();
+                    h.AromaWheels = new List<AromaWheel>();
                     h.HopBeerStyles = new List<HopBeerStyle>();
                     return h;
                 }, new { Id = id }, splitOn: "HopId,OriginId");
@@ -139,9 +146,13 @@ namespace Microbrewit.Api.Repository.Component
 
                 var hopFlavours = await connection.QueryAsync<HopFlavour>("SELECT flavour_id AS FlavourId, hop_id AS HopId FROM hop_flavours WHERE hop_id = @id",
                   new { id = hop.HopId });
-                var aromaWheels = await connection.QueryAsync<HopFlavour>("SELECT flavour_id AS FlavourId, hop_id AS HopId FROM hop_aroma_wheels WHERE hop_id = @id",
+                
+                var aromaWheelsSql = "SELECT aw.aroma_wheel_id AS Id, aw.name FROM hop_aroma_wheels haw " + 
+                                     "INNER JOIN aroma_wheels aw ON aw.aroma_wheel_id = haw.aroma_wheel_id WHERE hop_id = @Id";
+                var aromaWheels = await connection.QueryAsync<AromaWheel>(aromaWheelsSql,
                   new { id = hop.HopId });
-
+                if(aromaWheels.Any())
+                  hop.AromaWheels = aromaWheels;
 
                 var flavours = (await connection.QueryAsync<Flavour>("SELECT flavour_id AS FlavourId, name FROM flavours")).ToList();
                 foreach (var hopFlavour in hopFlavours)
@@ -153,15 +164,7 @@ namespace Microbrewit.Api.Repository.Component
                         hop.Flavours.Add(hopFlavour);
                     }
                 }
-                foreach (var hopFlavour in aromaWheels)
-                {
-                    var flavour = flavours.SingleOrDefault(f => f.FlavourId == hopFlavour.FlavourId);
-                    if (flavour != null)
-                    {
-                        hopFlavour.Flavour = flavour;
-                        hop.AromaWheel.Add(hopFlavour);
-                    }
-                }
+      
 
                 var beerstyleFields =
                    "h.hop_id AS HopId, h.beerstyle_id AS BeerStyleId, bs.beerstyle_id AS BeerStyleId, bs.name, bs.superstyle_id AS SuperStyleId, bs.og_low AS OGLow, " +
@@ -211,11 +214,11 @@ namespace Microbrewit.Api.Repository.Component
                                 hop.Flavours.Select(h => new { h.FlavourId, hop.HopId }),
                                 transaction);
                         }
-                        if (hop.AromaWheel != null)
+                        if (hop.AromaWheels != null)
                         {
                             await connection.ExecuteAsync(
-                                @"INSERT INTO hop_aroma_wheels(flavour_id, hop_id) VALUES(@FlavourId,@HopId);",
-                                hop.AromaWheel.Select(h => new { h.FlavourId, hop.HopId }),
+                                @"INSERT INTO hop_aroma_wheels(aroma_wheel_id, hop_id) VALUES(@Id,@HopId);",
+                                hop.AromaWheels.Select(h => new { h.Id, hop.HopId }),
                                 transaction);
                         }
 
@@ -316,15 +319,16 @@ namespace Microbrewit.Api.Repository.Component
 
         private async Task UpdateAromaWheelAsync(DbConnection connection, DbTransaction transaction, Hop hop)
         {
-            var aromaWheels = (await connection.QueryAsync<HopFlavour>(@"SELECT flavour_id AS FlavourId, hop_id AS HopId FROM hop_aroma_wheels WHERE hop_id = @HopId", new { hop.HopId },
+            var aromaWheels = (await connection.QueryAsync<int>(@"SELECT aroma_wheel_id FROM hop_aroma_wheels WHERE hop_id = @HopId", new { hop.HopId },
                 transaction)).ToList();
 
-            var toDelete = aromaWheels.Where(h => hop.AromaWheel.All(f => f.FlavourId != h.FlavourId));
-            await connection.ExecuteAsync("DELETE FROM hop_aroma_wheels WHERE hop_id = @HopId and flavour_id = @FlavourId;",
-                toDelete.Select(h => new { h.HopId, h.FlavourId }), transaction);
+            var toDelete = aromaWheels.Where(id => hop.AromaWheels.All(a => a.Id != id));
+            await connection.ExecuteAsync("DELETE FROM hop_aroma_wheels WHERE hop_id = @HopId and aroma_wheel_id = @Id;",
+                toDelete.Select(id => new { hop.HopId, Id = id}), transaction);
 
-            var toAdd = hop.AromaWheel.Where(h => aromaWheels.All(f => f.FlavourId != h.FlavourId));
-            await connection.ExecuteAsync(@"INSERT INTO hop_aroma_wheels(FlavourId, HopId) VALUES(@FlavourId,@HopId);", toAdd.Select(h => new { h.HopId, h.FlavourId }), transaction);
+            var toAdd = hop.AromaWheels.Where(a => aromaWheels.All(id => id != a.Id));
+            await connection.ExecuteAsync(@"INSERT INTO hop_aroma_wheels(aroma_wheel_id, hop_id) VALUES(6,@HopId);", 
+                toAdd.Select(a => new {Id = a.Id, hop.HopId}), transaction);
 
         }
 

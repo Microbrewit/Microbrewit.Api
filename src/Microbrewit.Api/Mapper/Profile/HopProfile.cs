@@ -15,7 +15,7 @@ namespace Microbrewit.Api.Mapper.Profile
                 .ForMember(dto => dto.Origin, conf => conf.MapFrom(rec => rec.Origin))
                 .ForMember(dto => dto.Oils, conf => conf.ResolveUsing<HopOilResolver>())
                 .ForMember(dto => dto.Acids, conf => conf.ResolveUsing<HopAcidResolver>())
-                .ForMember(dto => dto.AromaWheel, conf => conf.ResolveUsing<HopAromaWheelResolver>())
+                .ForMember(dto => dto.AromaWheels, conf => conf.MapFrom(src => src.AromaWheels))
                 .ForMember(dto => dto.Aliases, conf => conf.ResolveUsing<HopAliasesResolver>())
                 .ForMember(dto => dto.Flavours, conf => conf.ResolveUsing<HopFlavoursResolver>())
                 .ForMember(dto => dto.BeerStyles, conf => conf.ResolveUsing<HopBeerStylesResolver>())
@@ -66,7 +66,7 @@ namespace Microbrewit.Api.Mapper.Profile
                 .ForMember(dto => dto.Aliases, conf => conf.ResolveUsing<HopPostAliasesResolver>())
                 .ForMember(dto => dto.OriginId, conf => conf.MapFrom(rec => rec.Origin.Id))
                 .ForMember(dto => dto.Flavours, conf => conf.ResolveUsing<HopPostFlavoursResolver>())
-                .ForMember(dto => dto.AromaWheel, conf => conf.ResolveUsing<HopPostFlavoursResolver>())
+                .ForMember(dto => dto.AromaWheels, conf => conf.MapFrom(rec => rec.AromaWheels))
                 .ForMember(dto => dto.Substituts, conf => conf.ResolveUsing<SubstitutResolver>())
                 .ForMember(dto => dto.HopBeerStyles, conf => conf.ResolveUsing<HopBeerStylesPostResolver>());
 
@@ -94,6 +94,11 @@ namespace Microbrewit.Api.Mapper.Profile
             CreateMap<AromaWheel,AromaWheelDto>()
             .ForMember(dto => dto.Id, conf => conf.MapFrom(source => source.Id))
             .ForMember(dto => dto.Name, conf => conf.MapFrom(source => source.Name));
+            
+            CreateMap<AromaWheelDto,AromaWheel>()
+            .ForMember(db => db.Id, conf => conf.MapFrom(dto => dto.Id))
+            .ForMember(db => db.Name, conf => conf.MapFrom(dto => dto.Name));
+            
             //CreateMap<DTO,HopFlavour>()
             //     .ForMember(dto => dto.FlavourId, conf => conf.MapFrom(rec => rec.Id));
         }
