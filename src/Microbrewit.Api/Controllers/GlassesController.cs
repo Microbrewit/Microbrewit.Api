@@ -5,6 +5,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Microbrewit.Api.Model.DTOs;
 using Microbrewit.Api.Service.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Microbrewit.Api.Controllers
