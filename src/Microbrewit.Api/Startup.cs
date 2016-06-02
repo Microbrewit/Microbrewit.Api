@@ -1,5 +1,3 @@
-
-
 using System.IdentityModel.Tokens.Jwt;
 using Microbrewit.Api.Calculations;
 using Microbrewit.Api.Configuration;
@@ -26,10 +24,18 @@ namespace Microbrewit.Api
     {
         public Startup(IHostingEnvironment env)
         {
-            // Set up configuration sources.
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json");
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
+
+            if (env.IsEnvironment("Development"))
+            {
+                // This will push telemetry data through Application Insights pipeline faster, allowing you to view results immediately.
+                builder.AddApplicationInsightsSettings(developerMode: true);
+            }
+
+            builder.AddEnvironmentVariables();
             Configuration = builder.Build();
         }
  
@@ -138,8 +144,5 @@ namespace Microbrewit.Api
             app.UseMvc();
             AutoMapperConfiguration.Configure();                      
         }
-
-        // Entry point for the application.
-        //public static void Main(string[] args) => Microsoft.AspNet.Hosting.WebApplication.Run<Startup>(args);
     }
 }

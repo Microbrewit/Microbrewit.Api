@@ -11,13 +11,15 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "api/values",
+      "launchUrl": "http://localhost:5000/",
       "environmentVariables": {
         "ASPNET_ENV": "Development"
       }
     },
-    "web": {
-      "commandName": "web",
+       "Microbrewit.Api": {
+      "commandName": "Project",
+      "launchBrowser": false,
+      "launchUrl": "http://localhost:5000/",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
