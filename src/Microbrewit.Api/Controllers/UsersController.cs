@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microbrewit.Api.Model.DTOs;
+using Microbrewit.Api.Model.Validation;
 using Microbrewit.Api.Service.Interface;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -45,6 +46,21 @@ namespace Microbrewit.Api.Controllers
             result.Users.Add(user);
             return Ok(result);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> PostUser(UserPostDto userPostDto)
+        {
+            if (userPostDto == null) return BadRequest("Missing data");
+            var validator = new UserPostDtoValidation(_userService);
+            var result = validator.Validate(userPostDto);
+            if (!result.IsValid)
+            {
+                return BadRequest(result.Errors);
+            }
+            var user = await _userService.AddAsync(userPostDto);
+            return Ok(user);
+        }
+
 
         /// <summary>
         /// Searches in users.

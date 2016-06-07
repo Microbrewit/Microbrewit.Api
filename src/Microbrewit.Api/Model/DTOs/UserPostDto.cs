@@ -1,17 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
+using Microbrewit.Api.Model.Validation;
+using Microbrewit.Api.Repository.Interface;
+using Microbrewit.Api.Settings;
+using Microsoft.Extensions.Options;
 
 namespace Microbrewit.Api.Model.DTOs
 {
     public class UserPostDto
     {
-        [Required]
-        [Display(Name = "User name")]
         [JsonProperty(PropertyName = "username")]
         public string Username { get; set; }
-        [Required]
-        [StringLength(500, ErrorMessage = "The{0} must be at leaste {2} characters long", MinimumLength = 2)]
         [JsonProperty(PropertyName = "email")]
         public string Email { get; set; }
         [JsonProperty(PropertyName = "brewery")]
@@ -19,24 +19,20 @@ namespace Microbrewit.Api.Model.DTOs
         [JsonProperty(PropertyName = "settings")]
         public string Settings { get; set; }
         [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
         [DataType(DataType.Password)]
-        [Display(Name = "Password")]
         [JsonProperty(PropertyName = "password")]
         public string Password { get; set; }
         [DataType(DataType.Password)]
         [JsonProperty(PropertyName = "confirmPassword")]
-        [Display(Name = "Confirm password")]
-        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
-         [JsonProperty(PropertyName = "geoLocation")]
+        [JsonProperty(PropertyName = "geoLocation")]
         public GeoLocationDto GeoLocation { get; set; }
-         [JsonProperty(PropertyName = "headerImage")]
-         public string HeaderImage { get; set; }
-         [JsonProperty(PropertyName = "avatar")]
-         public string Avatar { get; set; }
-         [JsonProperty(PropertyName = "socials")]
-         public Dictionary<string, string> Socials { get; set; }
+        [JsonProperty(PropertyName = "headerImage")]
+        public string HeaderImage { get; set; }
+        [JsonProperty(PropertyName = "avatar")]
+        public string Avatar { get; set; }
+        [JsonProperty(PropertyName = "socials")]
+        public Dictionary<string, string> Socials { get; set; }
 
 
         

@@ -12,7 +12,7 @@ namespace Microbrewit.Api.Mapper.Profile
         protected override void Configure()
         {
             CreateMap<User, UserDto>()
-                .ForMember(dest => dest.UserId, conf => conf.MapFrom(src => src.Username))
+                .ForMember(dest => dest.UserId, conf => conf.MapFrom(src => src.UserId))
                 .ForMember(dest => dest.Username, conf => conf.MapFrom(src => src.Username))
                 .ForMember(dest => dest.Gravatar, conf => conf.MapFrom(src => src.Gravatar))
                 .ForMember(dest => dest.Breweries, conf => conf.MapFrom(src => src.Breweries))

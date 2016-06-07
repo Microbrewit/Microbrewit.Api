@@ -14,6 +14,7 @@ namespace Microbrewit.Api.Repository.Interface
         Task RemoveAsync(User user);        
         IEnumerable<UserSocial> GetUserSocials(string user_id);
         Task<IEnumerable<UserBeer>> GetAllUserBeersAsync(string user_id);
-     
+        bool ExistsUsername(string username);
+
     }
 }

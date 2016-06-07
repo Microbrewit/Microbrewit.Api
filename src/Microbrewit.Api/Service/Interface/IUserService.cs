@@ -10,7 +10,7 @@ namespace Microbrewit.Api.Service.Interface
         Task<IEnumerable<UserDto>> GetAllAsync(int from, int size);
         Task<UserDto> GetSingleByUserIdAsync(string userId);
         Task<UserDto> GetSingleByUsernameAsync(string username);
-        Task<UserDto> AddAsync(User user);
+        Task<UserDto> AddAsync(UserPostDto userPostDto);
         Task<UserDto> DeleteAsync(string username);
         Task UpdateAsync(UserDto userDto);
         Task<IEnumerable<UserDto>> SearchAsync(string query, int from, int size);
@@ -21,5 +21,6 @@ namespace Microbrewit.Api.Service.Interface
         Task ReIndexBreweryRelationElasticSearch(BreweryDto breweryDto);
         Task ReIndexUserElasticSearch(string username);
         Task<bool> UpdateNotification(string username, NotificationDto notificationDto);
+        bool ExistsUsername(string username);
     }
 }

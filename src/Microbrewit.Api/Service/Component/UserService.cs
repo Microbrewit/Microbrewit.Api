@@ -11,8 +11,8 @@ namespace Microbrewit.Api.Service.Component
 {
     public class UserService : IUserService
     {
-        IUserRepository _userRepository;
-        IUserElasticsearch _userElasticsearch;
+        private readonly IUserRepository _userRepository;
+        private readonly IUserElasticsearch _userElasticsearch;
         
         public UserService(IUserRepository userRepository, IUserElasticsearch userElasticsearch)
         {
@@ -26,9 +26,14 @@ namespace Microbrewit.Api.Service.Component
             return AutoMapper.Mapper.Map<User, UserDto>(user);
         }
 
-        public Task<UserDto> AddAsync(User user)
+        public async Task<UserDto> AddAsync(UserPostDto userPostDto)
         {
-            throw new NotImplementedException();
+            var user = AutoMapper.Mapper.Map<UserPostDto, User>(userPostDto);
+            await _userRepository.AddAsync(user);
+            user = await _userRepository.GetSingleByUserIdAsync(user.UserId);
+            var userDto = AutoMapper.Mapper.Map<User,UserDto>(user);
+            //await _userElasticsearch.UpdateAsync(userDto);
+            return userDto;
         }
 
         public Task<UserDto> DeleteAsync(string username)
@@ -86,6 +91,11 @@ namespace Microbrewit.Api.Service.Component
         public Task<bool> UpdateNotification(string username, NotificationDto notificationDto)
         {
             throw new NotImplementedException();
+        }
+
+        public bool ExistsUsername(string username)
+        {
+            return _userRepository.ExistsUsername(username);
         }
     }
 }

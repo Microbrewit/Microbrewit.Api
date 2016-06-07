@@ -7,6 +7,7 @@ using Dapper;
 using Microbrewit.Api.Model.Database;
 using Microbrewit.Api.Repository.Interface;
 using Microbrewit.Api.Settings;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Npgsql;
 
@@ -14,11 +15,13 @@ namespace Microbrewit.Api.Repository.Component
 {
     public class UserDapperRepository : IUserRepository
     {
-       private DatabaseSettings _databaseSettings;
-       public UserDapperRepository(IOptions<DatabaseSettings> databaseSettings)
-       {
-           _databaseSettings = databaseSettings.Value;
-       }
+        private DatabaseSettings _databaseSettings;
+        private ILogger<UserDapperRepository> _logger; 
+        public UserDapperRepository(IOptions<DatabaseSettings> databaseSettings, ILogger<UserDapperRepository> logger)
+        {
+            _logger = logger;
+            _databaseSettings = databaseSettings.Value;
+        }
 
         public async Task<IList<User>> GetAllAsync()
         {
@@ -55,9 +58,9 @@ namespace Microbrewit.Api.Repository.Component
             {
                 var users = await context.QueryAsync<User>("SELECT user_id AS UserId, username, email, settings, gravatar, longitude, latitude, " +
                                                             "header_image_url, avatar_url, firstname, lastname, is_email_comfirmed AS EmailConfirmed FROM users WHERE user_id = @UserId;",
-                                                            new {UserId = userId});
+                                                            new { UserId = userId });
                 var user = users.SingleOrDefault();
-                if(user != null)
+                if (user != null)
                     await GetUserProperties(context, user);
                 return user;
             }
@@ -69,7 +72,7 @@ namespace Microbrewit.Api.Repository.Component
                 await
                     context.QueryAsync<UserSocial>(
                         "SELECT user_id AS UserId, social_id AS SocialId, site, url FROM user_socials WHERE user_id = @UserId",
-                        new {user.UserId});
+                        new { user.UserId });
             user.Socials = userSocials.ToList();
             var sql = "SELECT bm.brewery_id AS BreweryId,bm.user_id AS UserId,role, confirmed, " +
                       " b.brewery_id AS BreweryId, b.name, description, type, created_date AS CreatedDate, updated_date AS UpdatedDate," +
@@ -88,7 +91,7 @@ namespace Microbrewit.Api.Repository.Component
                             brewery.Origin = origin;
                         return breweryMember;
                     },
-                    new {user.UserId}, splitOn: "BreweryId,OriginId");
+                    new { user.UserId }, splitOn: "BreweryId,OriginId");
             user.Breweries = breweryMembers.ToList();
 
             ;
@@ -122,11 +125,9 @@ namespace Microbrewit.Api.Repository.Component
                     if (beerStyle != null)
                         beer.BeerStyle = beerStyle;
                     return userBeer;
-                }, new {user.UserId}, splitOn: "BeerId,BeerStyleId,SrmId,AbvId,IbuId");
+                }, new { user.UserId }, splitOn: "BeerId,BeerStyleId,SrmId,AbvId,IbuId");
             user.Beers = userBeers.ToList();
         }
-
-      
 
         public async Task AddAsync(User user)
         {
@@ -137,25 +138,30 @@ namespace Microbrewit.Api.Repository.Component
                 {
                     try
                     {
+
+                        user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password,12);
+                        user.UserId = Guid.NewGuid().ToString();
+
                         await context.ExecuteAsync(
-                            "INSERT users(user_id,username,email,settings,gravatar,latitude,longitude,header_image_url,avatar_url,firstname,lastname)" +
-                            "VALUES(@Username,@Email,@Settings,@Gravatar,@Latitude,@Longitude,@HeaderImage,@Avatar,@Firstname,@Lastname);",
+                            "INSERT INTO users(user_id,username,email,settings,gravatar,latitude,longitude,header_image_url,avatar_url,firstname,lastname,password)" +
+                            "VALUES(@UserId,@Username,@Email,@Settings,@Gravatar,@Latitude,@Longitude,@HeaderImage,@Avatar,@Firstname,@Lastname,@Password);",
                             user, transaction);
                         if (user.Socials != null)
                         {
                             await context.ExecuteAsync(
-                                "INSERT UserSocials(user_id,site,url) VALUES(@UserId,@Site,@Url);",
+                                "INSERT INTO user_socials(user_id,site,url) VALUES(@UserId,@Site,@Url);",
                                 user.Socials.Select(u => new { user.UserId, u.Site, u.Url }), transaction);
                         }
 
-                        var userSocials =
-                            await context.QueryAsync<UserSocial>("SELECT user_id AS UserId,site,url FROM UserSocials WHERE Username = @Username",
-                               new { user.Username }, transaction);
-                        user.Socials = userSocials.ToList();
+                        //var userSocials =
+                        //    await context.QueryAsync<UserSocial>("SELECT user_id AS UserId,site,url FROM UserSocials WHERE user_id = @UserId",
+                        //       new { user.UserId }, transaction);
+                        //user.Socials = userSocials.ToList();
                         transaction.Commit();
                     }
-                    catch (Exception)
+                    catch (Exception exception)
                     {
+                        _logger.LogError(exception.ToString());
                         transaction.Rollback();
                         throw;
                     }
@@ -171,11 +177,11 @@ namespace Microbrewit.Api.Repository.Component
                 {
                     try
                     {
-                       var result = await context.ExecuteAsync(
-                             "UPDATE Users set Username = @Username, Email = @Email, Settings = @Settings ,Gravatar = @Gravatar," +
-                             " Latitude = @Latitude, Longitude = @Longitude, HeaderImage = @HeaderImage, Avatar = @Avatar " +
-                             "WHERE Username = @Username;",
-                             user, transaction);
+                        var result = await context.ExecuteAsync(
+                              "UPDATE Users set Username = @Username, Email = @Email, Settings = @Settings ,Gravatar = @Gravatar," +
+                              " Latitude = @Latitude, Longitude = @Longitude, HeaderImage = @HeaderImage, Avatar = @Avatar " +
+                              "WHERE Username = @Username;",
+                              user, transaction);
                         await UpdateUserSocialsAsync(context, transaction, user);
                         transaction.Commit();
                         return result;
@@ -232,6 +238,15 @@ namespace Microbrewit.Api.Repository.Component
             }
         }
 
+        public bool ExistsUsername(string username)
+        {
+            using (var context = new NpgsqlConnection(_databaseSettings.DbConnection))
+            {
+                var users = context.Query<User>("SELECT * FROM users WHERe username = @Username;", new { Username = username});
+                return users.Any();
+            }
+        }
+
         private void UpdateUserSocials(DbConnection context, DbTransaction transaction, User user)
         {
             var userSocials = context.Query<UserSocial>("SELECT * FROM UserSocials WHERE Username = @Username",
@@ -271,5 +286,7 @@ namespace Microbrewit.Api.Repository.Component
                     s => userSocials.All(u => s.UserId != u.UserId && u.SocialId != s.SocialId)).Select(s => new { user.Username, s.Site, s.Url }),
                 transaction);
         }
+
+
     }
 }

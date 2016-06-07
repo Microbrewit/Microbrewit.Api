@@ -3,21 +3,27 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microbrewit.Api.Elasticsearch.Interface;
 using Microbrewit.Api.Model.DTOs;
+using Microbrewit.Api.Settings;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Nest;
 
 namespace Microbrewit.Api.Elasticsearch.Component
 {
     public class UserElasticsearch : IUserElasticsearch
     {
+        private readonly ElasticSearchSettings _elasticSearchSettings;
+        private readonly ILogger<UserElasticsearch> _logger; 
         private Uri _node;
         private ConnectionSettings _settings;
         private ElasticClient _client;
         private string _index;
 
-        public UserElasticsearch()
+        public UserElasticsearch(IOptions<ElasticSearchSettings> elsaticSearchSettings, ILogger<UserElasticsearch> logger)
         {
-            string url = "http://localhost:9200";
-            this._node = new Uri(url);
+            _logger = logger;
+            _elasticSearchSettings = elsaticSearchSettings.Value;
+            this._node = new Uri(_elasticSearchSettings.Url);
             this._settings = new ConnectionSettings(_node);
             this._client = new ElasticClient(_settings);
             _index = "mb";
@@ -25,9 +31,19 @@ namespace Microbrewit.Api.Elasticsearch.Component
 
         public async Task<IIndexResponse> UpdateAsync(UserDto userDto)
         {
+            try
+            {
+
             // Adds an analayzer to the name property in FermentableDto object.
             await _client.MapAsync<UserDto>(d => d.Properties(p => p.String(s => s.Name(n => n.Username).Analyzer("autocomplete"))));
             return await _client.IndexAsync<UserDto>(userDto);
+
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception.ToString());
+                throw;
+            }
         }
 
         public async Task<IEnumerable<UserDto>> GetAllAsync(int from, int size)
