@@ -66,6 +66,20 @@ namespace Microbrewit.Api.Repository.Component
             }
         }
 
+        public async Task<User> GetSingleByEmailAsync(string email)
+        {
+            using (DbConnection context = new NpgsqlConnection(_databaseSettings.DbConnection))
+            {
+                var users = await context.QueryAsync<User>("SELECT user_id AS UserId, username, email, settings, gravatar, longitude, latitude, " +
+                                                            "header_image_url, avatar_url, firstname, lastname, is_email_comfirmed AS EmailConfirmed FROM users WHERE email = @Email;",
+                                                            new { Email = email });
+                var user = users.SingleOrDefault();
+                if (user != null)
+                    await GetUserProperties(context, user);
+                return user;
+            }
+        }
+
         private static async Task GetUserProperties(DbConnection context, User user)
         {
             var userSocials =
@@ -240,10 +254,32 @@ namespace Microbrewit.Api.Repository.Component
 
         public bool ExistsUsername(string username)
         {
+           // if (username == null) return false;
             using (var context = new NpgsqlConnection(_databaseSettings.DbConnection))
             {
                 var users = context.Query<User>("SELECT * FROM users WHERe username = @Username;", new { Username = username});
                 return users.Any();
+            }
+        }
+
+        public bool ExistsEmail(string email)
+        {
+           // if(email == null) return false;
+            using (var context = new NpgsqlConnection(_databaseSettings.DbConnection))
+            {
+                var users = context.Query<User>("SELECT * FROM users WHERE email = @Email", new {Email = email});
+                return users.Any();
+            }
+        }
+
+        public async Task SetResetPasswordToken(string userId,string token)
+        {
+            using (var context = new NpgsqlConnection(_databaseSettings.DbConnection))
+            {
+                await
+                    context.ExecuteAsync(
+                        "UPDATE users SET password_reset_token = @Token, password_reset_timestamp = @Datetime WHERE user_id = @UserId;",
+                        new {Token = token, Datetime = DateTime.Now, UserId = userId});
             }
         }
 

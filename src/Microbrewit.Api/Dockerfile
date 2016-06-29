@@ -1,4 +1,4 @@
-FROM microsoft/dotnet:1.0.0-preview1
+FROM microsoft/dotnet:1.0.0-preview2-sdk
 
 WORKDIR /app
 COPY ["./project.json","/app"]
@@ -8,6 +8,6 @@ COPY . /app
 RUN ["dotnet","restore"]
 
 EXPOSE 5000/tcp
-
-ENTRYPOINT ["/app/docker/entrypoint.sh"]
+RUN chmod +x /app/entrypoint.sh
+ENTRYPOINT ["/app/entrypoint.sh"]
 CMD ["dotnet", "run"]

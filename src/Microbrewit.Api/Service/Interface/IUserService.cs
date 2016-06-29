@@ -22,5 +22,8 @@ namespace Microbrewit.Api.Service.Interface
         Task ReIndexUserElasticSearch(string username);
         Task<bool> UpdateNotification(string username, NotificationDto notificationDto);
         bool ExistsUsername(string username);
+        bool ExistsEmail(string email);
+
+        Task ResetPassword(string email);
     }
 }

@@ -73,6 +73,7 @@ namespace Microbrewit.Api
             services.AddTransient<IOriginService,OriginService>();
             services.AddTransient<IGlassService, GlassService>();
             services.AddTransient<IIngredientService, IngredientService>();
+            services.AddTransient<IEmailService, EmailService>();
             
             //ElasticSearch dependency injection
             services.AddTransient<IBeerElasticsearch, BeerElasticsearch>();

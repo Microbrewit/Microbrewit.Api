@@ -9,12 +9,16 @@ namespace Microbrewit.Api.Repository.Interface
         Task<IList<User>> GetAllAsync();
         Task<User> GetSingleByUserIdAsync(string userId);
         Task<User> GetSingleByUsernameAsync(string username);
+        Task<User> GetSingleByEmailAsync(string email);
         Task AddAsync(User user);
         Task<int> UpdateAsync(User user);
         Task RemoveAsync(User user);        
         IEnumerable<UserSocial> GetUserSocials(string user_id);
         Task<IEnumerable<UserBeer>> GetAllUserBeersAsync(string user_id);
         bool ExistsUsername(string username);
+        bool ExistsEmail(string email);
 
+        Task SetResetPasswordToken(string userId,string token);
+        
     }
 }
