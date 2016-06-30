@@ -8,6 +8,5 @@ COPY . /app
 RUN ["dotnet","restore"]
 
 EXPOSE 5000/tcp
-RUN chmod +x /app/entrypoint.sh
-ENTRYPOINT ["/app/entrypoint.sh"]
+ENTRYPOINT ["/bin/bash","/app/entrypoint.sh"]
 CMD ["dotnet", "run"]
