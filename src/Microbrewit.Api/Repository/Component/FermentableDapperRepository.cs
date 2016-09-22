@@ -7,6 +7,7 @@ using Dapper;
 using Microbrewit.Api.Model.Database;
 using Microbrewit.Api.Repository.Interface;
 using Microbrewit.Api.Settings;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Npgsql;
 
@@ -15,9 +16,11 @@ namespace Microbrewit.Api.Repository.Component
     public class FermentableDapperRepository : IFermentableRepository
     {
        private readonly DatabaseSettings _databaseSettings;
-       public FermentableDapperRepository(IOptions<DatabaseSettings> databaseSettings)
+       private readonly ILogger<FermentableDapperRepository> _logger;
+       public FermentableDapperRepository(IOptions<DatabaseSettings> databaseSettings, ILogger<FermentableDapperRepository> logger)
        {
            _databaseSettings = databaseSettings.Value;
+           _logger = logger;
 
        }
         public async Task<IList<Fermentable>> GetAllAsync(int from, int size)
@@ -56,7 +59,7 @@ namespace Microbrewit.Api.Repository.Component
                     fermentable.SubFermentables = (await
                         connection.QueryAsync<Fermentable>(select + subWhere,
                             new { fermentable.FermentableId })).ToList();
-                    var flavours = await connection.QueryAsync<Flavour>("SELECT f.flavour_id AS FlavourId, f.name FROM flavours f INNER JOIN fermentable_flavours ff f.flavour_id = ff.flavour_id WHERE f.fermentable_id = @FermentableId",
+                    var flavours = await connection.QueryAsync<Flavour>("SELECT f.flavour_id AS FlavourId, f.name FROM flavours f INNER JOIN fermentable_flavours ff ON f.flavour_id = ff.flavour_id WHERE ff.fermentable_id = @FermentableId",
                     fermentable.FermentableId);
                     if(flavours != null)
                         fermentable.Flavours = flavours;
@@ -69,14 +72,16 @@ namespace Microbrewit.Api.Repository.Component
         {
             using (DbConnection connection = new NpgsqlConnection(_databaseSettings.DbConnection))
             {
-                var fermentables = await connection.QueryAsync<Fermentable, Supplier, Origin, Fermentable>(
-                    "SELECT fermentable_id AS FermentableId, f.name, ebc, lovibond, ppg, f.supplier_id AS SupplierId, type," +
+                var fermentableSql = "SELECT fermentable_id AS FermentableId, f.name, ebc, lovibond, ppg, f.supplier_id AS SupplierId, type," +
                     "custom, super_fermentable_id AS SuperFermentableId,f.created_date AS CreatedDate, updated_date As UpdatedDate, " +
                     "s.supplier_id AS SupplierId, s.name, s.origin_id AS OriginId, o.origin_id AS OriginId, o.name " +
                     "FROM fermentables f " +
                     "LEFT JOIN suppliers s ON f.supplier_id = s.supplier_id " +
                     "LEFT JOIN origins o ON s.origin_id = o.origin_id " + 
-                    "WHERE f.fermentable_id = @FermentableId;",
+                    "WHERE f.fermentable_id = @FermentableId;";
+                    
+                var fermentables = await connection.QueryAsync<Fermentable, Supplier, Origin, Fermentable>(
+                    fermentableSql,
                     (f, supplier, origin) =>
                     {
                         if (supplier != null)
@@ -101,9 +106,9 @@ namespace Microbrewit.Api.Repository.Component
                 fermentable.SubFermentables = (await
                     connection.QueryAsync<Fermentable>(select + subWhere,
                         new { fermentable.FermentableId })).ToList();
-
-                var flavours = await connection.QueryAsync<Flavour>("SELECT f.flavour_id AS FlavourId, f.name FROM flavours f INNER JOIN fermentable_flavours ff f.flavour_id = ff.flavour_id WHERE f.fermentable_id = @FermentableId",
-                    fermentable.FermentableId);
+                _logger.LogInformation(select + subWhere);
+                var flavours = await connection.QueryAsync<Flavour>("SELECT f.flavour_id AS FlavourId, f.name FROM flavours f INNER JOIN fermentable_flavours ff ON f.flavour_id = ff.flavour_id WHERE ff.fermentable_id = @FermentableId",
+                    new {fermentable.FermentableId});
                     if(flavours != null)
                         fermentable.Flavours = flavours;
                 return fermentable;
