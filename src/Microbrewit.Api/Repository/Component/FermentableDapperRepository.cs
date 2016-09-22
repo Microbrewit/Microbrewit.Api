@@ -60,7 +60,7 @@ namespace Microbrewit.Api.Repository.Component
                         connection.QueryAsync<Fermentable>(select + subWhere,
                             new { fermentable.FermentableId })).ToList();
                     var flavours = await connection.QueryAsync<Flavour>("SELECT f.flavour_id AS FlavourId, f.name FROM flavours f INNER JOIN fermentable_flavours ff ON f.flavour_id = ff.flavour_id WHERE ff.fermentable_id = @FermentableId",
-                    fermentable.FermentableId);
+                    new {fermentable.FermentableId});
                     if(flavours != null)
                         fermentable.Flavours = flavours;
                 }
