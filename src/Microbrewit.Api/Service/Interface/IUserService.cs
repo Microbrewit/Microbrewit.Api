@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microbrewit.Api.Model.Database;
 using Microbrewit.Api.Model.DTOs;
 
 namespace Microbrewit.Api.Service.Interface

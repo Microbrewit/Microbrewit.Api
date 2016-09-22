@@ -1,9 +1,6 @@
 ﻿using FluentValidation;
 using Microbrewit.Api.Model.DTOs;
-using Microbrewit.Api.Model.Validation.Custom;
-using Microbrewit.Api.Repository.Interface;
 using Microbrewit.Api.Service.Interface;
-using Nest;
 
 namespace Microbrewit.Api.Model.Validation
 {

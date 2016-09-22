@@ -1,10 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
-using Microbrewit.Api.Model.Validation;
-using Microbrewit.Api.Repository.Interface;
-using Microbrewit.Api.Settings;
-using Microsoft.Extensions.Options;
 
 namespace Microbrewit.Api.Model.DTOs
 {
