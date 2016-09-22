@@ -56,6 +56,10 @@ namespace Microbrewit.Api.Repository.Component
                     fermentable.SubFermentables = (await
                         connection.QueryAsync<Fermentable>(select + subWhere,
                             new { fermentable.FermentableId })).ToList();
+                    var flavours = await connection.QueryAsync<Flavour>("SELECT f.flavour_id AS FlavourId, f.name FROM flavours f INNER JOIN fermentable_flavours ff f.flavour_id = ff.flavour_id WHERE f.fermentable_id = @FermentableId",
+                    fermentable.FermentableId);
+                    if(flavours != null)
+                        fermentable.Flavours = flavours;
                 }
                 return fermentables.ToList();
             }
@@ -97,6 +101,11 @@ namespace Microbrewit.Api.Repository.Component
                 fermentable.SubFermentables = (await
                     connection.QueryAsync<Fermentable>(select + subWhere,
                         new { fermentable.FermentableId })).ToList();
+
+                var flavours = await connection.QueryAsync<Flavour>("SELECT f.flavour_id AS FlavourId, f.name FROM flavours f INNER JOIN fermentable_flavours ff f.flavour_id = ff.flavour_id WHERE f.fermentable_id = @FermentableId",
+                    fermentable.FermentableId);
+                    if(flavours != null)
+                        fermentable.Flavours = flavours;
                 return fermentable;
             }
         }
@@ -109,12 +118,15 @@ namespace Microbrewit.Api.Repository.Component
                 using (var transaction = connection.BeginTransaction())
                 {
                     try
-                    {
+                    {  
+                       fermentable.UpdatedDate = DateTime.Now;
+                       fermentable.CreatedDate = DateTime.Now;                       
                        var result =
                             await connection.ExecuteAsync("INSERT INTO fermentables(name,super_fermentable_id,EBC,Lovibond,PPG,supplier_id,Type,Custom,created_date,updated_date) " +
                                                "VALUES(@Name,@SuperFermentableId,@EBC,@Lovibond,@PPG,@SupplierId,@Type,@Custom,@CreatedDate,@UpdatedDate);", fermentable, transaction);
                         var fermentableId = await connection.QueryAsync<int>("SELECT last_value FROM fermentables_seq;");
                         fermentable.FermentableId = fermentableId.SingleOrDefault();
+                        await AddFermentableFlavours(fermentable,connection,transaction);
                         transaction.Commit();
                     }
                     catch (Exception)
@@ -125,6 +137,33 @@ namespace Microbrewit.Api.Repository.Component
 
                 }
             }
+        }
+
+        private async Task AddFermentableFlavours(Fermentable fermentable, DbConnection connection, DbTransaction transaction)
+        {
+            await SetCorrectFlavourId(fermentable.Flavours, connection, transaction);
+            await InsertFermentableFlavours(fermentable, connection, transaction);
+        }
+
+        private static async Task InsertFermentableFlavours(Fermentable fermentable, DbConnection connection, DbTransaction transaction)
+        {
+            await connection.ExecuteAsync("INSERT INTO fermentable_flavours (flavour_id,fermentable_id) VALUES(@FlavourId,@FermentableId)",
+                                fermentable.Flavours.Select(f => new { f.FlavourId, fermentable.FermentableId }), transaction);
+        }
+
+        private async Task SetCorrectFlavourId(IEnumerable<Flavour> flavours, DbConnection connection, DbTransaction transaction)
+        {
+            foreach (var flavour in flavours)
+            {                       
+                var dbFlavour = await connection.QueryAsync<Flavour>("SELECT f.flavour_id AS FlavourId, f.name FROM flavours f WHERE f.name = @Name;",new {flavour.Name},transaction);
+                if(dbFlavour.FirstOrDefault() == null)
+                {
+                       var id = await connection.QueryAsync<int>("INSERT INTO flavours(name) VALUES(@Name); SELECT last_value FROM flavours_seq; ",new {flavour.Name},transaction);
+                       flavour.FlavourId = id.Single();
+                }  
+                else 
+                    flavour.FlavourId = dbFlavour.First().FlavourId; 
+            }   
         }
 
         public async Task<int> UpdateAsync(Fermentable fermentable)
@@ -142,6 +181,7 @@ namespace Microbrewit.Api.Repository.Component
                                         "updated_date = @UpdatedDate " +
                                         "WHERE fermentable_id = @FermentableId;",
                                               fermentable, transaction);
+                        await UpdateFermantableFlavours(fermentable,connection,transaction);
                         transaction.Commit();
                         return result;
                     }
@@ -152,6 +192,13 @@ namespace Microbrewit.Api.Repository.Component
                     }
                 }
             }
+        }
+
+        private async Task UpdateFermantableFlavours(Fermentable fermentable, DbConnection connection, DbTransaction transaction)
+        {
+            await connection.ExecuteAsync("DELETE FROM fermentable_flavours WHERE fermentable_id = @FermentableId", fermentable.FermentableId);          
+            await SetCorrectFlavourId(fermentable.Flavours,connection,transaction);                
+            await InsertFermentableFlavours(fermentable,connection,transaction);
         }
 
         public async Task RemoveAsync(Fermentable fermentable)
