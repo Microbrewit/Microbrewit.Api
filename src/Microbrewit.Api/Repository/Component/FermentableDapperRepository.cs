@@ -180,6 +180,7 @@ namespace Microbrewit.Api.Repository.Component
                 {
                     try
                     {
+                        fermentable.UpdatedDate = DateTime.Now;
                         var result = await connection.ExecuteAsync(
                                         "Update Fermentables set Name = @Name,super_fermentable_id = @SuperFermentableId,EBC = @EBC," + 
                                         "Lovibond = @Lovibond,PPG= @PPG,supplier_id = @SupplierId,Type = @Type, Custom = @Custom, " +
@@ -201,7 +202,7 @@ namespace Microbrewit.Api.Repository.Component
 
         private async Task UpdateFermantableFlavours(Fermentable fermentable, DbConnection connection, DbTransaction transaction)
         {
-            await connection.ExecuteAsync("DELETE FROM fermentable_flavours WHERE fermentable_id = @FermentableId", fermentable.FermentableId);          
+            await connection.ExecuteAsync("DELETE FROM fermentable_flavours WHERE fermentable_id = @FermentableId", new {fermentable.FermentableId});          
             await SetCorrectFlavourId(fermentable.Flavours,connection,transaction);                
             await InsertFermentableFlavours(fermentable,connection,transaction);
         }
