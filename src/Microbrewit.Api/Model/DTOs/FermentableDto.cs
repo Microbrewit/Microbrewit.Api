@@ -31,8 +31,9 @@ namespace Microbrewit.Api.Model.DTOs
         [JsonProperty(PropertyName = "superFermentableId")]
         public int? SuperFermentableId { get; set; }
         [JsonProperty(PropertyName = "subFermentables")]
-        
         public IList<DTO> SubFermentables { get; set; }
+        [JsonProperty(PropertyName = "flavours")]
+        public IList<string> Flavours { get; set; }
         [JsonProperty(PropertyName = "createdDate")]
         public DateTimeOffset CreatedDate { get; set; }
         [JsonProperty(PropertyName = "updatedDate")]

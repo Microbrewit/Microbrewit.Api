@@ -39,7 +39,7 @@ namespace Microbrewit.Api.Service.Component
 
         public async Task<FermentableDto> AddAsync(FermentableDto fermentableDto)
         {
-           var fermantable = AutoMapper.Mapper.Map<FermentableDto, Fermentable>(fermentableDto);
+            var fermantable = AutoMapper.Mapper.Map<FermentableDto, Fermentable>(fermentableDto);
             await _fermentableRepository.AddAsync(fermantable);
             var result = await _fermentableRepository.GetSingleAsync(fermantable.FermentableId);
             var mappedResult = AutoMapper.Mapper.Map<Fermentable,FermentableDto>(result);

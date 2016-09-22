@@ -21,6 +21,7 @@ namespace Microbrewit.Api.Model.Database
         public Supplier Supplier { get; set; }
         public DateTimeOffset CreatedDate { get; set; }
         public DateTimeOffset UpdatedDate { get; set; }
+        public IEnumerable<Flavour> Flavours { get; set; }
         public ICollection<MashStepFermentable> MashSteps { get; set; }
         public ICollection<BoilStepFermentable> BoilSteps { get; set; }
         public ICollection<FermentationStepFermentable> FermentationSteps { get; set; }
