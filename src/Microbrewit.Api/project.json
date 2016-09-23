@@ -35,10 +35,10 @@
   },
 
   "tools": {
-    "Microsoft.AspNetCore.Server.IISIntegration.Tools": {
-      "version": "1.0.0-preview2-final",
-      "imports": "portable-net45+win8+dnxcore50"
-    },
+    // "Microsoft.AspNetCore.Server.IISIntegration.Tools": {
+    //   "version": "1.0.0-preview2-final",
+    //   "imports": "portable-net45+win8+dnxcore50"
+    // },
    "Microsoft.VisualStudio.Web.CodeGeneration.Tools": {
      "version": "1.0.0-preview2-final",
      "imports": [
@@ -47,11 +47,11 @@
        "portable-net45+win8"
      ]
    },
-   "Microsoft.DotNet.Watcher.Tools": {
-      "version": "1.0.0-preview2-final",
-      "imports": "portable-net451+win8"
-    }
-  },
+  //  "Microsoft.DotNet.Watcher.Tools": {
+  //     "version": "1.0.0-preview2-final",
+  //     "imports": "portable-net451+win8"
+  //   }
+  // },
 
     "frameworks": {
       "netcoreapp1.6": {
