@@ -6,7 +6,7 @@ using Microbrewit.Api.Model.DTOs;
 using Microbrewit.Api.Service.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
+using Microsoft.Extensions.Logging;
 
 namespace Microbrewit.Api.Controllers
 {
@@ -14,10 +14,12 @@ namespace Microbrewit.Api.Controllers
     public class YeastsController : Controller
     {
         private readonly IYeastService _yeastService;
+        private readonly ILogger<YeastsController> _logger;
 
-        public YeastsController(IYeastService yeastService)
+        public YeastsController(IYeastService yeastService, ILogger<YeastsController> logger)
         {
             _yeastService = yeastService;
+            _logger = logger;
         }
 
 
@@ -57,7 +59,7 @@ namespace Microbrewit.Api.Controllers
         /// <returns>No Content 204</returns>
         [Authorize(Roles=("Admin"))]
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> PutYeast(int id, [FromBody] YeastDto yeastDto)
+        public async Task<IActionResult> PutYeast(int id, YeastDto yeastDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -74,8 +76,12 @@ namespace Microbrewit.Api.Controllers
         /// <returns>201 Created</returns>
         [Authorize(Roles=("Admin"))]
         [HttpPost]
-        public async Task<IActionResult> PostYeast([FromBody]YeastDto yeastDto)
+        public async Task<IActionResult> PostYeast(YeastDto yeastDto)
         {
+            if(yeastDto == null)
+            {
+                _logger.LogInformation("YEASTDTO NULL");
+            }
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
