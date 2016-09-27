@@ -52,9 +52,8 @@
       "imports": "portable-net451+win8"
     }
   },
-
     "frameworks": {
-      "netcoreapp1.0": {
+      "netcoreapp1.6": {
         "imports": [
           "dotnet5.6",
           "dnxcore50",
