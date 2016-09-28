@@ -59,7 +59,7 @@ namespace Microbrewit.Api.Controllers
         /// <returns>No Content 204</returns>
         [Authorize(Roles=("Admin"))]
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> PutYeast(int id, YeastDto yeastDto)
+        public async Task<IActionResult> PutYeast(int id, [FromBody]YeastDto yeastDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -76,7 +76,7 @@ namespace Microbrewit.Api.Controllers
         /// <returns>201 Created</returns>
         [Authorize(Roles=("Admin"))]
         [HttpPost]
-        public async Task<IActionResult> PostYeast(YeastDto yeastDto)
+        public async Task<IActionResult> PostYeast([FromBody]YeastDto yeastDto)
         {
             if(yeastDto == null)
             {

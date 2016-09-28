@@ -11,7 +11,7 @@
       "type": "platform"
     },
     "AutoMapper": "4.2.1",
-    "Dapper": "1.50.0-beta8",
+    "Dapper": "1.50.2",
     "Microsoft.AspNetCore.Authentication.JwtBearer": "1.0.0-rc2-final",
     "Microsoft.AspNetCore.Authorization": "1.0.0-rc2-final",
     "Microsoft.AspNetCore.Cors": "1.0.0-rc2-final",
@@ -24,7 +24,8 @@
     "Microsoft.Extensions.Logging": "1.0.0-rc2-final",
     "Microsoft.Extensions.Logging.Console": "1.0.0-rc2-final",
     "Microsoft.Extensions.Logging.Debug": "1.0.0-rc2-final",
-    "System.Xml.XmlSerializer": "4.0.10",
+    "System.Xml.XmlSerializer": "4.0.11",
+    "System.Threading.Tasks.Extensions": "4.0.0-rc2-24027",
     "NEST": "2.0.4",
     "FluentValidation": "6.3.4-alpha",
     "Npgsql": "3.1.0-beta0001",
