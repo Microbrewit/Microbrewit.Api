@@ -76,9 +76,7 @@ namespace Microbrewit.Api.Mapper.Profile
                 .ForMember(dto => dto.AAValue,
                     conf => conf.MapFrom(rec => (rec.Acids.AlphaAcid.Low + rec.Acids.AlphaAcid.High)/2))
                 .ForMember(dto => dto.Name, conf => conf.MapFrom(rec => rec.Name));
-                //.ForMember(dto => dto.FlavourDescription, conf => conf.MapFrom(rec => rec.FlavourDescription))
-                //.ForMember(dto => dto.Flavours, conf => conf.ResolveUsing<HopPostFlavoursResolver>());
-
+                
             CreateMap<DTO, Origin>()
                    .ForMember(dto => dto.Name, conf => conf.MapFrom(rec => rec.Name))
                    .ForMember(dto => dto.OriginId, conf => conf.MapFrom(rec => rec.Id));

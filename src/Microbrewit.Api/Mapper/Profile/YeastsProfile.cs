@@ -26,10 +26,10 @@ namespace Microbrewit.Api.Mapper.Profile
 
             CreateMap<Supplier,DTO>()
                 .ForMember(dto => dto.Id, conf => conf.MapFrom(rec => rec.SupplierId))
-                 .ForMember(dto => dto.Name, conf => conf.MapFrom(rec => rec.Name));
+                .ForMember(dto => dto.Name, conf => conf.MapFrom(rec => rec.Name));
 
             CreateMap<YeastDto,Yeast>()
-                 .ForMember(dto => dto.YeastId, conf => conf.MapFrom(rec => rec.Id))
+                .ForMember(dto => dto.YeastId, conf => conf.MapFrom(rec => rec.Id))
                 .ForMember(dto => dto.Name, conf => conf.MapFrom(rec => rec.Name))
                 .ForMember(dto => dto.ProductCode, conf => conf.MapFrom(rec => rec.ProductCode))
                 .ForMember(dto => dto.TemperatureLow, conf => conf.MapFrom(rec => rec.Temperature.Low))
