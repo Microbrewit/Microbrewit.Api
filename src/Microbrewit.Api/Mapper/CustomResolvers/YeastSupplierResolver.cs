@@ -24,6 +24,10 @@ namespace Microbrewit.Api.Mapper.CustomResolvers
 //                     }
 //                     return supplier.SupplierId;
 //                 }
+                if(source?.Supplier?.Id != null)
+                {
+                    return source.Supplier.Id;
+                }
                 return null;
             //}
         }
