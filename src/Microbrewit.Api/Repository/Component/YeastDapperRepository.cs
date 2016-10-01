@@ -16,6 +16,10 @@ namespace Microbrewit.Repository.Component
 
     public class YeastDapperRepository : IYeastRepository
     {
+        private const string _yeastFields = "y.yeast_id AS YeastId, y.name as Name, y.temperature_low AS TemperatureLow, y.temperature_high AS TemperatureHigh," +
+                             " y.flocculation, y.alcohol_tolerance AS AlcoholTolerance, y.product_code AS ProductCode, y.notes, " +
+                             "y.type, y.brewery_source AS BrewerySource, y.species, y.attenution_range AS AttenutionRange, y.pitching_fermentation_notes As PitchingFermentationNotes, " +
+                             "y.supplier_id AS SupplierId, y.custom, s.supplier_id AS SupplierId, s.name, s.origin_id AS OriginId";
         private readonly DatabaseSettings _databaseSettings;
         private readonly ILogger<YeastDapperRepository> _logger;
         public YeastDapperRepository(IOptions<DatabaseSettings> databaseSettings, ILogger<YeastDapperRepository> logger)
@@ -28,16 +32,17 @@ namespace Microbrewit.Repository.Component
             using (DbConnection connection = new NpgsqlConnection(_databaseSettings.DbConnection))
             {
                 connection.Open();
-                var fields = "y.yeast_id AS YeastId, y.name as Name, y.temperature_low AS TemperatureLow, y.temperature_high AS TemperatureHigh," +
-                             " y.flocculation, y.alcohol_tolerance AS AlcoholTolerance, y.product_code AS ProductCode, y.notes, " +
-                             "y.type, y.brewery_source AS BrewerySource, y.species, y.attenution_range AS AttenutionRange, y.pitching_fermentation_notes As PitchingFermentationNotes, " +
-                             "y.supplier_id AS SupplierId, y.custom, s.supplier_id AS SupplierId, s.name, s.origin_id AS OriginId ";
-                string sql = $"SELECT {fields} FROM yeasts y LEFT JOIN suppliers s ON y.supplier_id = s.supplier_id ORDER BY y.name;";
+
+                string sql = $"SELECT {_yeastFields} FROM yeasts y LEFT JOIN suppliers s ON y.supplier_id = s.supplier_id ORDER BY y.name;";
                 var yeasts = await connection.QueryAsync<Yeast, Supplier, Yeast>(sql, (yeast, supplier) =>
                 {
                     yeast.Supplier = supplier;
                     return yeast;
                 }, splitOn: "YeastId,SupplierId");
+                foreach (var yeast in yeasts)
+                {
+                    yeast.Sources = await GetYeastSources(yeast.YeastId);
+                }
                 return yeasts.ToList();
             }
         }
@@ -47,17 +52,15 @@ namespace Microbrewit.Repository.Component
             using (DbConnection connection = new NpgsqlConnection(_databaseSettings.DbConnection))
             {
                 connection.Open();
-                var fields = "y.yeast_id AS YeastId, y.name as Name, y.temperature_low AS TemperatureLow, y.temperature_high AS TemperatureHigh," +
-                             " y.flocculation, y.alcohol_tolerance AS AlcoholTolerance, y.product_code AS ProductCode, y.notes, " +
-                             "y.type, y.brewery_source AS BrewerySource, y.species, y.attenution_range AS AttenutionRange, y.pitching_fermentation_notes As PitchingFermentationNotes, " +
-                             "y.supplier_id AS SupplierId, y.custom, s.supplier_id AS SupplierId, s.name, s.origin_id AS OriginId ";
-                var sql = $"SELECT {fields} FROM yeasts y LEFT JOIN suppliers s ON y.supplier_id = s.supplier_id WHERE y.yeast_id = @YeastId;";
-                var yeast = await connection.QueryAsync<Yeast, Supplier, Yeast>(sql, (s, supplier) =>
+                var sql = $"SELECT {_yeastFields} FROM yeasts y LEFT JOIN suppliers s ON y.supplier_id = s.supplier_id WHERE y.yeast_id = @YeastId;";
+                var yeast = (await connection.QueryAsync<Yeast, Supplier, Yeast>(sql, (s, supplier) =>
                 {
                     s.Supplier = supplier;
                     return s;
-                }, new { YeastId = id }, splitOn: "YeastId,SupplierId");
-                return yeast.SingleOrDefault();
+                }, new { YeastId = id }, splitOn: "YeastId,SupplierId")).SingleOrDefault();
+                if(yeast == null) return yeast;
+                yeast.Sources = await GetYeastSources(yeast.YeastId);
+                return yeast;
             };
         }
 
@@ -132,6 +135,16 @@ namespace Microbrewit.Repository.Component
                         throw;
                     }
                 }
+            }
+        }
+
+        public async Task<IEnumerable<YeastSource>> GetYeastSources(int yeastId)
+        {
+            using (DbConnection connection = new NpgsqlConnection(_databaseSettings.DbConnection))
+            {
+                connection.Open();
+                var sql ="SELECT yeast_id AS YeastId, social_id AS SocialId, site, url FROM yeast_sources WHERE yeast_id = @YeastId;";
+                return await connection.QueryAsync<YeastSource>(sql,new{YeastId = yeastId});   
             }
         }
     }

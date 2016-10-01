@@ -66,7 +66,6 @@ namespace Microbrewit.Api.Service.Component
             var yeastsDto = AutoMapper.Mapper.Map<IEnumerable<Yeast>, IEnumerable<YeastDto>>(yeasts);
             var esYeasts = await _yeastElasticsearch.GetAllAsync();
             var toDelete = esYeasts.Where(esy => yeasts.All(y => y.YeastId != esy.Id));
-            _logger.LogDebug($"toDelete: {toDelete.Count()}");
             await _yeastElasticsearch.DeleteListAsync(toDelete.Select(y => y.Id));
             await _yeastElasticsearch.UpdateAllAsync(yeastsDto);
 

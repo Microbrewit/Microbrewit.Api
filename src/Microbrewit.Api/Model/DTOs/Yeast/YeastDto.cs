@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Nest;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace Microbrewit.Api.Model.DTOs
@@ -39,5 +40,7 @@ namespace Microbrewit.Api.Model.DTOs
         [JsonProperty(PropertyName = "custom")]
         public bool Custom { get; set; }
         public string SubType {get; set;}
+        [JsonProperty("sources")]
+        public IEnumerable<YeastSourceDto> Sources { get; set; }
     }
 }

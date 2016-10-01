@@ -20,6 +20,7 @@ namespace Microbrewit.Api.Mapper.Profile
                 .ForMember(dto => dto.BrewerySource, conf => conf.MapFrom(rec => rec.BrewerySource))
                 .ForMember(dto => dto.Species, conf => conf.MapFrom(rec => rec.Species))
                 .ForMember(dto => dto.AttenutionRange, conf => conf.MapFrom(rec => rec.AttenutionRange))
+                .ForMember(dto => dto.Sources, conf => conf.MapFrom(rec => rec.Sources))
                 .ForMember(dto => dto.PitchingFermentationNotes, conf => conf.MapFrom(rec => rec.PitchingFermentationNotes))
                 .ForMember(dto => dto.Supplier, conf => conf.MapFrom(rec => rec.Supplier));
                
@@ -38,6 +39,7 @@ namespace Microbrewit.Api.Mapper.Profile
                 .ForMember(dto => dto.Notes, conf => conf.MapFrom(rec => rec.Notes))
                 .ForMember(dto => dto.Flocculation, conf => conf.MapFrom(rec => rec.Flocculation))
                 .ForMember(dto => dto.AlcoholTolerance, conf => conf.MapFrom(rec => rec.AlcoholTolerance))
+                .ForMember(dto => dto.Sources, conf => conf.MapFrom(rec => rec.Sources))
                 .ForMember(dto => dto.Supplier, conf => conf.MapFrom(rec => rec.Supplier))
                 .ForMember(dto => dto.SupplierId, conf => conf.ResolveUsing<YeastSupplierResolver>());
 
@@ -47,6 +49,16 @@ namespace Microbrewit.Api.Mapper.Profile
                 .ForMember(dto => dto.ProductCode, conf => conf.MapFrom(rec => rec.ProductCode))
                 .ForMember(dto => dto.SubType, conf => conf.MapFrom(rec => rec.SubType))
                 .ForMember(dto => dto.Supplier, conf => conf.MapFrom(rec => rec.Supplier));
+
+            CreateMap<YeastSource, YeastSourceDto>()
+             .ForMember(dto => dto.Site, conf => conf.MapFrom(rec => rec.Site))
+             .ForMember(dto => dto.Id, conf => conf.MapFrom(rec => rec.SocialId))
+             .ForMember(dto => dto.Url, conf => conf.MapFrom(rec => rec.Url));
+
+              CreateMap<YeastSourceDto, YeastSource>()
+             .ForMember(dto => dto.Site, conf => conf.MapFrom(rec => rec.Site))
+             .ForMember(dto => dto.SocialId, conf => conf.MapFrom(rec => rec.Id))
+             .ForMember(dto => dto.Url, conf => conf.MapFrom(rec => rec.Url));
         }
     }
 }
