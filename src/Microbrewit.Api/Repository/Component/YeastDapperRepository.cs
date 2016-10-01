@@ -19,7 +19,9 @@ namespace Microbrewit.Repository.Component
         private const string _yeastFields = "y.yeast_id AS YeastId, y.name as Name, y.temperature_low AS TemperatureLow, y.temperature_high AS TemperatureHigh," +
                              " y.flocculation, y.alcohol_tolerance AS AlcoholTolerance, y.product_code AS ProductCode, y.notes, " +
                              "y.type, y.brewery_source AS BrewerySource, y.species, y.attenution_range AS AttenutionRange, y.pitching_fermentation_notes As PitchingFermentationNotes, " +
-                             "y.supplier_id AS SupplierId, y.custom, s.supplier_id AS SupplierId, s.name, s.origin_id AS OriginId";
+                             "y.flocculation_low as FlocculationLow, y.flocculation_high As FlocculationHigh, y.attenution_low as AttenutionLow, y.attenution_high as AttenutionHigh, " +
+                             "y.alcohol_tolerance_low as AlcoholToleranceLow, y.alcohol_tolerance_high as AlcoholToleranceHigh, " +
+                             "y.supplier_id AS SupplierId, y.custom, s.supplier_id AS SupplierId, s.name, s.origin_id AS OriginId ";
         private readonly DatabaseSettings _databaseSettings;
         private readonly ILogger<YeastDapperRepository> _logger;
         public YeastDapperRepository(IOptions<DatabaseSettings> databaseSettings, ILogger<YeastDapperRepository> logger)
@@ -73,7 +75,7 @@ namespace Microbrewit.Repository.Component
                 {
                     try
                     {
-                        var result = await connection.ExecuteAsync("INSERT INTO yeasts(name,temperature_high,temperature_low,flocculation,alcohol_tolerance,product_code,notes,type,brewery_source,species,attenution_range,pitching_fermentation_notes,supplier_id,custom) VALUES(@Name,@TemperatureHigh,@TemperatureLow,@Flocculation,@AlcoholTolerance,@ProductCode,@Notes,@Type,@BrewerySource,@Species,@AttenutionRange,@PitchingFermentationNotes,@SupplierId,@Custom);",                           
+                        var result = await connection.ExecuteAsync("INSERT INTO yeasts(name,temperature_high,temperature_low,flocculation,alcohol_tolerance,product_code,notes,type,brewery_source,species,attenution_range,pitching_fermentation_notes,supplier_id,custom, flocculation_low,flocculation_high,attenution_low,attenution_high,alcohol_tolerance_low,alcohol_tolerance_high,) VALUES(@Name,@TemperatureHigh,@TemperatureLow,@Flocculation,@AlcoholTolerance,@ProductCode,@Notes,@Type,@BrewerySource,@Species,@AttenutionRange,@PitchingFermentationNotes,@SupplierId,@Custom,@FlocculationLow,@FlocculationHigh,@AttenutionLow,@AttenutionLow,@AttenutionHigh,@AlcoholToleranceLow,@AlcoholToleranceHigh);",                           
                                 yeast,transaction);
                         
                         var yeastId = await connection.QueryAsync<int>("SELECT last_value FROM yeasts_seq;");
@@ -101,8 +103,9 @@ namespace Microbrewit.Repository.Component
                         var result = await connection.ExecuteAsync(
                                 "UPDATE Yeasts set name = @Name,temperature_high = @TemperatureHigh,temperature_low = @TemperatureLow,flocculation = @Flocculation," +
                                 "alcohol_tolerance = @AlcoholTolerance,product_code = @ProductCode, notes = @Notes, type = @Type, brewery_source = @BrewerySource, species = @Species," +
-                                "attenution_range = @AttenutionRange, pitching_fermentation_notes = @PitchingFermentationNotes, supplier_id = @SupplierId, custom = @Custom " +
-                                "WHERE yeast_id = @YeastId;",yeast, transaction);
+                                "attenution_range = @AttenutionRange, pitching_fermentation_notes = @PitchingFermentationNotes, supplier_id = @SupplierId, custom = @Custom, " +
+                                "flocculation_low = @FlocculationLow, flocculation_high = @FlocculationHigh, attenution_low = @AttenutionLow, attenution_high = @AttenutionHigh, alcohol_tolerance_low = @AlcoholToleranceLow, alcohol_tolerance_high = @AlcoholToleranceHigh " +
+                                "WHERE yeast_id = @YeastId;", yeast, transaction);
                         transaction.Commit();
                         return result;
                     }
