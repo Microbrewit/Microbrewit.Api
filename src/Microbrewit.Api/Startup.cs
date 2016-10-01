@@ -28,8 +28,7 @@ namespace Microbrewit.Api
         {
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
-                .WriteTo.RollingFile(new CompactJsonFormatter(),"./log/log.txt")
-                .WriteTo.LiterateConsole()
+                .WriteTo.Console(new CompactJsonFormatter())
                 .Enrich.FromLogContext() 
                 .CreateLogger();
                 
