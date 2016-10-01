@@ -43,9 +43,9 @@ namespace Microbrewit.Api.Service.Component
         }
 
 
-        public async Task<IEnumerable<YeastDto>> GetAllAsync(string custom)
+        public async Task<IEnumerable<YeastDto>> GetAllAsync()
         {
-            var yeastsDto = await _yeastElasticsearch.GetAllAsync(custom);
+            var yeastsDto = await _yeastElasticsearch.GetAllAsync();
             if (yeastsDto.Any()) 
                 return yeastsDto ;
             var yeasts = await _yeastRepository.GetAllAsync();
@@ -64,7 +64,12 @@ namespace Microbrewit.Api.Service.Component
         {
             var yeasts = await _yeastRepository.GetAllAsync();
             var yeastsDto = AutoMapper.Mapper.Map<IEnumerable<Yeast>, IEnumerable<YeastDto>>(yeasts);
+            var esYeasts = await _yeastElasticsearch.GetAllAsync();
+            var toDelete = esYeasts.Where(esy => yeasts.All(y => y.YeastId != esy.Id));
+            _logger.LogDebug($"toDelete: {toDelete.Count()}");
+            await _yeastElasticsearch.DeleteListAsync(toDelete.Select(y => y.Id));
             await _yeastElasticsearch.UpdateAllAsync(yeastsDto);
+
         }
 
         public async Task UpdateAsync(YeastDto yeastDto)

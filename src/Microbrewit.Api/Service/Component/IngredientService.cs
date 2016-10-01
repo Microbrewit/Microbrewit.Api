@@ -30,7 +30,7 @@ namespace Microbrewit.Api.Service.Component
             ingredients.AddRange(await _hopService.GetAllAsync(0,100000));
             ingredients.AddRange(await _fermentableService.GetAllAsync(0, 10000, custom));
             ingredients.AddRange(await _otherService.GetAllAsync(custom));
-            ingredients.AddRange(await _yeastService.GetAllAsync(custom));
+            ingredients.AddRange(await _yeastService.GetAllAsync());
             return ingredients;
             
         }

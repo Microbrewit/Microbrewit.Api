@@ -6,7 +6,7 @@ namespace Microbrewit.Api.Service.Interface
 {
     public interface IYeastService
     {
-        Task<IEnumerable<YeastDto>> GetAllAsync(string custom);
+        Task<IEnumerable<YeastDto>> GetAllAsync();
         Task<YeastDto> GetSingleAsync(int id);
         Task<YeastDto> AddAsync(YeastDto yeastDto);
         Task<YeastDto> DeleteAsync(int id);

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microbrewit.Api.Elasticsearch.Interface;
 using Microbrewit.Api.Model.DTOs;
 using Microbrewit.Api.Settings;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Nest;
 
@@ -13,18 +14,20 @@ namespace Microbrewit.Api.Elasticsearch.Component
     {
 
         private readonly ElasticSearchSettings _elasticSearchSettings;
+        private readonly ILogger<YeastElasticsearch> _logger;
         private Uri _node;
         private ConnectionSettings _settings;
         private ElasticClient _client;
         private int _bigNumber = 10000;
 
-        public YeastElasticsearch(IOptions<ElasticSearchSettings> elasticSearchSettings)
+        public YeastElasticsearch(IOptions<ElasticSearchSettings> elasticSearchSettings, ILogger<YeastElasticsearch> logger)
         {
             _elasticSearchSettings = elasticSearchSettings.Value;
             this._node = new Uri( _elasticSearchSettings.Url);
             this._settings = new ConnectionSettings(_node);
             _settings.DefaultIndex(_elasticSearchSettings.Index);
             this._client = new ElasticClient(_settings);
+            _logger = logger;
         }
 
         public async Task UpdateAsync(YeastDto yeastDto)
@@ -36,13 +39,13 @@ namespace Microbrewit.Api.Elasticsearch.Component
             await _client.IndexAsync(yeastDto);
         }
 
-        public async Task<IEnumerable<YeastDto>> GetAllAsync(string custom)
+        public async Task<IEnumerable<YeastDto>> GetAllAsync()
         {
             var res = await _client.SearchAsync<YeastDto>(s => s
                 .Size(_bigNumber)
                 .Query(q => q
                     .Bool(fi => fi
-                    .Filter(f => f.Term(t => t.Type, "yeast") && f.Term(t => t.Custom, custom)))));
+                    .Filter(f => f.Term(t => t.Type, "yeast")))));
             return res.Documents;
         }
 
@@ -75,6 +78,14 @@ namespace Microbrewit.Api.Elasticsearch.Component
         public async Task DeleteAsync(int id)
         {
             await _client.DeleteAsync<YeastDto>(id);
+        }
+
+        public async Task DeleteListAsync(IEnumerable<int> yeasts)
+        {
+            foreach (var id in yeasts)
+            {
+                await DeleteAsync(id);
+            }
         }
     }
 

@@ -28,9 +28,9 @@ namespace Microbrewit.Api.Controllers
         /// </summary>
         /// <returns>200 OK</returns>
         [HttpGet]
-        public async Task<YeastCompleteDto> GetYeasts(string custom = "false")
+        public async Task<YeastCompleteDto> GetYeasts()
         {
-            var yeasts = await _yeastService.GetAllAsync(custom);
+            var yeasts = await _yeastService.GetAllAsync();
             return new YeastCompleteDto {Yeasts = yeasts.ToList()};
         }
 
