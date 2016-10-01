@@ -17,6 +17,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
+using Serilog.Formatting.Compact;
 
 namespace Microbrewit.Api
 {
@@ -24,6 +26,13 @@ namespace Microbrewit.Api
     {
         public Startup(IHostingEnvironment env)
         {
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.RollingFile(new CompactJsonFormatter(),"./log/log.txt")
+                .WriteTo.LiterateConsole()
+                .Enrich.FromLogContext() 
+                .CreateLogger();
+                
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
@@ -103,8 +112,9 @@ namespace Microbrewit.Api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug(LogLevel.Debug);
+            loggerFactory.AddSerilog();
+            //loggerFactory.AddConsole(Configuration.GetSection("Logging"));
+            //loggerFactory.AddDebug(LogLevel.Debug);
 
             ApiConfiguration.ApiSettings = app.ApplicationServices.GetService<IOptions<ApiSettings>>().Value;
             app.UseCors(policy =>
