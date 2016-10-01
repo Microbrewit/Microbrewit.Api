@@ -20,9 +20,9 @@ namespace Microbrewit.Api.Model.Database
         // new from google doc.
         public string BrewerySource { get; set; }
         public string Species { get; set; }
-        public string AttenutionRange { get; set; }
-        public int? AttenutionLow { get; set; }
-        public int? AttenutionHigh { get; set; }
+        public string AttenuationRange { get; set; }
+        public int? AttenuationLow { get; set; }
+        public int? AttenuationHigh { get; set; }
         public string PitchingFermentationNotes { get; set; }
        
         // relations

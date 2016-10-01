@@ -19,7 +19,7 @@ namespace Microbrewit.Api.Mapper.Profile
                 .ForMember(dto => dto.AlcoholTolerance, conf => conf.MapFrom(rec => new AlcoholTolerance {Low = rec.AlcoholToleranceLow, High = rec.AlcoholToleranceHigh, Label = rec.AlcoholTolerance}))
                 .ForMember(dto => dto.BrewerySource, conf => conf.MapFrom(rec => rec.BrewerySource))
                 .ForMember(dto => dto.Species, conf => conf.MapFrom(rec => rec.Species))
-                .ForMember(dto => dto.Attenution, conf => conf.MapFrom(rec => new Attenution{Low = rec.AttenutionLow, High = rec.AttenutionHigh, Label = rec.AttenutionRange}))
+                .ForMember(dto => dto.Attenuation, conf => conf.MapFrom(rec => new Attenuation{Low = rec.AttenuationLow, High = rec.AttenuationHigh, Label = rec.AttenuationRange}))
                 .ForMember(dto => dto.Sources, conf => conf.MapFrom(rec => rec.Sources))
                 .ForMember(dto => dto.PitchingFermentationNotes, conf => conf.MapFrom(rec => rec.PitchingFermentationNotes))
                 .ForMember(dto => dto.Supplier, conf => conf.MapFrom(rec => rec.Supplier));
@@ -43,9 +43,9 @@ namespace Microbrewit.Api.Mapper.Profile
                 .ForMember(dto => dto.AlcoholTolerance, conf => conf.MapFrom(rec => rec.AlcoholTolerance.Label))
                 .ForMember(dto => dto.AlcoholToleranceLow, conf => conf.MapFrom(rec => rec.AlcoholTolerance.Low))
                 .ForMember(dto => dto.AlcoholToleranceHigh, conf => conf.MapFrom(rec => rec.AlcoholTolerance.High))
-                .ForMember(dto => dto.AttenutionRange, conf => conf.MapFrom(rec => rec.Attenution.Label))
-                .ForMember(dto => dto.AttenutionLow, conf => conf.MapFrom(rec => rec.Attenution.Low))
-                .ForMember(dto => dto.AttenutionHigh, conf => conf.MapFrom(rec => rec.Attenution.High))
+                .ForMember(dto => dto.AttenuationRange, conf => conf.MapFrom(rec => rec.Attenuation.Label))
+                .ForMember(dto => dto.AttenuationLow, conf => conf.MapFrom(rec => rec.Attenuation.Low))
+                .ForMember(dto => dto.AttenuationHigh, conf => conf.MapFrom(rec => rec.Attenuation.High))
                 .ForMember(dto => dto.Sources, conf => conf.MapFrom(rec => rec.Sources))
                 .ForMember(dto => dto.Supplier, conf => conf.MapFrom(rec => rec.Supplier))
                 .ForMember(dto => dto.SupplierId, conf => conf.ResolveUsing<YeastSupplierResolver>());

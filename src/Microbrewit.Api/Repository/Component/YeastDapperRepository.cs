@@ -132,6 +132,7 @@ namespace Microbrewit.Repository.Component
                     try
                     {
                         await connection.ExecuteAsync("DELETE FROM yeasts WHERE yeast_id = @YeastId", new { yeast.YeastId }, transaction);
+                        await DeleteYeastSources(yeast.YeastId,connection,transaction);
                         transaction.Commit();
                     }
                     catch (Exception e)
@@ -168,6 +169,12 @@ namespace Microbrewit.Repository.Component
             {
                 await connection.ExecuteAsync("UPDATE yeast_sources SET site = @Site, url = @Url WHERE yeast_id = @YeastId AND social_id = @SocialId;",new {yeast.YeastId, source.SocialId, source.Site,source.Url},transaction);
             }
+        }
+
+        private async Task DeleteYeastSources(int yeastId, DbConnection connection, DbTransaction transaction)
+        {
+            await connection.ExecuteAsync("DELETE FROM yeast_sources WHERE yeast_id = @YeastId",
+                            new { YeastId = yeastId}, transaction);
         }
     }
 }

@@ -151,6 +151,7 @@ namespace Microbrewit.Api.Repository.Component
         {
             await SetCorrectFlavourId(fermentable.Flavours, connection, transaction);
             await InsertFermentableFlavours(fermentable, connection, transaction);
+            await AddFermentableSources(fermentable,connection,transaction);
         }
 
         private static async Task InsertFermentableFlavours(Fermentable fermentable, DbConnection connection, DbTransaction transaction)
@@ -191,6 +192,7 @@ namespace Microbrewit.Api.Repository.Component
                                         "WHERE fermentable_id = @FermentableId;",
                                               fermentable, transaction);
                         await UpdateFermantableFlavours(fermentable,connection,transaction);
+                        await UpdateFermentableSources(fermentable,connection,transaction);
                         transaction.Commit();
                         return result;
                     }
@@ -221,6 +223,7 @@ namespace Microbrewit.Api.Repository.Component
                     {
                         await connection.ExecuteAsync("DELETE FROM fermentables WHERE fermentable_id = @FermentableId",
                             new { fermentable.FermentableId }, transaction);
+                            await DeleteFermentableSources(fermentable.FermentableId, connection,transaction);
                         transaction.Commit();
                     }
                     catch (Exception)
@@ -240,6 +243,28 @@ namespace Microbrewit.Api.Repository.Component
                 var sql ="SELECT fermentable_id AS Id, social_id AS SocialId, site, url FROM fermentable_sources WHERE fermentable_id = @FermentableId;";
                 return await connection.QueryAsync<Source>(sql,new{FermentableId = fermentableId});   
             }
+        }
+
+          private async Task AddFermentableSources(Fermentable fermentable, DbConnection connection, DbTransaction transaction)
+        {
+            foreach (var source in fermentable?.Sources)
+            {
+                   await connection.ExecuteAsync("INSERT INTO fermentable_sources (fermentable_id, social_id, site, url) VALUE(@FermentableId,@SocialId,@Site,@Url);",new {fermentable.FermentableId, source.SocialId, source.Site,source.Url},transaction);
+            }
+        }
+
+        private async Task UpdateFermentableSources(Fermentable fermentable, DbConnection connection, DbTransaction transaction)
+        {
+            foreach (var source in fermentable?.Sources)
+            {
+                await connection.ExecuteAsync("UPDATE fermentable_sources SET site = @Site, url = @Url WHERE fermentable_id = @FermentableId AND social_id = @SocialId;",new {fermentable.FermentableId, source.SocialId, source.Site,source.Url},transaction);
+            }
+        }
+
+        private async Task DeleteFermentableSources(int fermentableId, DbConnection connection, DbTransaction transaction)
+        {
+            await connection.ExecuteAsync("DELETE FROM fermentable_sources WHERE fermentable_id = @FermentableId",
+                            new { FermentableId = fermentableId}, transaction);
         }
     }
 }
