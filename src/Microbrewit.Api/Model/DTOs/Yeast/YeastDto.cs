@@ -16,17 +16,9 @@ namespace Microbrewit.Api.Model.DTOs
         [JsonProperty(PropertyName = "temperature")]
         public Temperature Temperature { get; set; }
         [JsonProperty(PropertyName = "flocculation")]
-        public string Flocculation { get; set; }
-        [JsonProperty(PropertyName = "flocculationLow")]
-        public int FlocculationLow { get; set; }
-        [JsonProperty(PropertyName = "flocculationHigh")]
-        public int FlocculationHigh { get; set; }
+        public Flocculation Flocculation { get; set; }
         [JsonProperty(PropertyName = "alcoholTolerance")]
-        public string AlcoholTolerance { get; set; }
-        [JsonProperty(PropertyName = "alcoholToleranceLow")]
-        public double AlcoholToleranceLow { get; set; }
-        [JsonProperty(PropertyName = "alcoholToleranceHigh")]
-        public double AlcoholToleranceHigh { get; set; }
+        public AlcoholTolerance AlcoholTolerance { get; set; }
         [JsonProperty(PropertyName = "productCode")]
         public string ProductCode { get; set; }
         [JsonProperty(PropertyName = "notes")]
@@ -35,12 +27,8 @@ namespace Microbrewit.Api.Model.DTOs
         public string BrewerySource { get; set; }
         [JsonProperty(PropertyName = "species")]
         public string Species { get; set; }
-        [JsonProperty(PropertyName = "attenutionRange")]
-        public string AttenutionRange { get; set; }
-        [JsonProperty(PropertyName = "attenutionLow")]
-        public int AttenutionLow { get; set; }
-        [JsonProperty(PropertyName = "attenutionHigh")]
-        public int AttenutionHigh { get; set; }
+        [JsonProperty(PropertyName = "attenution")]
+        public Attenution Attenution { get; set; }
         [JsonProperty(PropertyName = "pitchingFermentationNotes")]
         public string PitchingFermentationNotes { get; set; }
         [JsonProperty(PropertyName = "supplier")]

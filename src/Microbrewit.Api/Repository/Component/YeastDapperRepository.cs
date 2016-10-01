@@ -80,7 +80,10 @@ namespace Microbrewit.Repository.Component
                         
                         var yeastId = await connection.QueryAsync<int>("SELECT last_value FROM yeasts_seq;");
                         yeast.YeastId = yeastId.SingleOrDefault();
+                        await AddYeastSources(yeast, connection, transaction);
+                        
                         transaction.Commit();
+
                     }
                     catch (Exception e)
                     {
@@ -148,6 +151,22 @@ namespace Microbrewit.Repository.Component
                 connection.Open();
                 var sql ="SELECT yeast_id AS Id, social_id AS SocialId, site, url FROM yeast_sources WHERE yeast_id = @YeastId;";
                 return await connection.QueryAsync<Source>(sql,new{YeastId = yeastId});   
+            }
+        }
+
+        private async Task AddYeastSources(Yeast yeast, DbConnection connection, DbTransaction transaction)
+        {
+            foreach (var source in yeast?.Sources)
+            {
+                   await connection.ExecuteAsync("INSERT INTO yeast_sources (yeast_id, social_id, site, url) VALUE(@YeastId,@SocialId,@Site,@Url);",new {yeast.YeastId, source.SocialId, source.Site,source.Url},transaction);
+            }
+        }
+
+        private async Task UpdateYeastSources(Yeast yeast, DbConnection connection, DbTransaction transaction)
+        {
+            foreach (var source in yeast?.Sources)
+            {
+                await connection.ExecuteAsync("UPDATE yeast_sources SET site = @Site, url = @Url WHERE yeast_id = @YeastId AND social_id = @SocialId;",new {yeast.YeastId, source.SocialId, source.Site,source.Url},transaction);
             }
         }
     }

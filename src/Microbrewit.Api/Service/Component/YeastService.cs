@@ -54,8 +54,8 @@ namespace Microbrewit.Api.Service.Component
 
         public async Task<YeastDto> GetSingleAsync(int id)
         {
-            var yeastDto = await _yeastElasticsearch.GetSingleAsync(id);
-            if (yeastDto != null) return yeastDto;
+            //var yeastDto = await _yeastElasticsearch.GetSingleAsync(id);
+            //if (yeastDto != null) return yeastDto;
             var yeast = await _yeastRepository.GetSingleAsync(id);
             return AutoMapper.Mapper.Map<Yeast,YeastDto>(yeast);
         }
