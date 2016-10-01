@@ -63,6 +63,8 @@ namespace Microbrewit.Api.Repository.Component
                     new {fermentable.FermentableId});
                     if(flavours != null)
                         fermentable.Flavours = flavours;
+                    
+                    fermentable.Sources = await GetFermentableSource(fermentable.FermentableId);
                 }
                 return fermentables.ToList();
             }
@@ -111,6 +113,7 @@ namespace Microbrewit.Api.Repository.Component
                     new {fermentable.FermentableId});
                     if(flavours != null)
                         fermentable.Flavours = flavours;
+                fermentable.Sources = await GetFermentableSource(fermentable.FermentableId);
                 return fermentable;
             }
         }
@@ -226,6 +229,16 @@ namespace Microbrewit.Api.Repository.Component
                         throw;
                     }
                 }
+            }
+        }
+
+        private async Task<IEnumerable<Source>> GetFermentableSource(int fermentableId)
+        {
+            using (DbConnection connection = new NpgsqlConnection(_databaseSettings.DbConnection))
+            {
+                connection.Open();
+                var sql ="SELECT fermentable_id AS Id, social_id AS SocialId, site, url FROM fermentable_sources WHERE fermentable_id = @FermentableId;";
+                return await connection.QueryAsync<Source>(sql,new{FermentableId = fermentableId});   
             }
         }
     }

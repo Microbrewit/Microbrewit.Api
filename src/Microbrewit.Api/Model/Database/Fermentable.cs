@@ -25,5 +25,6 @@ namespace Microbrewit.Api.Model.Database
         public ICollection<MashStepFermentable> MashSteps { get; set; }
         public ICollection<BoilStepFermentable> BoilSteps { get; set; }
         public ICollection<FermentationStepFermentable> FermentationSteps { get; set; }
+        public IEnumerable<Source> Sources { get; set; }
     }
 }

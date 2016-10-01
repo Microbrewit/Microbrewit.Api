@@ -41,6 +41,6 @@ namespace Microbrewit.Api.Model.DTOs
         public bool Custom { get; set; }
         public string SubType {get; set;}
         [JsonProperty("sources")]
-        public IEnumerable<YeastSourceDto> Sources { get; set; }
+        public IEnumerable<SourceDto> Sources { get; set; }
     }
 }

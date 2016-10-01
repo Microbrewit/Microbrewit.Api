@@ -23,7 +23,7 @@ namespace Microbrewit.Api.Model.Database
         public int? SupplierId { get; set; }
         public Supplier Supplier { get; set; }
         public bool Custom { get; set; }
-        public IEnumerable<YeastSource> Sources { get; set; }
+        public IEnumerable<Source> Sources { get; set; }
         public ICollection<FermentationStepYeast> FermentationSteps { get; set; }
     }
 }

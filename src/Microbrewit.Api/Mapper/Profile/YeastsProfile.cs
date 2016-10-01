@@ -50,12 +50,12 @@ namespace Microbrewit.Api.Mapper.Profile
                 .ForMember(dto => dto.SubType, conf => conf.MapFrom(rec => rec.SubType))
                 .ForMember(dto => dto.Supplier, conf => conf.MapFrom(rec => rec.Supplier));
 
-            CreateMap<YeastSource, YeastSourceDto>()
+            CreateMap<Source, SourceDto>()
              .ForMember(dto => dto.Site, conf => conf.MapFrom(rec => rec.Site))
              .ForMember(dto => dto.Id, conf => conf.MapFrom(rec => rec.SocialId))
              .ForMember(dto => dto.Url, conf => conf.MapFrom(rec => rec.Url));
 
-              CreateMap<YeastSourceDto, YeastSource>()
+              CreateMap<SourceDto, Source>()
              .ForMember(dto => dto.Site, conf => conf.MapFrom(rec => rec.Site))
              .ForMember(dto => dto.SocialId, conf => conf.MapFrom(rec => rec.Id))
              .ForMember(dto => dto.Url, conf => conf.MapFrom(rec => rec.Url));

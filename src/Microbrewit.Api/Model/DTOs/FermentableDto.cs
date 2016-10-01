@@ -38,6 +38,8 @@ namespace Microbrewit.Api.Model.DTOs
         public DateTimeOffset CreatedDate { get; set; }
         [JsonProperty(PropertyName = "updatedDate")]
         public DateTimeOffset UpdatedDate { get; set; }
+        [JsonProperty("sources")]
+        public IEnumerable<SourceDto> Sources { get; set; }
     }
 
 }

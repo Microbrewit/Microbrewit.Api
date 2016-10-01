@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 
 namespace Microbrewit.Api.Model.DTOs
 {
-    public class YeastSourceDto
+    public class SourceDto
     {
         [JsonProperty("id")]
         public int Id { get; set; }

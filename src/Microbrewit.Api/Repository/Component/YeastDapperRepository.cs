@@ -138,13 +138,13 @@ namespace Microbrewit.Repository.Component
             }
         }
 
-        public async Task<IEnumerable<YeastSource>> GetYeastSources(int yeastId)
+        private async Task<IEnumerable<Source>> GetYeastSources(int yeastId)
         {
             using (DbConnection connection = new NpgsqlConnection(_databaseSettings.DbConnection))
             {
                 connection.Open();
-                var sql ="SELECT yeast_id AS YeastId, social_id AS SocialId, site, url FROM yeast_sources WHERE yeast_id = @YeastId;";
-                return await connection.QueryAsync<YeastSource>(sql,new{YeastId = yeastId});   
+                var sql ="SELECT yeast_id AS Id, social_id AS SocialId, site, url FROM yeast_sources WHERE yeast_id = @YeastId;";
+                return await connection.QueryAsync<Source>(sql,new{YeastId = yeastId});   
             }
         }
     }
