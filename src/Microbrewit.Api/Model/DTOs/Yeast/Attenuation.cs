@@ -1,6 +1,6 @@
 namespace Microbrewit.Api.Model.DTOs
 {
-    public class Attenution : HighLowLabelInt
+    public class Attenuation : HighLowLabelInt
     {
     }
 }

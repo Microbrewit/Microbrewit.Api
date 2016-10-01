@@ -27,7 +27,7 @@ namespace Microbrewit.Api.Model.DTOs
         public string BrewerySource { get; set; }
         [JsonProperty(PropertyName = "species")]
         public string Species { get; set; }
-        [JsonProperty(PropertyName = "Attenuation")]
+        [JsonProperty(PropertyName = "attenuation")]
         public Attenuation Attenuation { get; set; }
         [JsonProperty(PropertyName = "pitchingFermentationNotes")]
         public string PitchingFermentationNotes { get; set; }

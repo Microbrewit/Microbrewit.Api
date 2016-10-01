@@ -467,7 +467,7 @@ namespace Microbrewit.Api.Repository.Component
                 const string yeastFields = "fs.recipe_id AS RecipeId, fs.step_number AS StepNumber, fs.yeast_id AS YeastId, fs.amount," +
                                            "y.yeast_id AS YeastId, y.name as Name, y.temperature_low AS TemperatureLow, y.temperature_high AS TemperatureHigh," +
                              " y.flocculation, y.alcohol_tolerance AS AlcoholTolerance, y.product_code AS ProductCode, y.notes, " +
-                             "y.type, y.brewery_source AS BrewerySource, y.species, y.attenution_range AS AttenutionRange, y.pitching_fermentation_notes As PitchingFermentationNotes, " +
+                             "y.type, y.brewery_source AS BrewerySource, y.species, y.attenution_range AS AttenuationRange, y.pitching_fermentation_notes As PitchingFermentationNotes, " +
                              "y.supplier_id AS SupplierId, y.custom, s.supplier_id AS SupplierId, s.name, s.origin_id AS OriginId, o.origin_id AS OriginId, o.name";
                 var fermentationStepYeasts = connection.Query<FermentationStepYeast, Yeast, Supplier, Origin, FermentationStepYeast>(
                  $"SELECT {yeastFields} FROM fermentation_step_yeasts fs " +
