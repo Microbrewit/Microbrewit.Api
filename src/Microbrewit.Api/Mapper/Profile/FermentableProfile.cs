@@ -1,6 +1,5 @@
 ﻿using Microbrewit.Api.Model.Database;
 using Microbrewit.Api.Model.DTOs;
-using Microbrewit.Api.Mapper.CustomResolvers;
 using System.Linq;
 
 namespace Microbrewit.Api.Mapper.Profile
