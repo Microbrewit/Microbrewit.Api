@@ -43,7 +43,8 @@ namespace Microbrewit.Repository.Component
                 }, splitOn: "YeastId,SupplierId");
                 foreach (var yeast in yeasts)
                 {
-                    yeast.Sources = await GetYeastSources(yeast.YeastId);
+                    yeast.Sources = await GetYeastSources(yeast.YeastId, connection);
+                    yeast.Flavours = await GetYeastFlavours(yeast.YeastId,connection);
                 }
                 return yeasts.ToList();
             }
@@ -61,9 +62,22 @@ namespace Microbrewit.Repository.Component
                     return s;
                 }, new { YeastId = id }, splitOn: "YeastId,SupplierId")).SingleOrDefault();
                 if(yeast == null) return yeast;
-                yeast.Sources = await GetYeastSources(yeast.YeastId);
+                yeast.Sources = await GetYeastSources(yeast.YeastId, connection);
+                yeast.Flavours = await GetYeastFlavours(yeast.YeastId,connection);
                 return yeast;
             };
+        }
+
+        private async Task<IEnumerable<YeastFlavour>> GetYeastFlavours(int yeastId, DbConnection connection)
+        {
+            var sql = "SELECT yf.flavour_id as FlavourId, yf.yeast_id as YeastId, f.flavour_id as FlavourId, f.name " +
+                      " FROM public.yeast_flavours yf INNER JOIN flavours f ON f.flavour_id = yf.flavour_id WHERE yf.yeast_id = @YeastId;";
+            var result = await connection.QueryAsync<YeastFlavour,Flavour,YeastFlavour>(sql,(yeastFlavour, flavour) => 
+            {
+                yeastFlavour.Flavour = flavour;
+                return yeastFlavour;
+            }, new {YeastId = yeastId}, splitOn: "FlavourId");
+            return result;
         }
 
         public async Task AddAsync(Yeast yeast)
@@ -75,13 +89,13 @@ namespace Microbrewit.Repository.Component
                 {
                     try
                     {
-                        var result = await connection.ExecuteAsync("INSERT INTO yeasts(name,temperature_high,temperature_low,flocculation,alcohol_tolerance,product_code,notes,type,brewery_source,species,attenution_range,pitching_fermentation_notes,supplier_id,custom, flocculation_low,flocculation_high,attenution_low,attenution_high,alcohol_tolerance_low,alcohol_tolerance_high,) VALUES(@Name,@TemperatureHigh,@TemperatureLow,@Flocculation,@AlcoholTolerance,@ProductCode,@Notes,@Type,@BrewerySource,@Species,@AttenuationRange,@PitchingFermentationNotes,@SupplierId,@Custom,@FlocculationLow,@FlocculationHigh,@AttenuationLow,@AttenuationLow,@AttenuationHigh,@AlcoholToleranceLow,@AlcoholToleranceHigh);",                           
+                        var result = await connection.ExecuteAsync("INSERT INTO yeasts(name,temperature_high,temperature_low,flocculation,alcohol_tolerance,product_code,notes,type,brewery_source,species,attenution_range,pitching_fermentation_notes,supplier_id,custom, flocculation_low,flocculation_high,attenution_low,attenution_high,alcohol_tolerance_low,alcohol_tolerance_high) VALUES (@Name,@TemperatureHigh,@TemperatureLow,@Flocculation,@AlcoholTolerance,@ProductCode,@Notes,@Type,@BrewerySource,@Species,@AttenuationRange,@PitchingFermentationNotes, @SupplierId, @Custom, @FlocculationLow,@FlocculationHigh,@AttenuationLow,@AttenuationHigh,@AlcoholToleranceLow,@AlcoholToleranceHigh);",                           
                                 yeast,transaction);
                         
                         var yeastId = await connection.QueryAsync<int>("SELECT last_value FROM yeasts_seq;");
                         yeast.YeastId = yeastId.SingleOrDefault();
-                        await AddYeastSources(yeast, connection, transaction);
-                        
+                        await InsertYeastSources(yeast, connection, transaction);
+                        await InsertYeastFlavours(yeast,connection,transaction);
                         transaction.Commit();
 
                     }
@@ -109,6 +123,8 @@ namespace Microbrewit.Repository.Component
                                 "attenution_range = @AttenuationRange, pitching_fermentation_notes = @PitchingFermentationNotes, supplier_id = @SupplierId, custom = @Custom, " +
                                 "flocculation_low = @FlocculationLow, flocculation_high = @FlocculationHigh, attenution_low = @AttenuationLow, attenution_high = @AttenuationHigh, alcohol_tolerance_low = @AlcoholToleranceLow, alcohol_tolerance_high = @AlcoholToleranceHigh " +
                                 "WHERE yeast_id = @YeastId;", yeast, transaction);
+                        await UpdateYeastSources(yeast,connection,transaction);
+                        await InsertYeastFlavours(yeast,connection,transaction);
                         transaction.Commit();
                         return result;
                     }
@@ -145,21 +161,17 @@ namespace Microbrewit.Repository.Component
             }
         }
 
-        private async Task<IEnumerable<Source>> GetYeastSources(int yeastId)
+        private async Task<IEnumerable<Source>> GetYeastSources(int yeastId, DbConnection connection)
         {
-            using (DbConnection connection = new NpgsqlConnection(_databaseSettings.DbConnection))
-            {
-                connection.Open();
-                var sql ="SELECT yeast_id AS Id, social_id AS SocialId, site, url FROM yeast_sources WHERE yeast_id = @YeastId;";
-                return await connection.QueryAsync<Source>(sql,new{YeastId = yeastId});   
-            }
+            var sql ="SELECT yeast_id AS Id, social_id AS SocialId, site, url FROM yeast_sources WHERE yeast_id = @YeastId;";
+            return await connection.QueryAsync<Source>(sql,new{YeastId = yeastId});
         }
 
-        private async Task AddYeastSources(Yeast yeast, DbConnection connection, DbTransaction transaction)
+        private async Task InsertYeastSources(Yeast yeast, DbConnection connection, DbTransaction transaction)
         {
             foreach (var source in yeast?.Sources)
             {
-                   await connection.ExecuteAsync("INSERT INTO yeast_sources (yeast_id, social_id, site, url) VALUE(@YeastId,@SocialId,@Site,@Url);",new {yeast.YeastId, source.SocialId, source.Site,source.Url},transaction);
+                   await connection.ExecuteAsync("INSERT INTO yeast_sources (yeast_id, social_id, site, url) VALUES(@YeastId,@SocialId,@Site,@Url);",new {yeast.YeastId, source.SocialId, source.Site,source.Url},transaction);
             }
         }
 
@@ -174,6 +186,32 @@ namespace Microbrewit.Repository.Component
         private async Task DeleteYeastSources(int yeastId, DbConnection connection, DbTransaction transaction)
         {
             await connection.ExecuteAsync("DELETE FROM yeast_sources WHERE yeast_id = @YeastId",
+                            new { YeastId = yeastId}, transaction);
+        }
+
+        private async Task InsertYeastFlavours(Yeast yeast, DbConnection connection, DbTransaction transaction)
+        {
+            await DeleteYeastFlavours(yeast.YeastId, connection, transaction);
+            var flavours = await connection.QueryAsync<Flavour>("SELECT flavour_id as FlavourId, name FROM flavours f");
+            foreach (var flavour in yeast?.Flavours)
+            {
+                var dbFlavour = flavours.FirstOrDefault(f => f.Name == flavour.Flavour.Name);
+                if(dbFlavour == null)
+                    dbFlavour = await InsertFlavour(flavour.Flavour.Name,connection,transaction);
+                await connection.ExecuteAsync("INSERT INTO yeast_flavours (yeast_id, flavour_id) VALUES(@YeastId,@FlavourId);",new {yeast.YeastId, dbFlavour.FlavourId},transaction);
+            }
+        }
+
+        private async Task<Flavour> InsertFlavour(string name, DbConnection connection, DbTransaction transaction)
+        {
+            await connection.ExecuteAsync("INSERT INTO flavours (name) VALUES(@Name);", new {Name = name},transaction);
+            var result = await connection.QueryAsync<Flavour>("SELECT flavour_id as FlavourId, name FROM flavours f WHERE name = @Name", new {Name = name});
+            return result.SingleOrDefault();
+        }
+
+        private async Task DeleteYeastFlavours(int yeastId, DbConnection connection, DbTransaction transaction)
+        {
+            await connection.ExecuteAsync("DELETE FROM yeast_flavours WHERE yeast_id = @YeastId",
                             new { YeastId = yeastId}, transaction);
         }
     }

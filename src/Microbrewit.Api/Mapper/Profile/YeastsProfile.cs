@@ -1,6 +1,7 @@
 ﻿using Microbrewit.Api.Model.Database;
 using Microbrewit.Api.Model.DTOs;
 using Microbrewit.Api.Mapper.CustomResolvers;
+using System.Linq;
 
 namespace Microbrewit.Api.Mapper.Profile
 {
@@ -21,6 +22,7 @@ namespace Microbrewit.Api.Mapper.Profile
                 .ForMember(dto => dto.Species, conf => conf.MapFrom(rec => rec.Species))
                 .ForMember(dto => dto.Attenuation, conf => conf.MapFrom(rec => new Attenuation{Low = rec.AttenuationLow, High = rec.AttenuationHigh, Label = rec.AttenuationRange}))
                 .ForMember(dto => dto.Sources, conf => conf.MapFrom(rec => rec.Sources))
+                .ForMember(dto => dto.Flavours, conf => conf.MapFrom(rec => rec.Flavours.Select(yf => yf.Flavour.Name)))
                 .ForMember(dto => dto.PitchingFermentationNotes, conf => conf.MapFrom(rec => rec.PitchingFermentationNotes))
                 .ForMember(dto => dto.Supplier, conf => conf.MapFrom(rec => rec.Supplier));
                
@@ -48,6 +50,7 @@ namespace Microbrewit.Api.Mapper.Profile
                 .ForMember(dto => dto.AttenuationHigh, conf => conf.MapFrom(rec => rec.Attenuation.High))
                 .ForMember(dto => dto.Sources, conf => conf.MapFrom(rec => rec.Sources))
                 .ForMember(dto => dto.Supplier, conf => conf.MapFrom(rec => rec.Supplier))
+                .ForMember(dto => dto.Flavours, conf => conf.ResolveUsing<YeastFlavoursResolver>())
                 .ForMember(dto => dto.SupplierId, conf => conf.ResolveUsing<YeastSupplierResolver>());
 
             CreateMap<YeastDto, YeastStepDto>()
