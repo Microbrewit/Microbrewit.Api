@@ -327,7 +327,7 @@ namespace Microbrewit.Api.Repository.Component
                 toDelete.Select(id => new { hop.HopId, Id = id}), transaction);
 
             var toAdd = hop.AromaWheels.Where(a => aromaWheels.All(id => id != a.Id));
-            await connection.ExecuteAsync(@"INSERT INTO hop_aroma_wheels(aroma_wheel_id, hop_id) VALUES(6,@HopId);", 
+            await connection.ExecuteAsync(@"INSERT INTO hop_aroma_wheels(aroma_wheel_id, hop_id) VALUES(@Id,@HopId);", 
                 toAdd.Select(a => new {Id = a.Id, hop.HopId}), transaction);
 
         }
