@@ -6,6 +6,7 @@ using Microbrewit.Api.Model.Database;
 using Microbrewit.Api.Model.DTOs;
 using Microbrewit.Api.Repository.Interface;
 using Microbrewit.Api.Service.Interface;
+using System;
 
 namespace Microbrewit.Api.Service.Component
 {
@@ -114,6 +115,11 @@ namespace Microbrewit.Api.Service.Component
            if(aromaWheelsDto.Any()) return aromaWheelsDto;
            var aromaWheels = await _hopRepository.GetAromaWheelsAsync();
            return AutoMapper.Mapper.Map<IEnumerable<AromaWheel>,IEnumerable<AromaWheelDto>>(aromaWheels);
+        }
+
+        public async Task<IEnumerable<HopDto>> GetHopsByAromaWheel(string aromaWheel)
+        {
+            return await _hopElasticsearch.GetHopsByAromaWheel(aromaWheel);
         }
     }
 }

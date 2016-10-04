@@ -9,7 +9,7 @@ using Nest;
 
 namespace Microbrewit.Api.Elasticsearch.Component
 {
-    public class HopElasticsearch : IHopElasticsearch
+    public class HopElasticsearch : Interface.IHopElasticsearch
     {
         private readonly ElasticSearchSettings _elasticSearchSettings;
         private Uri _node;
@@ -132,6 +132,19 @@ namespace Microbrewit.Api.Elasticsearch.Component
                                     .Term(h => h.Type, "aromawheel")
                                     ))));
             return res.Documents;
+        }
+
+        public async Task<IEnumerable<HopDto>> GetHopsByAromaWheel(string aromaWheel)
+        {
+             var searchResults = await _client.SearchAsync<HopDto>(s => s
+                                               .From(0)
+                                               .Size(10000)
+                                               .Query(q1 => q1
+                                               .Bool(fi => fi
+                                                .Filter(f => f.Term(t => t.Type, "hop"))
+                                                .Must(q2 => q2.Match(m => m.Field(f => f.AromaWheels)
+                                                                         )))));
+            return searchResults.Documents;
         }
     }
 }

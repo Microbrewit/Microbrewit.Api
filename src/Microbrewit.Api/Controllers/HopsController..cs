@@ -31,6 +31,14 @@ namespace Microbrewit.Api.Controllers
             var hops = await _hopService.GetAllAsync(from,size);
             return new HopCompleteDto { Hops = hops};
         }
+
+        [HttpGet("aromawheels/{aromawheel}")]
+         public async Task<HopCompleteDto> GetHopsByAromaWheel(string aromawheel)
+        {
+            _logger.LogDebug("Api Url:" + ApiConfiguration.ApiSettings.Url);
+            var hops = await _hopService.GetHopsByAromaWheel(aromawheel);
+            return new HopCompleteDto { Hops = hops};
+        }
         
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetHop(int id)

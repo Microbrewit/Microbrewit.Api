@@ -15,6 +15,7 @@ namespace Microbrewit.Api.Service.Interface
         Task ReIndexHopsElasticSearch();
         Task<IEnumerable<DTO>> GetHopFromsAsync();     
         Task<IEnumerable<AromaWheelDto>> GetAromaWheelsAsync();
+        Task<IEnumerable<HopDto>> GetHopsByAromaWheel(string aromaWheel);
         
         
     }
