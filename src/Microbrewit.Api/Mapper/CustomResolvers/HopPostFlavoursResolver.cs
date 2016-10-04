@@ -12,16 +12,17 @@ namespace Microbrewit.Api.Mapper.CustomResolvers
         protected override IList<HopFlavour> ResolveCore(HopDto dto)
         {
             var hopFlavours = new List<HopFlavour>();
-            // var flavours = repository.GetFlavours();
-            // if (dto.Flavours != null)
-            // {
-            //     foreach (var item in dto.Flavours)
-            //     {
-            //         var flavour = flavours.SingleOrDefault(f => f.Name == item);
-            //         if (flavour != null)
-            //             hopFlavours.Add(new HopFlavour { FlavourId = flavour.FlavourId, HopId = dto.Id });
-            //     }
-            // }
+            foreach (var flavour in dto.Flavours)
+            {
+                var hopFlavour = new HopFlavour
+                {
+                    HopId = dto.Id,
+                    Flavour = new Flavour {
+                        Name = flavour,
+                    }
+                };
+                hopFlavours.Add(hopFlavour);
+            }
             return hopFlavours;
         }
 
