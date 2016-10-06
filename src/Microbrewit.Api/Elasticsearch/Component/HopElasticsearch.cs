@@ -137,13 +137,19 @@ namespace Microbrewit.Api.Elasticsearch.Component
         public async Task<IEnumerable<HopDto>> GetHopsByAromaWheel(string aromaWheel)
         {
              var searchResults = await _client.SearchAsync<HopDto>(s => s
-                                               .From(0)
-                                               .Size(10000)
-                                               .Query(q1 => q1
-                                               .Bool(fi => fi
-                                                .Filter(f => f.Term(t => t.Type, "hop"))
-                                                .Must(q2 => q2.Match(m => m.Field(f => f.AromaWheels)
-                                                                         )))));
+                                                .From(0)
+                                                .Size(10000)
+                                                .Query(q1 => q1
+                                                    .Bool(fi => fi
+                                                        .Must(q2 => q2.Match(m => m.Field(f => f.AromaWheels).Query("Cirus"))
+                                                                         ))));
+
+        var searchTerm = new TermQuery 
+        {
+            Field= "aromawheel.name",
+            Value = aromaWheel,
+        };
+        var result = await _client.SearchAsync<HopDto>(new SearchRequest<HopDto>{Query= searchTerm});
             return searchResults.Documents;
         }
     }
