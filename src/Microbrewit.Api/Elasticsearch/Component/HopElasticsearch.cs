@@ -141,15 +141,9 @@ namespace Microbrewit.Api.Elasticsearch.Component
                                                 .Size(10000)
                                                 .Query(q1 => q1
                                                     .Bool(fi => fi
-                                                        .Must(q2 => q2.Match(m => m.Field(f => f.AromaWheels).Query("Cirus"))
+                                                        .Must(q2 => q2.Match(m => m.Field("aromaWheel.name").Query(aromaWheel))
                                                                          ))));
 
-        var searchTerm = new TermQuery 
-        {
-            Field= "aromawheel.name",
-            Value = aromaWheel,
-        };
-        var result = await _client.SearchAsync<HopDto>(new SearchRequest<HopDto>{Query= searchTerm});
             return searchResults.Documents;
         }
     }
