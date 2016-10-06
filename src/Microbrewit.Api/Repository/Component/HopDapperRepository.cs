@@ -101,8 +101,9 @@ namespace Microbrewit.Api.Repository.Component
                   new { id = hop.HopId });
                 if(aromaWheels.Any())
                   hop.AromaWheels = aromaWheels;
+                
+                hop.Sources = await GetHopSources(hop.HopId, connection);
                 }
-
                 return hops.ToList();
             }
         }
@@ -179,7 +180,7 @@ namespace Microbrewit.Api.Repository.Component
                 }, new { Id = id }, splitOn: "HopId,BeerStyleId");
                 if (hopBeerStyles != null)
                     hop.HopBeerStyles = hopBeerStyles.ToList();
-
+                hop.Sources = await GetHopSources(hop.HopId,connection);
                 return hop;
             }
         }
@@ -232,6 +233,10 @@ namespace Microbrewit.Api.Repository.Component
                                 @"INSERT INTO hop_beerstyles(hop_id,beerstyle_id) VALUES(@HopId,@BeerStyleId);",
                                 hop.HopBeerStyles.Select(h => new { hop.HopId, h.BeerStyleId }), transaction);
                         }
+                        if(hop.Sources != null && hop.Sources.Any())
+                        {
+                            await InsertHopSources(hop,connection,transaction);
+                        }
                         transaction.Commit();
                     }
                     catch (Exception)
@@ -242,32 +247,7 @@ namespace Microbrewit.Api.Repository.Component
                 }
             }
         }
-        private async Task<Flavour> InsertFlavour(string name, DbConnection connection, DbTransaction transaction)
-        {
-            await connection.ExecuteAsync("INSERT INTO flavours (name) VALUES(@Name);", new {Name = name},transaction);
-            var result = await connection.QueryAsync<Flavour>("SELECT flavour_id as FlavourId, name FROM flavours f WHERE name = @Name", new {Name = name});
-            return result.SingleOrDefault();
-        }
-
-        private async Task InsertHopFlavours(Hop hop, DbConnection connection, DbTransaction transaction)
-        {
-            await DeleteHopFlavours(hop.HopId, connection, transaction);
-            var flavours = await connection.QueryAsync<Flavour>("SELECT flavour_id as FlavourId, name FROM flavours f");
-            foreach (var flavour in hop?.Flavours)
-            {
-                var dbFlavour = flavours.FirstOrDefault(f => f.Name == flavour.Flavour.Name);
-                if(dbFlavour == null)
-                    dbFlavour = await InsertFlavour(flavour.Flavour.Name,connection,transaction);
-                await connection.ExecuteAsync("INSERT INTO hop_flavours (hop_id, flavour_id) VALUES(@HopId,@FlavourId);",new {hop.HopId, dbFlavour.FlavourId},transaction);
-            }
-        }
-
-        private async Task DeleteHopFlavours(int hopId, DbConnection connection, DbTransaction transaction)
-        {
-            await connection.ExecuteAsync("DELETE FROM hop_flavours WHERE hop_id = @HopId",
-                            new { HopId = hopId}, transaction);
-        }
-
+      
         public async Task<int> UpdateAsync(Hop hop)
         {
             using (DbConnection connection = new NpgsqlConnection(_databaseSettings.DbConnection))
@@ -292,6 +272,7 @@ namespace Microbrewit.Api.Repository.Component
                         await UpdateHopSubstituteAsync(connection, transaction, hop);
                         await UpdateAromaWheelAsync(connection, transaction, hop);
                         await UpdateHopBeerStyles(connection, transaction, hop);
+                        await InsertHopSources(hop, connection, transaction);
                         transaction.Commit();
                         return result;
                     }
@@ -364,6 +345,8 @@ namespace Microbrewit.Api.Repository.Component
                     try
                     {
                         var result = await connection.ExecuteAsync("DELETE FROM hops WHERE hop_id = @HopId", new { hop.HopId }, transaction);
+                        await DeleteHopFlavours(hop.HopId, connection, transaction);
+                        await DeleteHopSources(hop.HopId, connection, transaction);
                         transaction.Commit();
                     }
                     catch (Exception)
@@ -423,5 +406,53 @@ namespace Microbrewit.Api.Repository.Component
                 return await connection.QueryAsync<AromaWheel>("SELECT aroma_wheel_id AS Id, name FROM aroma_wheels;"); 
             }
         }
+
+        private async Task<IEnumerable<Source>> GetHopSources(int hopId, DbConnection connection)
+        {
+            var sql ="SELECT hop_id AS Id, social_id AS SocialId, site, url FROM hop_sources WHERE hop_id = @HopId;";
+            return await connection.QueryAsync<Source>(sql,new{HopId = hopId});
+        }
+
+        private async Task InsertHopSources(Hop hop, DbConnection connection, DbTransaction transaction)
+        {
+            await DeleteHopSources(hop.HopId, connection, transaction);
+            foreach (var source in hop?.Sources)
+            {
+                   await connection.ExecuteAsync("INSERT INTO hop_sources (hop_id, social_id, site, url) VALUES(@HopId,@SocialId,@Site,@Url);",new {hop.HopId, source.SocialId, source.Site,source.Url},transaction);
+            }
+        }
+
+        private async Task DeleteHopSources(int hopId, DbConnection connection, DbTransaction transaction)
+        {
+            await connection.ExecuteAsync("DELETE FROM hop_sources WHERE hop_id = @HopId",
+                            new { HopId = hopId}, transaction);
+        }
+
+          private async Task<Flavour> InsertFlavour(string name, DbConnection connection, DbTransaction transaction)
+        {
+            await connection.ExecuteAsync("INSERT INTO flavours (name) VALUES(@Name);", new {Name = name},transaction);
+            var result = await connection.QueryAsync<Flavour>("SELECT flavour_id as FlavourId, name FROM flavours f WHERE name = @Name", new {Name = name});
+            return result.SingleOrDefault();
+        }
+
+        private async Task InsertHopFlavours(Hop hop, DbConnection connection, DbTransaction transaction)
+        {
+            await DeleteHopFlavours(hop.HopId, connection, transaction);
+            var flavours = await connection.QueryAsync<Flavour>("SELECT flavour_id as FlavourId, name FROM flavours f");
+            foreach (var flavour in hop?.Flavours)
+            {
+                var dbFlavour = flavours.FirstOrDefault(f => f.Name == flavour.Flavour.Name);
+                if(dbFlavour == null)
+                    dbFlavour = await InsertFlavour(flavour.Flavour.Name,connection,transaction);
+                await connection.ExecuteAsync("INSERT INTO hop_flavours (hop_id, flavour_id) VALUES(@HopId,@FlavourId);",new {hop.HopId, dbFlavour.FlavourId},transaction);
+            }
+        }
+
+        private async Task DeleteHopFlavours(int hopId, DbConnection connection, DbTransaction transaction)
+        {
+            await connection.ExecuteAsync("DELETE FROM hop_flavours WHERE hop_id = @HopId",
+                            new { HopId = hopId}, transaction);
+        }
+
     }
 }

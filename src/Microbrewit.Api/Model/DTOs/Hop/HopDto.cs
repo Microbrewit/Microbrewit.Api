@@ -40,7 +40,8 @@ namespace Microbrewit.Api.Model.DTOs
         public IEnumerable<DTO> BeerStyles { get; set; }
         [JsonProperty(PropertyName = "type")]
         public string Type => "hop";
-            
+        [JsonProperty("sources")]
+        public IEnumerable<SourceDto> Sources { get; set; }
         [Required]
         [JsonProperty(PropertyName = "custom")]
         public bool Custom { get; set; }
