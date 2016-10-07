@@ -19,6 +19,7 @@ namespace Microbrewit.Api.Mapper.Profile
                 .ForMember(dto => dto.Aliases, conf => conf.ResolveUsing<HopAliasesResolver>())
                 .ForMember(dto => dto.Flavours, conf => conf.ResolveUsing<HopFlavoursResolver>())
                 .ForMember(dto => dto.BeerStyles, conf => conf.ResolveUsing<HopBeerStylesResolver>())
+                .ForMember(dto => dto.Metadata, conf => conf.ResolveUsing<HopMetadataResolver>())
                 .ForMember(dto => dto.Substituts, conf => conf.MapFrom(rec => rec.Substituts));
 
 
@@ -67,6 +68,7 @@ namespace Microbrewit.Api.Mapper.Profile
                 .ForMember(dto => dto.OriginId, conf => conf.MapFrom(rec => rec.Origin.Id))
                 .ForMember(dto => dto.Flavours, conf => conf.ResolveUsing<HopPostFlavoursResolver>())
                 .ForMember(dto => dto.AromaWheels, conf => conf.MapFrom(rec => rec.AromaWheels))
+                .ForMember(dto => dto.Metadata, conf => conf.ResolveUsing<HopPostMetadataResolver>())
                 .ForMember(dto => dto.Substituts, conf => conf.ResolveUsing<SubstitutResolver>())
                 .ForMember(dto => dto.HopBeerStyles, conf => conf.ResolveUsing<HopBeerStylesPostResolver>());
 

@@ -48,6 +48,7 @@ namespace Microbrewit.Api.Model.Database
         public ICollection<Hop> Substituts { get; set; }
         public ICollection<HopBeerStyle> HopBeerStyles {get; set;}
         public IEnumerable<Source> Sources { get; set; }
+        public IEnumerable<Metadata> Metadata { get; set; }
         
         public override string ToString()
         {

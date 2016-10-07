@@ -42,6 +42,8 @@ namespace Microbrewit.Api.Model.DTOs
         public string Type => "hop";
         [JsonProperty("sources")]
         public IEnumerable<SourceDto> Sources { get; set; }
+        [JsonProperty("metadata")]
+        public IDictionary<string,string> Metadata { get; set; }
         [Required]
         [JsonProperty(PropertyName = "custom")]
         public bool Custom { get; set; }

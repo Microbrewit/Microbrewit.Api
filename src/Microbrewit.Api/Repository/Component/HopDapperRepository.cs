@@ -103,6 +103,7 @@ namespace Microbrewit.Api.Repository.Component
                   hop.AromaWheels = aromaWheels;
                 
                 hop.Sources = await GetHopSources(hop.HopId, connection);
+                hop.Metadata = await GetHopMetadata(hop.HopId,connection);
                 }
                 return hops.ToList();
             }
@@ -181,6 +182,7 @@ namespace Microbrewit.Api.Repository.Component
                 if (hopBeerStyles != null)
                     hop.HopBeerStyles = hopBeerStyles.ToList();
                 hop.Sources = await GetHopSources(hop.HopId,connection);
+                hop.Metadata = await GetHopMetadata(hop.HopId,connection);
                 return hop;
             }
         }
@@ -237,6 +239,7 @@ namespace Microbrewit.Api.Repository.Component
                         {
                             await InsertHopSources(hop,connection,transaction);
                         }
+                        await InsertHopMetadata(hop,connection,transaction);
                         transaction.Commit();
                     }
                     catch (Exception)
@@ -273,6 +276,7 @@ namespace Microbrewit.Api.Repository.Component
                         await UpdateAromaWheelAsync(connection, transaction, hop);
                         await UpdateHopBeerStyles(connection, transaction, hop);
                         await InsertHopSources(hop, connection, transaction);
+                        await InsertHopMetadata(hop, connection, transaction);
                         transaction.Commit();
                         return result;
                     }
@@ -428,7 +432,7 @@ namespace Microbrewit.Api.Repository.Component
                             new { HopId = hopId}, transaction);
         }
 
-          private async Task<Flavour> InsertFlavour(string name, DbConnection connection, DbTransaction transaction)
+        private async Task<Flavour> InsertFlavour(string name, DbConnection connection, DbTransaction transaction)
         {
             await connection.ExecuteAsync("INSERT INTO flavours (name) VALUES(@Name);", new {Name = name},transaction);
             var result = await connection.QueryAsync<Flavour>("SELECT flavour_id as FlavourId, name FROM flavours f WHERE name = @Name", new {Name = name});
@@ -453,6 +457,27 @@ namespace Microbrewit.Api.Repository.Component
             await connection.ExecuteAsync("DELETE FROM hop_flavours WHERE hop_id = @HopId",
                             new { HopId = hopId}, transaction);
         }
+
+        private async Task<IEnumerable<Metadata>> GetHopMetadata(int hopId, DbConnection connection)
+        {
+            return await connection.QueryAsync<Metadata>("SELECT hop_id AS Id, key, value FROM hop_metadata WHERE hop_id = @HopId", new {HopId = hopId});
+        }
+
+        private async Task DeleteHopMetadata(int hopId, DbConnection connection, DbTransaction transaction)
+        {
+            await connection.ExecuteAsync("DELETE FROM hop_metadata WHERE hop_id = @HopId",
+                            new { HopId = hopId}, transaction);
+        }
+
+        private async Task InsertHopMetadata(Hop hop, DbConnection connection, DbTransaction transaction)
+        {
+            await DeleteHopMetadata(hop.HopId, connection, transaction);
+            foreach (var metadata in hop?.Metadata)
+            {
+                   await connection.ExecuteAsync("INSERT INTO hop_metadata (hop_id, key, value) VALUES(@HopId,@Key,@Value);",new {hop.HopId, metadata.Key, metadata.Value},transaction);
+            }
+        }
+
 
     }
 }
