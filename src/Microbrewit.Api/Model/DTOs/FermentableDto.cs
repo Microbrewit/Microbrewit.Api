@@ -42,6 +42,8 @@ namespace Microbrewit.Api.Model.DTOs
         public bool AddAfterBoil { get; set; }
         [JsonProperty(PropertyName = "moisture")]
         public decimal Moisture { get; set; }
+        [JsonProperty(PropertyName = "coarseFineDiff")]
+        public decimal CoarseFineDiff { get; set; }
 
         [JsonProperty(PropertyName = "superFermentableId")]
         public int? SuperFermentableId { get; set; }
