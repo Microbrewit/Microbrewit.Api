@@ -20,8 +20,8 @@ namespace Microbrewit.Api.Model.DTOs
         public double Lovibond { get; set; }
         [JsonProperty(PropertyName = "ppg")]
         public int PPG { get; set; }
-        [JsonProperty(PropertyName = "flavourDescription")]
-        public string FlavourDescription { get; set; }
+        [JsonProperty(PropertyName = "note")]
+        public string Note { get; set; }
         [Required]
         [JsonProperty(PropertyName = "subType")]
         public string SubType { get; set; }
@@ -30,6 +30,8 @@ namespace Microbrewit.Api.Model.DTOs
         [Required]
         [JsonProperty(PropertyName = "custom")]
         public bool Custom { get; set; }
+        [JsonProperty(PropertyName = "mustMash")]
+        public bool MustMash { get; set; }
         [JsonProperty(PropertyName = "superFermentableId")]
         public int? SuperFermentableId { get; set; }
         [JsonProperty(PropertyName = "subFermentables")]
