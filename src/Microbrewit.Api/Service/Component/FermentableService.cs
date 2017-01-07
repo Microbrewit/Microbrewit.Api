@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microbrewit.Api.Elasticsearch.Interface;
@@ -75,6 +76,11 @@ namespace Microbrewit.Api.Service.Component
               var fermentables = await _fermentableRepository.GetAllAsync(0,int.MaxValue);
             var fermentableDtos = AutoMapper.Mapper.Map<IEnumerable<Fermentable>, IEnumerable<FermentableDto>>(fermentables);
             await _fermentableElasticsearch.UpdateAllAsync(fermentableDtos);
+        }
+
+        public Task ReIndexBySupplier(int supplierId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

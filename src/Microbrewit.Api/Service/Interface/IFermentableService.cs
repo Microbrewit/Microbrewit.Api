@@ -13,5 +13,7 @@ namespace Microbrewit.Api.Service.Interface
         Task UpdateAsync(FermentableDto fermentableDto);
         Task<IEnumerable<FermentableDto>> SearchAsync(string query, int from, int size);
         Task ReIndexElasticsearch();
+
+        Task ReIndexBySupplier(int supplierId);
     }
 }
