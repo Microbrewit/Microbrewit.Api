@@ -44,6 +44,8 @@ namespace Microbrewit.Api.Model.DTOs
         public decimal Moisture { get; set; }
         [JsonProperty(PropertyName = "coarseFineDiff")]
         public decimal CoarseFineDiff { get; set; }
+        [JsonProperty(PropertyName = "dryYield")]
+        public decimal DryYield { get; set; }
 
         [JsonProperty(PropertyName = "superFermentableId")]
         public int? SuperFermentableId { get; set; }

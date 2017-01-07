@@ -22,6 +22,7 @@ namespace Microbrewit.Api.Model.Database
         public bool AddAfterBoil { get; set; }
         public decimal Moisture { get; set; }
         public decimal CoarseFineDiff { get; set; }
+        public decimal DryYield { get; set; }
         public int? SuperFermentableId { get; set; }
         public Fermentable SuperFermentable { get; set; }
         public ICollection<Fermentable> SubFermentables { get; set; }

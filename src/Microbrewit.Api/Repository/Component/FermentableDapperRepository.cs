@@ -29,7 +29,7 @@ namespace Microbrewit.Api.Repository.Component
             {
                 var fermentables = await connection.QueryAsync<Fermentable, Supplier, Origin, Fermentable>(
                     "SELECT fermentable_id AS FermentableId, f.name, ebc, lovibond, ppg, note as Note, must_mash AS MustMash, max_in_batch AS MaxInBatch," +
-                    "protein, diastatic_power AS DiastaticPower, add_after_boil AS AddAfterBoil, moisture, coarse_fine_diff AS CoarseFineDiff, f.supplier_id AS SupplierId, type," +
+                    "protein, diastatic_power AS DiastaticPower, add_after_boil AS AddAfterBoil, moisture, coarse_fine_diff AS CoarseFineDiff, dry_yield AS DryYield f.supplier_id AS SupplierId, type," +
                     "custom, super_fermentable_id AS SuperFermentableId,f.created_date AS CreatedDate, updated_date As UpdatedDate, " +
                     "s.supplier_id AS SupplierId, s.name, s.origin_id AS OriginId, o.origin_id AS OriginId, o.name " +
                     "FROM fermentables f " +
@@ -76,7 +76,7 @@ namespace Microbrewit.Api.Repository.Component
             using (DbConnection connection = new NpgsqlConnection(_databaseSettings.DbConnection))
             {
                 var fermentableSql = "SELECT fermentable_id AS FermentableId, f.name, ebc, lovibond, ppg,note AS Note, must_mash AS MustMash, max_in_batch AS MaxInBatch," +
-                    "protein, diastatic_power AS DiastaticPower, add_after_boil as AddAfterBoil,moisture, coarse_fine_diff AS CoarseFineDiff, f.supplier_id AS SupplierId, type," +
+                    "protein, diastatic_power AS DiastaticPower, add_after_boil as AddAfterBoil,moisture, coarse_fine_diff AS CoarseFineDiff,dry_yield AS DryYield,f.supplier_id AS SupplierId, type," +
                     "custom, super_fermentable_id AS SuperFermentableId,f.created_date AS CreatedDate, updated_date As UpdatedDate, " +
                     "s.supplier_id AS SupplierId, s.name, s.origin_id AS OriginId, o.origin_id AS OriginId, o.name " +
                     "FROM fermentables f " +
@@ -132,8 +132,8 @@ namespace Microbrewit.Api.Repository.Component
                        fermentable.UpdatedDate = DateTime.Now;
                        fermentable.CreatedDate = DateTime.Now;                       
                        var result =
-                            await connection.ExecuteAsync("INSERT INTO fermentables(name,super_fermentable_id,EBC,Lovibond,PPG,supplier_id,Type,Custom,created_date,updated_date, note, must_mash, max_in_batch, protein, diastatic_power, add_after_boil, moisture, coarse_fine_diff) " +
-                                               "VALUES(@Name,@SuperFermentableId,@EBC,@Lovibond,@PPG,@SupplierId,@Type,@Custom,@CreatedDate,@UpdatedDate,@Note,@MustMash,@MaxInBatch, @Protein, @DiastaticPower, @AddAfterBoil, @Moisture, @CoarseFineDiff);", fermentable, transaction);
+                            await connection.ExecuteAsync("INSERT INTO fermentables(name,super_fermentable_id,EBC,Lovibond,PPG,supplier_id,Type,Custom,created_date,updated_date, note, must_mash, max_in_batch, protein, diastatic_power, add_after_boil, moisture, coarse_fine_diff, dry_yield) " +
+                                               "VALUES(@Name,@SuperFermentableId,@EBC,@Lovibond,@PPG,@SupplierId,@Type,@Custom,@CreatedDate,@UpdatedDate,@Note,@MustMash,@MaxInBatch, @Protein, @DiastaticPower, @AddAfterBoil, @Moisture, @CoarseFineDiff, @DryYield);", fermentable, transaction);
                         var fermentableId = await connection.QueryAsync<int>("SELECT last_value FROM fermentables_seq;");
                         fermentable.FermentableId = fermentableId.SingleOrDefault();
                         await AddFermentableFlavours(fermentable,connection,transaction);
@@ -189,7 +189,7 @@ namespace Microbrewit.Api.Repository.Component
                         fermentable.UpdatedDate = DateTime.Now;
                         var result = await connection.ExecuteAsync(
                                         "Update Fermentables set Name = @Name,super_fermentable_id = @SuperFermentableId,EBC = @EBC," + 
-                                        "Lovibond = @Lovibond,PPG= @PPG,supplier_id = @SupplierId,Type = @Type, Custom = @Custom, " +
+                                        "Lovibond = @Lovibond,PPG= @PPG,supplier_id = @SupplierId,Type = @Type, Custom = @Custom, dry_yield = @DryYield," +
                                         "updated_date = @UpdatedDate, note = @Note, must_mash = @MustMash, max_in_batch = @MaxInBatch, coarse_fine_diff = @CoarseFineDiff" +
                                         "protein = @Protein, diastatic_power = @DiastaticPower, add_after_boil = @AddAfterBoil, moisture = @Moisture " +
                                         "WHERE fermentable_id = @FermentableId;",
