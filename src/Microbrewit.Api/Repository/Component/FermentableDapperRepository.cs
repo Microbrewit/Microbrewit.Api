@@ -28,7 +28,7 @@ namespace Microbrewit.Api.Repository.Component
             using (DbConnection connection = new NpgsqlConnection(_databaseSettings.DbConnection))
             {
                 var fermentables = await connection.QueryAsync<Fermentable, Supplier, Origin, Fermentable>(
-                    "SELECT fermentable_id AS FermentableId, f.name, ebc, lovibond, ppg, note as Note, must_mash AS MustMash, f.supplier_id AS SupplierId, type," +
+                    "SELECT fermentable_id AS FermentableId, f.name, ebc, lovibond, ppg, note as Note, must_mash AS MustMash, max_in_batch AS MaxInBatch, f.supplier_id AS SupplierId, type," +
                     "custom, super_fermentable_id AS SuperFermentableId,f.created_date AS CreatedDate, updated_date As UpdatedDate, " +
                     "s.supplier_id AS SupplierId, s.name, s.origin_id AS OriginId, o.origin_id AS OriginId, o.name " +
                     "FROM fermentables f " +
@@ -74,7 +74,7 @@ namespace Microbrewit.Api.Repository.Component
         {
             using (DbConnection connection = new NpgsqlConnection(_databaseSettings.DbConnection))
             {
-                var fermentableSql = "SELECT fermentable_id AS FermentableId, f.name, ebc, lovibond, ppg,note AS Note, must_mash AS MustMash, f.supplier_id AS SupplierId, type," +
+                var fermentableSql = "SELECT fermentable_id AS FermentableId, f.name, ebc, lovibond, ppg,note AS Note, must_mash AS MustMash, max_in_batch AS MaxInBatch, f.supplier_id AS SupplierId, type," +
                     "custom, super_fermentable_id AS SuperFermentableId,f.created_date AS CreatedDate, updated_date As UpdatedDate, " +
                     "s.supplier_id AS SupplierId, s.name, s.origin_id AS OriginId, o.origin_id AS OriginId, o.name " +
                     "FROM fermentables f " +
@@ -130,8 +130,8 @@ namespace Microbrewit.Api.Repository.Component
                        fermentable.UpdatedDate = DateTime.Now;
                        fermentable.CreatedDate = DateTime.Now;                       
                        var result =
-                            await connection.ExecuteAsync("INSERT INTO fermentables(name,super_fermentable_id,EBC,Lovibond,PPG,supplier_id,Type,Custom,created_date,updated_date, note, must_mash) " +
-                                               "VALUES(@Name,@SuperFermentableId,@EBC,@Lovibond,@PPG,@SupplierId,@Type,@Custom,@CreatedDate,@UpdatedDate,@Note,@MustMash);", fermentable, transaction);
+                            await connection.ExecuteAsync("INSERT INTO fermentables(name,super_fermentable_id,EBC,Lovibond,PPG,supplier_id,Type,Custom,created_date,updated_date, note, must_mash, max_in_batch) " +
+                                               "VALUES(@Name,@SuperFermentableId,@EBC,@Lovibond,@PPG,@SupplierId,@Type,@Custom,@CreatedDate,@UpdatedDate,@Note,@MustMash,@MaxInBatch);", fermentable, transaction);
                         var fermentableId = await connection.QueryAsync<int>("SELECT last_value FROM fermentables_seq;");
                         fermentable.FermentableId = fermentableId.SingleOrDefault();
                         await AddFermentableFlavours(fermentable,connection,transaction);
@@ -188,7 +188,7 @@ namespace Microbrewit.Api.Repository.Component
                         var result = await connection.ExecuteAsync(
                                         "Update Fermentables set Name = @Name,super_fermentable_id = @SuperFermentableId,EBC = @EBC," + 
                                         "Lovibond = @Lovibond,PPG= @PPG,supplier_id = @SupplierId,Type = @Type, Custom = @Custom, " +
-                                        "updated_date = @UpdatedDate, note = @Note, must_mash = @MustMash " +
+                                        "updated_date = @UpdatedDate, note = @Note, must_mash = @MustMash, max_in_batch = @MaxInBatch" +
                                         "WHERE fermentable_id = @FermentableId;",
                                               fermentable, transaction);
                         await UpdateFermantableFlavours(fermentable,connection,transaction);

@@ -16,6 +16,7 @@ namespace Microbrewit.Api.Model.Database
         public string Type { get; set; }
         public bool Custom { get; set; }
         public bool MustMash { get; set; }
+        public int MaxInBatch { get; set; }
         public int? SuperFermentableId { get; set; }
         public Fermentable SuperFermentable { get; set; }
         public ICollection<Fermentable> SubFermentables { get; set; }

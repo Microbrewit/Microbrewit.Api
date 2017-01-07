@@ -43,6 +43,7 @@ namespace Microbrewit.Api.Mapper.Profile
                .ForMember(dto => dto.Type, conf => conf.MapFrom(rec => rec.SubType))
                .ForMember(dto => dto.Note, conf => conf.MapFrom(rec => rec.Note))
                .ForMember(dto => dto.MustMash, conf => conf.MapFrom(rec => rec.MustMash))
+               .ForMember(dto => dto.MaxInBatch, conf => conf.MapFrom(rec => rec.MaxInBatch))
                .ForMember(dto => dto.SupplierId, conf => conf.MapFrom(rec => rec.Supplier.Id))
                .ForMember(dto => dto.SuperFermentableId, conf => conf.MapFrom(rec => rec.SuperFermentableId))
                .ForMember(dto => dto.SubFermentables, conf => conf.MapFrom(rec => rec.SubFermentables))
