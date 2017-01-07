@@ -19,6 +19,8 @@ namespace Microbrewit.Api.Model.Database
         public int MaxInBatch { get; set; }
         public decimal Protein { get; set; }
         public decimal DiastaticPower { get; set; }
+        public bool AddAfterBoil { get; set; }
+        public decimal Moisture { get; set; }
         public int? SuperFermentableId { get; set; }
         public Fermentable SuperFermentable { get; set; }
         public ICollection<Fermentable> SubFermentables { get; set; }

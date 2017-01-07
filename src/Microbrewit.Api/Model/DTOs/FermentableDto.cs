@@ -38,6 +38,10 @@ namespace Microbrewit.Api.Model.DTOs
         public decimal Protein { get; set; }
         [JsonProperty(PropertyName = "diastaticPower")]
         public decimal DiastaticPower { get; set; }
+        [JsonProperty(PropertyName = "addAfterBoil")]
+        public bool AddAfterBoil { get; set; }
+        [JsonProperty(PropertyName = "moisture")]
+        public decimal Moisture { get; set; }
 
         [JsonProperty(PropertyName = "superFermentableId")]
         public int? SuperFermentableId { get; set; }
