@@ -34,6 +34,11 @@ namespace Microbrewit.Api.Model.DTOs
         public bool MustMash { get; set; }
         [JsonProperty(PropertyName = "maxInBatch")]
         public int MaxInBatch { get; set; }
+        [JsonProperty(PropertyName = "protein")]
+        public decimal Protein { get; set; }
+        [JsonProperty(PropertyName = "diastaticPower")]
+        public decimal DiastaticPower { get; set; }
+
         [JsonProperty(PropertyName = "superFermentableId")]
         public int? SuperFermentableId { get; set; }
         [JsonProperty(PropertyName = "subFermentables")]
