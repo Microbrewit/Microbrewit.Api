@@ -118,7 +118,7 @@ namespace Microbrewit.Api
             ApiConfiguration.ApiSettings = app.ApplicationServices.GetService<IOptions<ApiSettings>>().Value;
             app.UseCors(policy =>
             {
-                policy.WithOrigins("https://microbrew.it","http://microbrew.it", "http://localhost:3000");
+                policy.WithOrigins("https://microbrew.it","http://microbrew.it", "http://localhost:3000", "http://calc.asphaug.io");
                 policy.AllowAnyHeader();
                 policy.AllowAnyMethod();
             });
